@@ -91,7 +91,6 @@
                 android:textSize="18dp"
                 android:textColor="@color/blue"
                 android:drawableLeft="@drawable/icongg"
-
                 android:layout_marginTop="5dp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -11,15 +11,15 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="30dp"
-        android:gravity="center_horizontal"> <!-- Căn giữa ngang -->
+        android:gravity="center_horizontal">
 
-        <!-- Bố cục mới: ImageView bên trái, TextView giữa màn hình -->
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/icon_close"
+                android:id="@+id/img_Iconclose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/iconclose"
@@ -64,6 +64,7 @@
             android:textSize="16sp" />
 
         <com.chaos.view.PinView
+            android:id="@+id/pinv_Otpcode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
@@ -77,11 +78,36 @@
             app:itemWidth="50dp"
             app:lineColor="@color/blue"
             app:lineWidth="2dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bạn chưa nhận được mã OTP?"
+            android:textColor="@color/gray"
+            android:textSize="16sp"/>
+        <TextView
+            android:id="@+id/tvResendOtp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" RESEND OTP"
+            android:textStyle="bold"
+            android:textColor="@color/blue"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:id="@+id/btnLogin"
+            android:id="@+id/btnVerifyCode"
             android:text="Verify Code"
             android:textSize="18sp"
             android:layout_marginTop="20dp"

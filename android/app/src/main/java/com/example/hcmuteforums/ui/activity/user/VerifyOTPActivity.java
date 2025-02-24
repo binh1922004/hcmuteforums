@@ -1,6 +1,8 @@
 package com.example.hcmuteforums.ui.activity.user;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,15 +14,18 @@ import com.example.hcmuteforums.R;
 
 public class VerifyOTPActivity extends AppCompatActivity {
 
+    private ImageView imgClose;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_verify_otpactivity);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        imgClose = findViewById(R.id.img_Iconclose);
+        imgClose.setOnClickListener(view -> {
+            Intent intent = new Intent(VerifyOTPActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
+
     }
 }
