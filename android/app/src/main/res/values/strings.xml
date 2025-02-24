@@ -4,5 +4,5 @@
     <!--OTP Screen-->
     <string name="otp_code_text">Xác nhận OTP</string>
     <string name="otp_verification_text">Mã xác minh</string>
-    <string name="otp_description_text">Nhập mã OTP được gửi tới \n+Email</string>
+    <string name="otp_description_text">Nhập mã OTP được gửi tới \n%s</string>
 </resources>

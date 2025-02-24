@@ -50,7 +50,6 @@
                  android:text="Đăng kí tài khoản"
                  android:id="@+id/tvRegister"
                  android:textSize="30dp"
-
                  android:textStyle="bold"
                  android:textColor="@color/blue"/>
              <EditText
@@ -93,7 +92,7 @@
              <EditText
                  android:layout_width="match_parent"
                  android:layout_height="50dp"
-                 android:id="@+id/edtPassword"
+                 android:id="@+id/register_edtPassword"
                  android:background="@drawable/custom_edittext"
                  android:drawableLeft="@drawable/baseline_lock_24"
                  android:drawablePadding="8dp"
