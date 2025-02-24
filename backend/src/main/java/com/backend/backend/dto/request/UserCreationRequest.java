@@ -12,6 +12,5 @@ public class UserCreationRequest {
     String username;
     String password;
     String email;
-    String mssv;
     String fullName;
 }
