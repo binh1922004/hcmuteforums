@@ -1,4 +1,4 @@
-package com.example.hcmuteforums;
+package com.example.hcmuteforums.ui.activity.user;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,18 +10,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.hcmuteforums.ui.activity.user.LoginActivity;
+import com.example.hcmuteforums.R;
 
-public class MainActivity extends AppCompatActivity {
-    private Button btnPagelogin;
+public class RegisterActivity extends AppCompatActivity {
+    private Button btn_next;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        btnPagelogin =findViewById(R.id.btn_pagelogin);
-        btnPagelogin.setOnClickListener(v->{
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        setContentView(R.layout.activity_register);
+        btn_next = findViewById(R.id.btnNextOTP);
+        btn_next.setOnClickListener(v->{
+            Intent intent = new Intent(RegisterActivity.this, VerifyOTPActivity.class);
             startActivity(intent);
         });
     }
