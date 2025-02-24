@@ -37,4 +37,8 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
+    @Bean
+    public CustomJwtDecoder jwtDecoder() {
+        return new CustomJwtDecoder();
+    }
 }

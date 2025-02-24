@@ -1,6 +1,8 @@
 package com.backend.backend.service;
 
 import com.backend.backend.dto.request.UserCreationRequest;
+import com.backend.backend.exception.AppException;
+import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.UserMapper;
 import com.backend.backend.repository.UserRepository;
 import lombok.AccessLevel;
@@ -18,7 +20,7 @@ public class UserService {
     UserMapper userMapper;
     public boolean createUser(UserCreationRequest userCreationRequest) {
         if (userRepository.existsUserByUsername(userCreationRequest.getUsername())) {
-            return false;
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
         userCreationRequest.setPassword(passwordEncoder.encode(userCreationRequest.getPassword()));
         userRepository.save(userMapper.toUser(userCreationRequest));
