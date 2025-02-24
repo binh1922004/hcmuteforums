@@ -1,6 +1,7 @@
 package com.backend.backend.service;
 
 import com.backend.backend.dto.request.UserCreationRequest;
+import com.backend.backend.dto.request.UserUpdateRequest;
 import com.backend.backend.dto.response.UserResponse;
 import com.backend.backend.entity.User;
 import com.backend.backend.exception.AppException;
@@ -33,7 +34,6 @@ public class UserService {
     }
 
     public UserResponse getUserInfo(){
-        System.out.println("GO");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userRepository.findByUsername(username).orElseThrow(() ->
@@ -42,5 +42,13 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
+    public UserResponse updateUserInfo(UserUpdateRequest userUpdateRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
+                new AppException(ErrorCode.USER_NOTEXISTED));
+        userMapper.updateUser(user, userUpdateRequest);
 
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 }

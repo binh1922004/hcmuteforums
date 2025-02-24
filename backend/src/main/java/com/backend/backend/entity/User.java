@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Entity
 @Data
 @Builder
@@ -19,6 +21,12 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private String mssv;
     private String fullName;
+
+    //not need
+    private String mssv;
+    private String phone;
+    private Date dob;
+    private String address;
+    private String gender;
 }

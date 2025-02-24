@@ -1,17 +1,16 @@
-package com.backend.backend.dto.response;
+package com.backend.backend.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 
-@Data
 @Builder
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
-    String username;
+public class UserUpdateRequest {
     String fullName;
     String phone;
     Date dob;

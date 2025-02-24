@@ -2,6 +2,7 @@ package com.backend.backend.controller;
 
 import com.backend.backend.dto.ApiResponse;
 import com.backend.backend.dto.request.UserCreationRequest;
+import com.backend.backend.dto.request.UserUpdateRequest;
 import com.backend.backend.dto.response.UserResponse;
 import com.backend.backend.service.UserService;
 import lombok.AccessLevel;
@@ -27,6 +28,13 @@ public class UserController {
     public ApiResponse<UserResponse> myInfo() {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getUserInfo())
+                .build();
+    }
+
+    @PutMapping("/update")
+    public ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateUserInfo(userUpdateRequest))
                 .build();
     }
 }
