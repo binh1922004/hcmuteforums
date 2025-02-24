@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/iconback"
+        android:padding="5dp"
+        android:layout_alignParentTop="true"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/register"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:src="@drawable/logoUte" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HCMUTE Forums "
+        android:textSize="32dp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
+     <androidx.cardview.widget.CardView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="vertical"
+         android:layout_gravity="center"
+         android:background="@drawable/custom_edittext">
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical"
+             android:layout_gravity="center_horizontal"
+             android:padding="24dp">
+             <TextView
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:text="Đăng kí tài khoản"
+                 android:id="@+id/tvRegister"
+                 android:textSize="30dp"
+
+                 android:textStyle="bold"
+                 android:textColor="@color/blue"/>
+             <EditText
+                 android:id="@+id/register_edtFullname"
+                 android:layout_width="match_parent"
+                 android:layout_height="50dp"
+                 android:layout_marginTop="20dp"
+                 android:background="@drawable/custom_edittext"
+                 android:drawableLeft="@drawable/iconname"
+                 android:drawablePadding="8dp"
+                 android:hint="Fullname"
+                 android:padding="8dp"
+                 android:textColor="@color/black"
+                 android:textColorHighlight="@color/cardview_dark_background" />
+             <EditText
+                 android:id="@+id/register_edtEmail"
+                 android:layout_width="match_parent"
+                 android:layout_height="50dp"
+                 android:layout_marginTop="20dp"
+                 android:background="@drawable/custom_edittext"
+                 android:drawableLeft="@drawable/iconemail"
+                 android:drawablePadding="8dp"
+                 android:hint="Ẹmail"
+                 android:padding="8dp"
+                 android:textColor="@color/black"
+                 android:textColorHighlight="@color/cardview_dark_background" />
+             <EditText
+                 android:id="@+id/register_edtUsername"
+                 android:layout_width="match_parent"
+                 android:layout_height="50dp"
+                 android:layout_marginTop="20dp"
+                 android:background="@drawable/custom_edittext"
+                 android:drawableLeft="@drawable/baseline_person_24"
+                 android:drawablePadding="8dp"
+                 android:hint="Username"
+                 android:padding="8dp"
+                 android:textColor="@color/black"
+                 android:textColorHighlight="@color/cardview_dark_background" />
+
+             <com.google.android.material.textfield.TextInputLayout
+                 android:id="@+id/register_password"
+                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:hint="Password"
+                 android:layout_marginTop="20dp"
+                 android:textColorHint="@color/gray"
+                 app:boxStrokeColor="@color/black"
+                 app:boxStrokeWidthFocused="2dp"
+                 app:endIconTint="@color/black"
+                 app:hintTextColor="@color/black"
+                 app:passwordToggleEnabled="true"
+                 app:passwordToggleTint="@color/black"
+                 app:startIconDrawable="@drawable/baseline_lock_24"
+                 app:startIconTint="@color/black">
+
+
+                 <com.google.android.material.textfield.TextInputEditText
+                     android:layout_width="match_parent"
+                     android:layout_height="50dp"
+
+                     android:inputType="textPassword"
+                     android:textColor="@color/gray"
+                     android:background="@drawable/custom_edittext"
+                     android:paddingStart="45dp" /> <!-- Thêm padding bên trái -->
+
+
+
+             </com.google.android.material.textfield.TextInputLayout>
+
+             <Button
+                 android:layout_width="wrap_content"
+                 android:layout_height="50dp"
+                 android:id="@+id/btnNextOTP"
+                 android:text="Tiếp theo"
+                 android:textSize="18sp"
+                 android:layout_marginTop="20dp"
+                 android:backgroundTint="@color/blue"
+                 android:layout_gravity="end"
+                 app:cornerRadius = "20dp"
+                 android:drawableRight="@drawable/iconnext"
+                 />
+
+         </LinearLayout>
+     </androidx.cardview.widget.CardView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Bạn đã có tài khoản? Đăng nhập ngay"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            android:id="@+id/register_tvLogin"
+            android:textColor="@color/blue"
+            android:layout_marginBottom="20dp"/>
+</LinearLayout>
+</RelativeLayout>
