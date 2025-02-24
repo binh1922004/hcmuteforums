@@ -15,7 +15,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        android:src="@drawable/logoUte" />
+        android:src="@drawable/logoute" />
 
     <TextView
         android:layout_width="match_parent"

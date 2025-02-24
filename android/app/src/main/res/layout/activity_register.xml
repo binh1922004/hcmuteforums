@@ -21,7 +21,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        android:src="@drawable/logoUte" />
+        android:src="@drawable/logoute" />
 
     <TextView
         android:layout_width="match_parent"
@@ -89,36 +89,19 @@
                  android:textColor="@color/black"
                  android:textColorHighlight="@color/cardview_dark_background" />
 
-             <com.google.android.material.textfield.TextInputLayout
-                 android:id="@+id/register_password"
-                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+             <EditText
                  android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
+                 android:layout_height="50dp"
+                 android:id="@+id/edtPassword"
+                 android:background="@drawable/custom_edittext"
+                 android:drawableLeft="@drawable/baseline_lock_24"
+                 android:drawablePadding="8dp"
                  android:hint="Password"
-                 android:layout_marginTop="20dp"
-                 android:textColorHint="@color/gray"
-                 app:boxStrokeColor="@color/black"
-                 app:boxStrokeWidthFocused="2dp"
-                 app:endIconTint="@color/black"
-                 app:hintTextColor="@color/black"
-                 app:passwordToggleEnabled="true"
-                 app:passwordToggleTint="@color/black"
-                 app:startIconDrawable="@drawable/baseline_lock_24"
-                 app:startIconTint="@color/black">
-
-
-                 <com.google.android.material.textfield.TextInputEditText
-                     android:layout_width="match_parent"
-                     android:layout_height="50dp"
-
-                     android:inputType="textPassword"
-                     android:textColor="@color/gray"
-                     android:background="@drawable/custom_edittext"
-                     android:paddingStart="45dp" /> <!-- Thêm padding bên trái -->
-
-
-
-             </com.google.android.material.textfield.TextInputLayout>
+                 android:padding="8dp"
+                 android:inputType="textPassword"
+                 android:textColor="@color/black"
+                 android:textColorHighlight="@color/cardview_dark_background"
+                 android:layout_marginTop="20dp"/>
 
              <Button
                  android:layout_width="wrap_content"
