@@ -1,0 +1,16 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /ute
+
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/hcmuteforums"
+    username: root
+    password: 10040109
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+jwt:
+  signerKey: "b4ISo6+PT1fY8eppQ564SXabONN945cjuPYa0mTOmPrThHVxEnH7+xxE5RFJCqtk"
