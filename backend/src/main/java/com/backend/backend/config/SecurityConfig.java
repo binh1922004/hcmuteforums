@@ -16,10 +16,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINT = {"/api/users"};
+    private final String[] PUBLIC_ENDPOINT = {"/api/users", "/api/auth/login"};
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity, CustomJwtDecoder customJwtDecoder) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
                         //authorization for role admin to get users.
@@ -27,6 +27,9 @@ public class SecurityConfig {
                         //second, if use has role, system will find claim has ROLE_ in prefix:
 //                                .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
                         .anyRequest().authenticated());
+        httpSecurity.oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         //cai nay tu bat nen phai tat
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
