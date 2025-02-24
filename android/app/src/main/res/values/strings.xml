@@ -2,7 +2,7 @@
     <string name="app_name">HCMUTEForums</string>
 
     <!--OTP Screen-->
-    <string name="otp_code_text">Code</string>
-    <string name="otp_verification_text">Verification</string>
-    <string name="otp_description_text">Enter one more password send on\n+Email</string>
+    <string name="otp_code_text">Xác nhận OTP</string>
+    <string name="otp_verification_text">Mã xác minh</string>
+    <string name="otp_description_text">Nhập mã OTP được gửi tới \n+Email</string>
 </resources>

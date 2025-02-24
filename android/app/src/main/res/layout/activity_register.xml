@@ -60,7 +60,7 @@
                  android:background="@drawable/custom_edittext"
                  android:drawableLeft="@drawable/iconname"
                  android:drawablePadding="8dp"
-                 android:hint="Fullname"
+                 android:hint="Họ và tên"
                  android:padding="8dp"
                  android:textColor="@color/black"
                  android:textColorHighlight="@color/cardview_dark_background" />
@@ -84,7 +84,7 @@
                  android:background="@drawable/custom_edittext"
                  android:drawableLeft="@drawable/baseline_person_24"
                  android:drawablePadding="8dp"
-                 android:hint="Username"
+                 android:hint="Tên đăng nhập"
                  android:padding="8dp"
                  android:textColor="@color/black"
                  android:textColorHighlight="@color/cardview_dark_background" />
@@ -96,7 +96,7 @@
                  android:background="@drawable/custom_edittext"
                  android:drawableLeft="@drawable/baseline_lock_24"
                  android:drawablePadding="8dp"
-                 android:hint="Password"
+                 android:hint="Mật khẩu"
                  android:padding="8dp"
                  android:inputType="textPassword"
                  android:textColor="@color/black"
