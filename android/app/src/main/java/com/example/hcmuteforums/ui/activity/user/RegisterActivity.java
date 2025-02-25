@@ -41,12 +41,14 @@ public class RegisterActivity extends AppCompatActivity {
         imgBackLogin.setOnClickListener(view -> {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
 
         tvBackLogin = findViewById(R.id.register_tvBackLogin);
         tvBackLogin.setOnClickListener(view -> {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
         edt_fullname = findViewById(R.id.register_edtFullname);
         edt_email = findViewById(R.id.register_edtEmail);

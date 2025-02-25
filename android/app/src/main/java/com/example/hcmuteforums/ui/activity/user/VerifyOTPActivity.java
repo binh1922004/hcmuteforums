@@ -36,6 +36,7 @@ public class VerifyOTPActivity extends AppCompatActivity {
             pinView.requestFocus();
             Intent intent = new Intent(VerifyOTPActivity.this, RegisterActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
         });
     }
 }
