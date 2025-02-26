@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_bold"
                 android:includeFontPadding="false"
-                android:text="@string/otp_code_text"
+                android:text="Xác nhận mã otp"
                 android:textAllCaps="true"
                 android:textColor="@color/black"
                 android:textSize="30dp"
@@ -49,7 +49,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "@string/otp_verification_text"
+            android:text = "Mã xác minh"
             android:fontFamily="@font/roboto_bold"
             android:layout_marginTop="20dp"
             android:textSize="20dp"/>
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:includeFontPadding="false"
-            android:text="@string/otp_description_text"
+            android:text="Mã otp đã dược gửi tới:"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="16sp" />

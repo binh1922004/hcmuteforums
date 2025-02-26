@@ -1,10 +1,5 @@
 <resources>
     <string name="app_name">HCMUTEForums</string>
-
-    <!--OTP Screen-->
-    <string name="otp_code_text">Xác nh?n OTP</string>
-    <string name="otp_verification_text">Mã xác minh</string>
-    <string name="otp_description_text">Nh?p mã OTP du?c g?i t?i \n%s</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
