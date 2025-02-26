@@ -49,6 +49,7 @@ public class UserMainActivity extends AppCompatActivity {
     }
 
     private void bottomNavigationViewSetup(){
+        bottomNavigationView.setSelectedItemId(R.id.itemHome);
         bottomNavigationView.setOnItemSelectedListener(item -> {
            int itemId = item.getItemId();
            if (itemId == R.id.itemHome){
