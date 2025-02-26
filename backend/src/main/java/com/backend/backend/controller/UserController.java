@@ -2,14 +2,13 @@ package com.backend.backend.controller;
 
 import com.backend.backend.dto.ApiResponse;
 import com.backend.backend.dto.request.UserCreationRequest;
+import com.backend.backend.dto.request.UserUpdateRequest;
+import com.backend.backend.dto.response.UserResponse;
 import com.backend.backend.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,6 +21,20 @@ public class UserController {
     public ApiResponse<Boolean> createUser(@RequestBody UserCreationRequest userCreationRequest) {
         return ApiResponse.<Boolean>builder()
                 .result(userService.createUser(userCreationRequest))
+                .build();
+    }
+
+    @GetMapping("/myInfo")
+    public ApiResponse<UserResponse> myInfo() {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUserInfo())
+                .build();
+    }
+
+    @PutMapping("/update")
+    public ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateUserInfo(userUpdateRequest))
                 .build();
     }
 }

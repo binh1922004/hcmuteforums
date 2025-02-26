@@ -38,7 +38,9 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.pinview)
+    implementation(libs.fragment)
     testImplementation(libs.junit)
+    implementation(libs.material)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }

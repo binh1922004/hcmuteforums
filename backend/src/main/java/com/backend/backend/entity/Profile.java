@@ -13,20 +13,22 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Users")
-public class User {
+@Table(name = "profiles")
+public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String username;
-    private String password;
-    private String email;
-    private String fullName;
 
-    //not need
-    private String mssv;
-    private String phone;
-    private Date dob;
-    private String address;
-    private String gender;
+    private String bio;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "cover_url")
+    private String coverUrl;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 }
