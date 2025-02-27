@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINT = {"/api/users", "/api/auth/login"};
+    private final String[] PUBLIC_ENDPOINT = {"/api/users", "/api/auth/login", "/api/otp/get", "/api/otp/validate"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity, CustomJwtDecoder customJwtDecoder) throws Exception {
