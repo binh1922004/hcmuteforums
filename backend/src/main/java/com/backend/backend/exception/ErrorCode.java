@@ -15,6 +15,8 @@ public enum ErrorCode {
     UNAUTHENTICATED(1006, "Can not authenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not permission", HttpStatus.FORBIDDEN),
     DOB_INVALID(1008, "Your age must be a least {min}", HttpStatus.BAD_REQUEST),
+    EMAIL_EXISTED(1009, "Email existed", HttpStatus.BAD_REQUEST),
+    OTP_LIMIT_TIME(1010, "You need to wait 30s for new OTP", HttpStatus.BAD_REQUEST),
     ;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
