@@ -23,9 +23,11 @@ public class UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
+    OtpGenerator otpGenerator;
+
     public boolean createUser(UserCreationRequest userCreationRequest) {
-        if (userRepository.existsUserByUsername(userCreationRequest.getUsername())) {
-            throw new AppException(ErrorCode.USER_EXISTED);
+        if (!otpGenerator.checkTimeToRegister(userCreationRequest.getEmail())) {
+            return false;
         }
         userCreationRequest.setPassword(passwordEncoder.encode(userCreationRequest.getPassword()));
         userRepository.save(userMapper.toUser(userCreationRequest));

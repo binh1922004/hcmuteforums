@@ -18,7 +18,7 @@ public class OtpGenerator {
     private static final int THROTTLE_EXPIRY_MINUTES = 2;
     private static final String OTP_PREFIX = "otp:";
     private static final String THROTTLE_KEY_PREFIX = "throttle:";
-    private static final String EMAIL_PREFIX = "email:";
+    private static final String WAIT_REGISTER_PREFIX = "wait:";
 
     RedisTemplate<String, String> redisTemplate;
     Random random = new Random();
@@ -30,23 +30,33 @@ public class OtpGenerator {
 
         String otp = String.valueOf(100000 + random.nextInt(900000)); // 6-digit OTP
         String key = OTP_PREFIX + email;
-        String throttle_ey = THROTTLE_KEY_PREFIX + email;
+        String throttle_key = THROTTLE_KEY_PREFIX + email;
         //save otp to redis
         redisTemplate.opsForValue().set(key, otp, OTP_EXPIRY_MINUTES, TimeUnit.MINUTES);
-        redisTemplate.opsForValue().set(throttle_ey, "true", THROTTLE_EXPIRY_MINUTES, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(throttle_key, "true", THROTTLE_EXPIRY_MINUTES, TimeUnit.MINUTES);
         return otp;
     }
 
     public boolean verifyOtp(String email, String otp) {
         String key = OTP_PREFIX + email;
+        String throttle_ey = THROTTLE_KEY_PREFIX + email;
         String storedOtp = redisTemplate.opsForValue().get(key);
         if (storedOtp != null && storedOtp.equals(otp)) {
+            //delete old key
             redisTemplate.delete(key);
-            String newKey = EMAIL_PREFIX + email;
+            if (redisTemplate.opsForValue().get(throttle_ey) != null)
+                redisTemplate.delete(throttle_ey);
+
+            String newKey = WAIT_REGISTER_PREFIX + email;
             redisTemplate.opsForValue().set(newKey, email, THROTTLE_EXPIRY_MINUTES, TimeUnit.MINUTES);
             return true;
         }
         return false;
+    }
+
+    public boolean checkTimeToRegister(String email) {
+        String key = WAIT_REGISTER_PREFIX + email;
+        return redisTemplate.opsForValue().get(key) != null;
     }
 
 }
