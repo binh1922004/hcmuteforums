@@ -64,6 +64,22 @@
                  android:padding="8dp"
                  android:textColor="@color/black"
                  android:textColorHighlight="@color/cardview_dark_background" />
+
+             <EditText
+                 android:id="@+id/register_etDOB"
+                 android:layout_width="match_parent"
+                 android:layout_height="50dp"
+                 android:padding="8dp"
+                 android:layout_marginTop="20dp"
+                 android:background="@drawable/custom_edittext"
+                 android:drawableLeft="@drawable/icondate"
+                 android:drawablePadding="8dp"
+                 android:hint="Nhập ngày sinh (dd/MM/yyyy)"
+                 android:textColor="@color/black"
+                 android:textColorHighlight="@color/cardview_dark_background"
+                 android:focusable="false"
+                 android:clickable="true"
+                 android:inputType="none"/>
              <EditText
                  android:id="@+id/register_edtEmail"
                  android:layout_width="match_parent"
