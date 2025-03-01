@@ -1,10 +1,5 @@
 <resources>
     <string name="app_name">HCMUTEForums</string>
-
-    <!--OTP Screen-->
-    <string name="otp_code_text">Code</string>
-    <string name="otp_verification_text">Verification</string>
-    <string name="otp_description_text">Enter one more password send on\n+Email</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
