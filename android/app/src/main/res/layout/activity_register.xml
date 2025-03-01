@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
+        android:id="@+id/imgBackLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/iconback"
@@ -49,7 +50,6 @@
                  android:text="Đăng kí tài khoản"
                  android:id="@+id/tvRegister"
                  android:textSize="30dp"
-
                  android:textStyle="bold"
                  android:textColor="@color/blue"/>
              <EditText
@@ -60,10 +60,26 @@
                  android:background="@drawable/custom_edittext"
                  android:drawableLeft="@drawable/iconname"
                  android:drawablePadding="8dp"
-                 android:hint="Fullname"
+                 android:hint="Họ và tên"
                  android:padding="8dp"
                  android:textColor="@color/black"
                  android:textColorHighlight="@color/cardview_dark_background" />
+
+             <EditText
+                 android:id="@+id/register_etDOB"
+                 android:layout_width="match_parent"
+                 android:layout_height="50dp"
+                 android:padding="8dp"
+                 android:layout_marginTop="20dp"
+                 android:background="@drawable/custom_edittext"
+                 android:drawableLeft="@drawable/icondate"
+                 android:drawablePadding="8dp"
+                 android:hint="Nhập ngày sinh (dd/MM/yyyy)"
+                 android:textColor="@color/black"
+                 android:textColorHighlight="@color/cardview_dark_background"
+                 android:focusable="false"
+                 android:clickable="true"
+                 android:inputType="none"/>
              <EditText
                  android:id="@+id/register_edtEmail"
                  android:layout_width="match_parent"
@@ -84,7 +100,7 @@
                  android:background="@drawable/custom_edittext"
                  android:drawableLeft="@drawable/baseline_person_24"
                  android:drawablePadding="8dp"
-                 android:hint="Username"
+                 android:hint="Tên đăng nhập"
                  android:padding="8dp"
                  android:textColor="@color/black"
                  android:textColorHighlight="@color/cardview_dark_background" />
@@ -92,11 +108,11 @@
              <EditText
                  android:layout_width="match_parent"
                  android:layout_height="50dp"
-                 android:id="@+id/edtPassword"
+                 android:id="@+id/register_edtPassword"
                  android:background="@drawable/custom_edittext"
                  android:drawableLeft="@drawable/baseline_lock_24"
                  android:drawablePadding="8dp"
-                 android:hint="Password"
+                 android:hint="Mật khẩu"
                  android:padding="8dp"
                  android:inputType="textPassword"
                  android:textColor="@color/black"
@@ -125,7 +141,7 @@
             android:text="Bạn đã có tài khoản? Đăng nhập ngay"
             android:textSize="14sp"
             android:textAlignment="center"
-            android:id="@+id/register_tvLogin"
+            android:id="@+id/register_tvBackLogin"
             android:textColor="@color/blue"
             android:layout_marginBottom="20dp"/>
 </LinearLayout>
