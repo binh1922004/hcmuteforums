@@ -3,6 +3,8 @@ package com.backend.backend.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @Builder
 @Data
 @AllArgsConstructor
@@ -13,4 +15,5 @@ public class UserCreationRequest {
     String password;
     String email;
     String fullName;
+    Date dob;
 }
