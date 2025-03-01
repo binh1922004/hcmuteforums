@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.ui.activity.user;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -16,11 +17,16 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.hcmuteforums.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 public class RegisterActivity extends AppCompatActivity {
     private Button btn_next;
     private ImageView imgBackLogin;
     private TextView tvBackLogin;
-    private EditText edt_fullname, edt_email, edt_username, edt_password;
+    private EditText edt_fullname, edt_email, edt_username, edt_password, etDateOfBirth;
+    private final Calendar calendar = Calendar.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -54,6 +60,8 @@ public class RegisterActivity extends AppCompatActivity {
         edt_email = findViewById(R.id.register_edtEmail);
         edt_username = findViewById(R.id.register_edtUsername);
         edt_password = findViewById(R.id.register_edtPassword);
+        etDateOfBirth = findViewById(R.id.register_etDOB);
+        etDateOfBirth.setOnClickListener(v -> showDatePickerDialog());
 
     }
     private boolean validateInput() {
@@ -61,10 +69,15 @@ public class RegisterActivity extends AppCompatActivity {
         String email = edt_email.getText().toString().trim();
         String username = edt_username.getText().toString().trim();
         String password = edt_password.getText().toString().trim();
+        String dateOfBirth = etDateOfBirth.getText().toString().trim();
 
         if (fullname.isEmpty()) {
             edt_fullname.setError("Họ tên không được để trống");
             edt_fullname.requestFocus();
+            return false;
+        }if (dateOfBirth.isEmpty()) {
+            etDateOfBirth.setError("Ngày sinh không được để trống");
+            etDateOfBirth.requestFocus();
             return false;
         }
 
@@ -87,5 +100,15 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+    private void showDatePickerDialog() {
+        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.MONTH, month);
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            etDateOfBirth.setText(dateFormat.format(calendar.getTime()));
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 }
