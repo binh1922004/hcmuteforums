@@ -1,5 +1,6 @@
 package com.backend.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +19,6 @@ public class SubCategory {
     private String name;
 
     @ManyToOne
+    @JsonIgnore
     private Category category;
 }
