@@ -7,6 +7,8 @@ import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -26,6 +28,8 @@ public class RegisterActivity extends AppCompatActivity {
     private ImageView imgBackLogin;
     private TextView tvBackLogin;
     private EditText edt_fullname, edt_email, edt_username, edt_password, etDateOfBirth;
+    private RadioGroup rgGender;
+    private RadioButton rbMale, rbFemale ,rbOther;
     private final Calendar calendar = Calendar.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,9 @@ public class RegisterActivity extends AppCompatActivity {
         edt_password = findViewById(R.id.register_edtPassword);
         etDateOfBirth = findViewById(R.id.register_etDOB);
         etDateOfBirth.setOnClickListener(v -> showDatePickerDialog());
+        rgGender = findViewById(R.id.rg_gender);
+        rbMale = findViewById(R.id.rb_male);
+        rbFemale = findViewById(R.id.rb_female);
 
     }
     private boolean validateInput() {
@@ -70,6 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
         String username = edt_username.getText().toString().trim();
         String password = edt_password.getText().toString().trim();
         String dateOfBirth = etDateOfBirth.getText().toString().trim();
+        String gender = getSelectedGender();
 
         if (fullname.isEmpty()) {
             edt_fullname.setError("Họ tên không được để trống");
@@ -98,6 +106,9 @@ public class RegisterActivity extends AppCompatActivity {
             edt_password.requestFocus();
             return false;
         }
+        if (gender.isEmpty()) {
+            return false;
+        }
 
         return true;
     }
@@ -110,5 +121,15 @@ public class RegisterActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             etDateOfBirth.setText(dateFormat.format(calendar.getTime()));
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+    // Hàm lấy giới tính từ RadioGroup
+    private String getSelectedGender() {
+        int selectedId = rgGender.getCheckedRadioButtonId();
+        if (selectedId == R.id.rb_male) {
+            return "Nam";
+        } else if (selectedId == R.id.rb_female) {
+            return "Nữ";
+        }
+        return "Khác";
     }
 }

@@ -80,6 +80,49 @@
                  android:focusable="false"
                  android:clickable="true"
                  android:inputType="none"/>
+             <LinearLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="50dp"
+                 android:layout_marginTop="20dp"
+                 android:background="@drawable/custom_edittext"
+                 android:padding="8dp"
+                 android:gravity="center_vertical"
+                 android:orientation="horizontal">
+
+                 <!-- Icon giống EditText -->
+                 <ImageView
+                     android:layout_width="24dp"
+                     android:layout_height="24dp"
+                     android:src="@drawable/icongender"
+                     android:layout_marginEnd="8dp"
+                     android:contentDescription="Icon giới tính" />
+
+                 <!-- RadioGroup -->
+                 <RadioGroup
+                     android:id="@+id/rg_gender"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:orientation="horizontal">
+
+                     <RadioButton
+                         android:id="@+id/rb_male"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="Nam" />
+
+                     <RadioButton
+                         android:id="@+id/rb_female"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="Nữ"
+                         />
+                     <RadioButton
+                         android:id="@+id/rb_other"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="Khác"/>
+                 </RadioGroup>
+             </LinearLayout>
              <EditText
                  android:id="@+id/register_edtEmail"
                  android:layout_width="match_parent"
