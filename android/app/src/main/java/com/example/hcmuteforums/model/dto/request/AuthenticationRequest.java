@@ -1,15 +1,15 @@
 package com.example.hcmuteforums.model.dto.request;
 
 public class AuthenticationRequest {
-    private String login;
+    private String username;
     private String password;
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -21,7 +21,7 @@ public class AuthenticationRequest {
     }
 
     public AuthenticationRequest(String login, String password) {
-        this.login = login;
+        this.username = login;
         this.password = password;
     }
 }

@@ -9,7 +9,7 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface AuthenticationApi {
-    @POST("/api/auth/login")
+    @POST("api/auth/login")
     public Call<ApiResponse<AuthenticationResponse>> login(@Body AuthenticationRequest authenticationRequest);
 
 }
