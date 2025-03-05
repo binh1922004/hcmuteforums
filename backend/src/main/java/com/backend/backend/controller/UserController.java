@@ -4,6 +4,7 @@ import com.backend.backend.dto.ApiResponse;
 import com.backend.backend.dto.request.UserCreationRequest;
 import com.backend.backend.dto.request.UserUpdateRequest;
 import com.backend.backend.dto.response.UserResponse;
+import com.backend.backend.service.OtpService;
 import com.backend.backend.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class UserController {
 
     @PostMapping
     public ApiResponse<Boolean> createUser(@RequestBody UserCreationRequest userCreationRequest) {
+
         return ApiResponse.<Boolean>builder()
                 .result(userService.createUser(userCreationRequest))
                 .build();
