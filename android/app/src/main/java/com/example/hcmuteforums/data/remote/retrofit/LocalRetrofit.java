@@ -10,11 +10,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LocalRetrofit {
     private Retrofit retrofit;
-    public LocalRetrofit(Context context){
-        initializeRetrofit(context);
+    public LocalRetrofit(){
+        initializeRetrofit();
     }
 
-    private void initializeRetrofit(Context context) {
+    private void initializeRetrofit() {
         OkHttpClient client = new OkHttpClient().newBuilder()
 //                .addInterceptor(new AuthInterceptor(context))
                 .build();

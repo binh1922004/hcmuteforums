@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.data.remote.api.AuthenticationApi;
@@ -21,6 +23,7 @@ import com.example.hcmuteforums.model.ApiResponse;
 import com.example.hcmuteforums.model.dto.request.AuthenticationRequest;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
 import com.example.hcmuteforums.utils.ApiErrorHandler;
+import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtUsername, edtpassword;
     private Button btnLogin;
 
+    private AuthenticationViewModel authenticationViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +48,8 @@ public class LoginActivity extends AppCompatActivity {
         edtpassword = findViewById(R.id.edtPassword);
         btnLogin = findViewById(R.id.btnLogin);
 
+        //
+        authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
         //function for event handler
         loginButton();
 
@@ -70,37 +77,26 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginButton(){
         btnLogin.setOnClickListener(v -> {
-            LocalRetrofit retrofit = new LocalRetrofit(this);
-            AuthenticationApi authenticationApi = retrofit.getRetrofit().create(AuthenticationApi.class);
-
             String username = edtUsername.getText().toString().trim();
             String password = edtpassword.getText().toString().trim();
-            AuthenticationRequest authenticationRequest = new AuthenticationRequest(username, password);
-            authenticationApi.login(authenticationRequest).enqueue(new Callback<ApiResponse<AuthenticationResponse>>() {
-                @Override
-                public void onResponse(Call<ApiResponse<AuthenticationResponse>> call, Response<ApiResponse<AuthenticationResponse>> response) {
-                    ApiResponse<?> apiResp;
-                    if (response.isSuccessful() && response.body() != null){
-                        apiResp = response.body();
-                    }
-                    else{
-                        apiResp = ApiErrorHandler.parseError(response);
-                    }
-
-                    if (apiResp.getCode() == 200){
-                        Toast.makeText(LoginActivity.this, "Thanh cong", Toast.LENGTH_SHORT).show();
-                    }
-                    else{
-                        Toast.makeText(LoginActivity.this, apiResp.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ApiResponse<AuthenticationResponse>> call, Throwable throwable) {
-                    Log.d("Loi", throwable.getMessage());
-                    Toast.makeText(LoginActivity.this, "Da co loi xay ra", Toast.LENGTH_SHORT).show();
-                }
-            });
+            authenticationViewModel.login(username, password);
         });
-    }
+
+        authenticationViewModel.getLoginResponse().observe(this, new Observer<ApiResponse<AuthenticationResponse>>() {
+            @Override
+            public void onChanged(ApiResponse<AuthenticationResponse> response) {
+                if (response != null) {
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        authenticationViewModel.getLoginError().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isError) {
+                if (isError) {
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thất bại!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });    }
 }
