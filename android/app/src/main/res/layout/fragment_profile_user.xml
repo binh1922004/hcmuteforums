@@ -13,20 +13,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#f2f1f6"
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:clipToPadding="true"
-                android:clipChildren="true"
                 android:background="@color/darkBlue">
 
                 <TextView
@@ -44,11 +40,9 @@
                 <ImageView
                     android:id="@+id/imageView6"
                     android:layout_width="wrap_content"
-                    android:layout_height="51.5dp"
-                    android:src="@drawable/arc_3"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/arc"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
                 <ImageView
                     android:id="@+id/imageView7"
@@ -87,31 +81,31 @@
                 android:id="@+id/textView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Tên đăng nhập của bạn"
                 android:textAlignment="center"
-                android:textColor="@color/darkBlue"
+                android:text="Tên đăng nhập của bạn"
                 android:textSize="25sp"
+                android:textColor="@color/darkBlue"
                 android:textStyle="bold"
+                android:layout_marginTop="8dp"
                 app:layout_constraintTop_toBottomOf="@+id/imageView6" />
 
             <TextView
                 android:id="@+id/textView6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Mail của bạn"
                 android:textAlignment="center"
                 android:textSize="15sp"
+                android:text="Mail của bạn"
 
                 />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="32dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_height="match_parent">
 
 
                 <ImageView
@@ -128,9 +122,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="14dp"
                     android:text="Chỉnh sửa thông tin"
+                    android:textStyle="bold"
                     android:textColor="@color/darkBlue"
                     android:textSize="20sp"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView13"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -145,14 +139,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="32dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_height="match_parent">
 
 
                 <ImageView
@@ -169,9 +162,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="14dp"
                     android:text="Bài viết của bạn"
+                    android:textStyle="bold"
                     android:textColor="@color/darkBlue"
                     android:textSize="20sp"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView11"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -186,14 +179,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="32dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_height="match_parent">
 
 
                 <ImageView
@@ -210,9 +202,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="14dp"
                     android:text="Bài viết yêu thích"
+                    android:textStyle="bold"
                     android:textColor="@color/darkBlue"
                     android:textSize="20sp"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView21"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -227,14 +219,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="32dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_height="match_parent">
 
 
                 <ImageView
@@ -251,9 +242,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="14dp"
                     android:text="Cài đặt"
+                    android:textStyle="bold"
                     android:textColor="@color/darkBlue"
                     android:textSize="20sp"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView16"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -268,14 +259,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="32dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_height="match_parent">
 
 
                 <ImageView
@@ -292,15 +282,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="14dp"
                     android:text="Đăng xuất"
+                    android:textStyle="bold"
                     android:textColor="@color/darkBlue"
                     android:textSize="20sp"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView9"
                     app:layout_constraintTop_toTopOf="parent" />
 
 
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
         </LinearLayout>
