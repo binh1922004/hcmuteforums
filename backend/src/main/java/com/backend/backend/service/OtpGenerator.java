@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OtpGenerator {
     private static final int OTP_EXPIRY_MINUTES = 5;
-    private static final int THROTTLE_EXPIRY_MINUTES = 2;
+    private static final int THROTTLE_EXPIRY_MINUTES = 30;
     private static final String OTP_PREFIX = "otp:";
     private static final String THROTTLE_KEY_PREFIX = "throttle:";
     private static final String WAIT_REGISTER_PREFIX = "wait:";
@@ -33,7 +33,7 @@ public class OtpGenerator {
         String throttle_key = THROTTLE_KEY_PREFIX + email;
         //save otp to redis
         redisTemplate.opsForValue().set(key, otp, OTP_EXPIRY_MINUTES, TimeUnit.MINUTES);
-        redisTemplate.opsForValue().set(throttle_key, "true", THROTTLE_EXPIRY_MINUTES, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(throttle_key, "true", THROTTLE_EXPIRY_MINUTES, TimeUnit.SECONDS);
         return otp;
     }
 
