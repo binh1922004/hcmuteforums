@@ -47,16 +47,10 @@ public class OtpGenerator {
             if (redisTemplate.opsForValue().get(throttle_ey) != null)
                 redisTemplate.delete(throttle_ey);
 
-            String newKey = WAIT_REGISTER_PREFIX + email;
-            redisTemplate.opsForValue().set(newKey, email, THROTTLE_EXPIRY_MINUTES, TimeUnit.MINUTES);
             return true;
         }
         return false;
     }
 
-    public boolean checkTimeToRegister(String email) {
-        String key = WAIT_REGISTER_PREFIX + email;
-        return redisTemplate.opsForValue().get(key) != null;
-    }
 
 }

@@ -6,9 +6,9 @@ server:
 spring:
   mail:
     username: hcmutesending@gmail.com
-    password: nbis htol vsck fyav
+    password: bbut pbzy uiva pged
     properties:
-      ®®mail.smtp.auth: true
+      mail.smtp.auth: true
       mail.smtp.starttls.enable: true
     host: smtp.gmail.com
     port: 587

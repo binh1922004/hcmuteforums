@@ -10,14 +10,18 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.viewmodel.RegisterViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,24 +34,34 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText edt_fullname, edt_email, edt_username, edt_password, etDateOfBirth;
     private RadioGroup rgGender;
     private RadioButton rbMale, rbFemale ,rbOther;
+
+
+    RegisterViewModel registerViewModel;
+
     private final Calendar calendar = Calendar.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
+        //mapping
         setContentView(R.layout.activity_register);
         btn_next = findViewById(R.id.btnNextOTP);
-        btn_next.setOnClickListener(v->{
-            if(validateInput()) {
-                String email = edt_email.getText().toString();
-                Intent intent = new Intent(RegisterActivity.this, VerifyOTPActivity.class);
-                intent.putExtra("Email", email);
-                startActivity(intent);
-            }
-        });
-
         imgBackLogin = findViewById(R.id.imgBackLogin);
+        edt_fullname = findViewById(R.id.register_edtFullname);
+        edt_email = findViewById(R.id.register_edtEmail);
+        edt_username = findViewById(R.id.register_edtUsername);
+        edt_password = findViewById(R.id.register_edtPassword);
+        etDateOfBirth = findViewById(R.id.register_etDOB);
+        etDateOfBirth.setOnClickListener(v -> showDatePickerDialog());
+        rgGender = findViewById(R.id.rg_gender);
+        rbMale = findViewById(R.id.rb_male);
+        rbFemale = findViewById(R.id.rb_female);
+        //viewmodel
+        registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
+
+        //event handler
         imgBackLogin.setOnClickListener(view -> {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
@@ -60,17 +74,44 @@ public class RegisterActivity extends AppCompatActivity {
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
-        edt_fullname = findViewById(R.id.register_edtFullname);
-        edt_email = findViewById(R.id.register_edtEmail);
-        edt_username = findViewById(R.id.register_edtUsername);
-        edt_password = findViewById(R.id.register_edtPassword);
-        etDateOfBirth = findViewById(R.id.register_etDOB);
-        etDateOfBirth.setOnClickListener(v -> showDatePickerDialog());
-        rgGender = findViewById(R.id.rg_gender);
-        rbMale = findViewById(R.id.rb_male);
-        rbFemale = findViewById(R.id.rb_female);
+
+        registerEvent();
 
     }
+
+    private void registerEvent() {
+        btn_next.setOnClickListener(v->{
+            if(validateInput()) {
+                String email = edt_email.getText().toString();
+                String username = edt_username.getText().toString();
+                registerViewModel.sendOtp(email, username);
+            }
+        });
+
+        registerViewModel.getSendOtpResponse().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isSent) {
+                Intent intent = new Intent(RegisterActivity.this, VerifyOTPActivity.class);
+                intent.putExtra("Email", "binh123");
+                startActivity(intent);
+            }
+        });
+
+        registerViewModel.getMessageError().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                Toast.makeText(RegisterActivity.this, s, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        registerViewModel.getSendOtpError().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Toast.makeText(RegisterActivity.this, "Da co loi xay ra", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private boolean validateInput() {
         String fullname = edt_fullname.getText().toString().trim();
         String email = edt_email.getText().toString().trim();
