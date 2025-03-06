@@ -1,4 +1,4 @@
-package com.example.hcmuteforums.model;
+package com.example.hcmuteforums.model.dto;
 
 
 public class ApiResponse<T> {

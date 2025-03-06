@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.hcmuteforums.data.repository.AuthenticationRepository;
-import com.example.hcmuteforums.model.ApiResponse;
+import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
 
 public class AuthenticationViewModel extends ViewModel {

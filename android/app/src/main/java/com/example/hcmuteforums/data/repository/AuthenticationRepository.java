@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.hcmuteforums.data.remote.api.AuthenticationApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
-import com.example.hcmuteforums.model.ApiResponse;
+import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.request.AuthenticationRequest;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
 import com.example.hcmuteforums.utils.ApiErrorHandler;

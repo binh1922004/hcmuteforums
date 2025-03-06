@@ -1,6 +1,6 @@
 package com.example.hcmuteforums.utils;
 
-import com.example.hcmuteforums.model.ApiResponse;
+import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.google.gson.Gson;
 
 import retrofit2.Response;

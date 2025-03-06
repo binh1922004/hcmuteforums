@@ -1,6 +1,6 @@
 package com.example.hcmuteforums.data.remote.api;
 
-import com.example.hcmuteforums.model.ApiResponse;
+import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.request.AuthenticationRequest;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
 
