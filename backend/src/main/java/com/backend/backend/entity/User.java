@@ -23,10 +23,10 @@ public class User {
     private String email;
     private Date dob;
     private String fullName;
-
+    private String gender;
     //not need
     private String mssv;
     private String phone;
     private String address;
-    private String gender;
+
 }
