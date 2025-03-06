@@ -50,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //
         authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
+
         //function for event handler
         loginButton();
 
@@ -77,9 +78,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginButton(){
         btnLogin.setOnClickListener(v -> {
-            String username = edtUsername.getText().toString().trim();
-            String password = edtpassword.getText().toString().trim();
-            authenticationViewModel.login(username, password);
+            if (validateInput()){
+                String username = edtUsername.getText().toString().trim();
+                String password = edtpassword.getText().toString().trim();
+                authenticationViewModel.login(username, password);
+            }
         });
 
         authenticationViewModel.getLoginResponse().observe(this, new Observer<ApiResponse<AuthenticationResponse>>() {
