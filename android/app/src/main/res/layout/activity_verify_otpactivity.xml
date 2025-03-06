@@ -109,7 +109,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:id="@+id/btnVerifyCode"
+            android:id="@+id/btnVerifyOtp"
             android:text="Verify Code"
             android:textSize="18sp"
             android:layout_marginTop="20dp"

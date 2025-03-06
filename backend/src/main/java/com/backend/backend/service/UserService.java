@@ -23,12 +23,13 @@ public class UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
-    OtpGenerator otpGenerator;
+    OtpService otpService;
 
     public boolean createUser(UserCreationRequest userCreationRequest) {
-        if (!otpGenerator.checkTimeToRegister(userCreationRequest.getEmail())) {
+        if (!otpService.validateOtp(userCreationRequest.getEmail(), userCreationRequest.getOtp())){
             return false;
         }
+
         userCreationRequest.setPassword(passwordEncoder.encode(userCreationRequest.getPassword()));
         userRepository.save(userMapper.toUser(userCreationRequest));
 

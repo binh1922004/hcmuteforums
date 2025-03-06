@@ -2,22 +2,29 @@ package com.example.hcmuteforums.ui.activity.user;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.model.dto.ApiResponse;
+import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
+import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
 
     private TextView tvRegister;
     private EditText edtUsername, edtpassword;
+    private Button btnLogin;
+
+    private AuthenticationViewModel authenticationViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +34,14 @@ public class LoginActivity extends AppCompatActivity {
         tvRegister = findViewById(R.id.tvRegister);
         edtUsername = findViewById(R.id.edtUsername);
         edtpassword = findViewById(R.id.edtPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+
+        //
+        authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
+
+        //function for event handler
+        loginButton();
+
         tvRegister.setOnClickListener(v->{
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
@@ -48,4 +63,31 @@ public class LoginActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    private void loginButton(){
+        btnLogin.setOnClickListener(v -> {
+            if (validateInput()){
+                String username = edtUsername.getText().toString().trim();
+                String password = edtpassword.getText().toString().trim();
+                authenticationViewModel.login(username, password);
+            }
+        });
+
+        authenticationViewModel.getLoginResponse().observe(this, new Observer<ApiResponse<AuthenticationResponse>>() {
+            @Override
+            public void onChanged(ApiResponse<AuthenticationResponse> response) {
+                if (response != null) {
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        authenticationViewModel.getLoginError().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isError) {
+                if (isError) {
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thất bại!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });    }
 }
