@@ -21,6 +21,7 @@ public class OtpRepository {
     private MutableLiveData<Boolean> sendOtpError;
     private MutableLiveData<Boolean> sendOtpResponse;
     private MutableLiveData<String> messageError;
+    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
     public static OtpRepository getInstance(){
         if (instance == null)
@@ -35,6 +36,7 @@ public class OtpRepository {
         messageError = new MutableLiveData<>();
     }
     public void sendOtp(String email, String username){
+        isLoading.setValue(true);
         OtpRequest otpRequest = new OtpRequest(email, username);
         otpApi.sendOtp(otpRequest).enqueue(new Callback<ApiResponse<Boolean>>() {
             @Override
@@ -58,14 +60,15 @@ public class OtpRepository {
                     else {
                         sendOtpError.setValue(true);
                     }
-
                 }
+                isLoading.setValue(false);
             }
 
             @Override
             public void onFailure(Call<ApiResponse<Boolean>> call, Throwable throwable) {
                 Log.d("Otp Error", "Can not send OTP");
                 sendOtpError.setValue(true);
+                isLoading.setValue(false);
             }
         });
     }
@@ -80,5 +83,9 @@ public class OtpRepository {
 
     public MutableLiveData<String> getMessageError() {
         return messageError;
+    }
+
+    public MutableLiveData<Boolean> getIsLoading() {
+        return isLoading;
     }
 }

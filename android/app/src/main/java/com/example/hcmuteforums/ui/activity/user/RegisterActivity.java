@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.model.dto.request.UserCreationRequest;
+import com.example.hcmuteforums.ui.fragment.LoadingDialogFragment;
 import com.example.hcmuteforums.viewmodel.RegisterViewModel;
 import com.google.gson.Gson;
 
@@ -39,8 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText edt_fullname, edt_email, edt_username, edt_password, etDateOfBirth;
     private RadioGroup rgGender;
     private RadioButton rbMale, rbFemale ,rbOther;
-
-
+    private LoadingDialogFragment loadingDialog;
     RegisterViewModel registerViewModel;
 
     private final Calendar calendar = Calendar.getInstance();
@@ -63,6 +63,8 @@ public class RegisterActivity extends AppCompatActivity {
         rgGender = findViewById(R.id.rg_gender);
         rbMale = findViewById(R.id.rb_male);
         rbFemale = findViewById(R.id.rb_female);
+        //support
+        loadingDialog = new LoadingDialogFragment();
         //viewmodel
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
@@ -97,7 +99,6 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onChanged(Boolean isSent) {
                 Intent intent = new Intent(RegisterActivity.this, VerifyOTPActivity.class);
-
                 Gson gson = new Gson();
                 String userJson = gson.toJson(getUserCreation());
                 intent.putExtra("user_request_json", userJson);
@@ -116,6 +117,17 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onChanged(Boolean aBoolean) {
                 Toast.makeText(RegisterActivity.this, "Da co loi xay ra", Toast.LENGTH_SHORT).show();
+            }
+        });
+        registerViewModel.getIsLoading().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isLoading) {
+                if (isLoading){
+                    loadingDialog.show(getSupportFragmentManager(), "LoadingDiaglog");
+                }
+                else{
+                    loadingDialog.dismiss();
+                }
             }
         });
     }
