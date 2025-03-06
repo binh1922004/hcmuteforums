@@ -2,7 +2,6 @@ package com.backend.backend.service;
 
 import com.backend.backend.dto.EmailDTO;
 import com.backend.backend.dto.request.OtpRequest;
-import com.backend.backend.dto.request.OtpValidateRequest;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.repository.UserRepository;
@@ -52,9 +51,7 @@ public class OtpService {
         return emailService.sendSimpleMessage(emailDTO);
     }
 
-    public Boolean validateOtp(OtpValidateRequest request) {
-        var email = request.getEmail();
-        var otp = request.getOtp();
+    public Boolean validateOtp(String email, String otp) {
         return otpGenerator.verifyOtp(email, otp);
     }
 }
