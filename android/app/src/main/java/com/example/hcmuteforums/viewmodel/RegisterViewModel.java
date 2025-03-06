@@ -25,4 +25,8 @@ public class RegisterViewModel extends ViewModel {
         return otpRepository.getMessageError();
     }
 
+    public LiveData<Boolean> getIsLoading(){
+        return otpRepository.getIsLoading();
+    }
+
 }

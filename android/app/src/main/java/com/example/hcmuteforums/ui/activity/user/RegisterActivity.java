@@ -3,6 +3,7 @@ package com.example.hcmuteforums.ui.activity.user;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,10 +22,15 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.model.dto.request.UserCreationRequest;
+import com.example.hcmuteforums.ui.fragment.LoadingDialogFragment;
 import com.example.hcmuteforums.viewmodel.RegisterViewModel;
+import com.google.gson.Gson;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -34,8 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText edt_fullname, edt_email, edt_username, edt_password, etDateOfBirth;
     private RadioGroup rgGender;
     private RadioButton rbMale, rbFemale ,rbOther;
-
-
+    private LoadingDialogFragment loadingDialog;
     RegisterViewModel registerViewModel;
 
     private final Calendar calendar = Calendar.getInstance();
@@ -58,6 +63,8 @@ public class RegisterActivity extends AppCompatActivity {
         rgGender = findViewById(R.id.rg_gender);
         rbMale = findViewById(R.id.rb_male);
         rbFemale = findViewById(R.id.rb_female);
+        //support
+        loadingDialog = new LoadingDialogFragment();
         //viewmodel
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
@@ -92,7 +99,9 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onChanged(Boolean isSent) {
                 Intent intent = new Intent(RegisterActivity.this, VerifyOTPActivity.class);
-                intent.putExtra("Email", "binh123");
+                Gson gson = new Gson();
+                String userJson = gson.toJson(getUserCreation());
+                intent.putExtra("user_request_json", userJson);
                 startActivity(intent);
             }
         });
@@ -108,6 +117,17 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onChanged(Boolean aBoolean) {
                 Toast.makeText(RegisterActivity.this, "Da co loi xay ra", Toast.LENGTH_SHORT).show();
+            }
+        });
+        registerViewModel.getIsLoading().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isLoading) {
+                if (isLoading){
+                    loadingDialog.show(getSupportFragmentManager(), "LoadingDiaglog");
+                }
+                else{
+                    loadingDialog.dismiss();
+                }
             }
         });
     }
@@ -159,7 +179,7 @@ public class RegisterActivity extends AppCompatActivity {
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
             etDateOfBirth.setText(dateFormat.format(calendar.getTime()));
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
@@ -172,5 +192,26 @@ public class RegisterActivity extends AppCompatActivity {
             return "Nữ";
         }
         return "Khác";
+    }
+
+    private UserCreationRequest getUserCreation(){
+        String fullname = edt_fullname.getText().toString().trim();
+        String email = edt_email.getText().toString().trim();
+        String username = edt_username.getText().toString().trim();
+        String password = edt_password.getText().toString().trim();
+        String dateOfBirth = etDateOfBirth.getText().toString().trim();
+        String gender = getSelectedGender();
+
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date dob = null;
+
+        try {
+            dob = inputFormat.parse(dateOfBirth);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // Tạo đối tượng UserCreationRequest
+        return new UserCreationRequest(username, password, email, fullname, dob, "", gender);
     }
 }

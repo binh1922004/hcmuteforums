@@ -17,4 +17,5 @@ public class UserCreationRequest {
     String fullName;
     Date dob;
     String otp;
+    String gender;
 }

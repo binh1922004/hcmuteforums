@@ -9,14 +9,16 @@ public class UserCreationRequest {
     String fullName;
     Date dob;
     String otp;
+    String gender;
 
-    public UserCreationRequest(String username, String password, String email, String fullName, Date dob, String otp) {
+    public UserCreationRequest(String username, String password, String email, String fullName, Date dob, String otp, String gender) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.fullName = fullName;
         this.dob = dob;
         this.otp = otp;
+        this.gender = gender;
     }
 
     public String getUsername() {
