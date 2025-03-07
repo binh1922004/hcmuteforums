@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,6 +40,10 @@ public class TopicService {
 
         topicRepository.save(topic);
         return true;
+    }
+
+    public List<Topic> getAllTopicsBySubCategory(String subCategoryId) {
+        return topicRepository.getTopicsBySubCategory_Id(subCategoryId);
     }
 
 }
