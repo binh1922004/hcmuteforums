@@ -183,7 +183,6 @@ public class RegisterActivity extends AppCompatActivity {
             etDateOfBirth.setText(dateFormat.format(calendar.getTime()));
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
-    // Hàm lấy giới tính từ RadioGroup
     private String getSelectedGender() {
         int selectedId = rgGender.getCheckedRadioButtonId();
         if (selectedId == R.id.rb_male) {
