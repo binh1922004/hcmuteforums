@@ -3,12 +3,21 @@ package com.example.hcmuteforums.ui.fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.adapter.CategoryAdapter;
+import com.example.hcmuteforums.model.entity.Category;
+import com.example.hcmuteforums.viewmodel.CategoryViewModel;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +34,8 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private CategoryViewModel categoryViewModel;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -61,6 +72,47 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        //init data
+        categoryViewModel = new CategoryViewModel();
+        //show category
+        showAllCategory(view);
+
+
+        return view;
+    }
+
+    private void showAllCategory(View view) {
+        RecyclerView rcvCategory = view.findViewById(R.id.rcvCategory);
+        CategoryAdapter categoryAdapter = new CategoryAdapter(getContext());
+
+        //get data from viewmodel
+        categoryViewModel.fetchCategories();
+        //observe
+        categoryViewModel.getCategoryList().observe(getViewLifecycleOwner(), new Observer<List<Category>>() {
+            @Override
+            public void onChanged(List<Category> categories) {
+                categoryAdapter.setData(categories);
+            }
+        });
+
+        categoryViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        categoryViewModel.getGetError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RecyclerView.LayoutManager linearLayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+        rcvCategory.setLayoutManager(linearLayout);
+        rcvCategory.setAdapter(categoryAdapter);
     }
 }
