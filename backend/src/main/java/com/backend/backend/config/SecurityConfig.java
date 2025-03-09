@@ -23,6 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity, CustomJwtDecoder customJwtDecoder) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(PUBLIC_ENDPOINT).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/topics/**").permitAll()
                         //authorization for role admin to get users.
 //                              first way:  .requestMatchers(HttpMethod.GET, "/users").hasAnyAuthority("ROLE_ADMIN")
                         //second, if use has role, system will find claim has ROLE_ in prefix:
