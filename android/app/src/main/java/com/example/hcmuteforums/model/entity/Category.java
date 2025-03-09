@@ -6,7 +6,15 @@ public class Category {
     private String id;
     private String name;
     private List<SubCategory> subCategories;
+    private boolean isExpanded = false;  // Thêm trạng thái mở rộng
 
+    public boolean isExpanded() {
+        return isExpanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        isExpanded = expanded;
+    }
     public Category(String id, String name, List<SubCategory> subCategories) {
         this.id = id;
         this.name = name;
