@@ -1,5 +1,6 @@
 package com.backend.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,10 +28,13 @@ public class Topic {
 
     @Column(name = "create_at")
     private Date createdAt;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "sub_category_id", nullable = false)
     private SubCategory subCategory;
