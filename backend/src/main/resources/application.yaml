@@ -13,12 +13,16 @@ spring:
     host: smtp.gmail.com
     port: 587
   datasource:
-    url: "jdbc:mysql://localhost:3306/hcmuteforums"
+    url: "jdbc:mysql://localhost:3307/hcmuteforums"
     username: root
-    password: 10040109    
+    password: root
   jpa:
     hibernate:  
       ddl-auto: update
     show-sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6380
 jwt:
   signerKey: "b4ISo6+PT1fY8eppQ564SXabONN945cjuPYa0mTOmPrThHVxEnH7+xxE5RFJCqtk"
