@@ -15,7 +15,7 @@ spring:
   datasource:
     url: "jdbc:mysql://localhost:3306/hcmuteforums"
     username: root
-    password: 16092004
+    password: 10040109
   jpa:
     hibernate:  
       ddl-auto: update
