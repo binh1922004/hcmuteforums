@@ -44,7 +44,7 @@
                 <ImageView
                     android:id="@+id/imageView6"
                     android:layout_width="wrap_content"
-                    android:layout_height="51.5dp"
+                    android:layout_height="52dp"
                     android:src="@drawable/arc_3"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
