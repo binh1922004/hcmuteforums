@@ -3,6 +3,8 @@ package com.backend.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,6 +14,9 @@ public class TopicDetailResponse {
     String fullName;
     String title;
     String description;
+    Date createdAt;
     int likeCount;
-    int commentCount;
+    int replyCount;
+    boolean isLiked;
+    boolean isYours;
 }

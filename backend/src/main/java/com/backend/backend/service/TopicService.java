@@ -7,12 +7,11 @@ import com.backend.backend.entity.User;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.TopicMapper;
-import com.backend.backend.repository.SubCategoryRepository;
-import com.backend.backend.repository.TopicRepository;
-import com.backend.backend.repository.UserRepository;
+import com.backend.backend.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +23,13 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class TopicService {
+    //repo
     UserRepository userRepository;
     SubCategoryRepository subCategoryRepository;
     TopicRepository topicRepository;
+    LikeRepository likeRepository;
+    ReplyRepository replyRepository;
+    //mapper
     TopicMapper topicMapper;
     public boolean postTopic(TopicPostRequest topicPostRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -54,7 +57,20 @@ public class TopicService {
                 new AppException(ErrorCode.TOPIC_NOTEXISTED));
         TopicDetailResponse topicDetailResponse = topicMapper.toTopicDetailResponse(topic);
         topicDetailResponse.setFullName(topic.getUser().getFullName());
-
+        topicDetailResponse.setLikeCount(likeRepository.countByTopic_Id(topicId));
+        topicDetailResponse.setReplyCount(replyRepository.countByTopic_Id(topicId));
+        //is your topic
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : null;
+        if (username != null && username.equals(topic.getUser().getUsername())) {
+            topicDetailResponse.setYours(true);
+        }
+        //is like?
+        if (username != null){
+            if (likeRepository.existsLikeByTopic_IdAndUser_Username(topicId, username)) {
+                topicDetailResponse.setYours(true);
+            }
+        }
         return topicDetailResponse;
     }
 

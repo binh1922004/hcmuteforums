@@ -40,7 +40,9 @@ public class TopicController {
 
     @GetMapping("/detail/{id}")
     public ApiResponse<TopicDetailResponse> topicDetail(@PathVariable String id) {
-
+        return ApiResponse.<TopicDetailResponse>builder()
+                .result(topicService.getTopicDetail(id))
+                .build();
     }
 
 }
