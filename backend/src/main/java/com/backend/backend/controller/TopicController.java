@@ -4,6 +4,7 @@ import com.backend.backend.dto.ApiResponse;
 import com.backend.backend.dto.request.TopicPostRequest;
 import com.backend.backend.dto.request.UserCreationRequest;
 import com.backend.backend.dto.request.UserUpdateRequest;
+import com.backend.backend.dto.response.TopicDetailResponse;
 import com.backend.backend.dto.response.UserResponse;
 import com.backend.backend.entity.Topic;
 import com.backend.backend.service.TopicService;
@@ -30,11 +31,16 @@ public class TopicController {
                 .build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/list/{id}")
     public ApiResponse<List<Topic>> getAllTopicsBySubCategory(@PathVariable String id) {
         return ApiResponse.<List<Topic>>builder()
                 .result(topicService.getAllTopicsBySubCategory(id))
                 .build();
+    }
+
+    @GetMapping("/detail/{id}")
+    public ApiResponse<TopicDetailResponse> topicDetail(@PathVariable String id) {
+
     }
 
 }

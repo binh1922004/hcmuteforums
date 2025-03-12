@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class TopicService {
+public class CommentService {
     UserRepository userRepository;
     SubCategoryRepository subCategoryRepository;
     TopicRepository topicRepository;
