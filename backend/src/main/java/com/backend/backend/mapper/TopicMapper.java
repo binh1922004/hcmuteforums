@@ -1,6 +1,7 @@
 package com.backend.backend.mapper;
 
 import com.backend.backend.dto.request.TopicPostRequest;
+import com.backend.backend.dto.request.TopicUpdateRequest;
 import com.backend.backend.dto.request.UserCreationRequest;
 import com.backend.backend.dto.request.UserUpdateRequest;
 import com.backend.backend.dto.response.TopicDetailResponse;
@@ -14,4 +15,5 @@ import org.mapstruct.MappingTarget;
 public interface TopicMapper {
     Topic toTopic(TopicPostRequest topicPostRequest);
     TopicDetailResponse toTopicDetailResponse(Topic topic);
+    void updateTopic(@MappingTarget Topic topic, TopicUpdateRequest topicUpdateRequest);
 }

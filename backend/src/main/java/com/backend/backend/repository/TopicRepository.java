@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, String> {
     List<Topic> getTopicsBySubCategory_Id(String subCategoryId);
+    boolean existsTopicByIdAndUser_Username(String id, String username);
 }
