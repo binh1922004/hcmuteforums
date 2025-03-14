@@ -30,8 +30,7 @@ public class UserRepository {
 
     public UserRepository(){
         //api
-        LocalRetrofit localRetrofit = new LocalRetrofit();
-        userApi = localRetrofit.getRetrofit().create(UserApi.class);
+        userApi = LocalRetrofit.getRetrofit().create(UserApi.class);
         //data
     }
 

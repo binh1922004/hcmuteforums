@@ -29,8 +29,7 @@ public class OtpRepository {
         return instance;
     }
     public OtpRepository(){
-        LocalRetrofit localRetrofit = new LocalRetrofit();
-        otpApi = localRetrofit.getRetrofit().create(OtpApi.class);
+        otpApi = LocalRetrofit.getRetrofit().create(OtpApi.class);
         sendOtpError = new MutableLiveData<>();
         sendOtpResponse = new MutableLiveData<>();
         messageError = new MutableLiveData<>();
