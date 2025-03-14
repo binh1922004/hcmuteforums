@@ -17,7 +17,7 @@ public enum ErrorCode {
     DOB_INVALID(1008, "Your age must be a least {min}", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1009, "Email existed", HttpStatus.BAD_REQUEST),
     OTP_LIMIT_TIME(1010, "You need to wait 30s for new OTP", HttpStatus.BAD_REQUEST),
-    TOPIC_NOTEXISTED(1010, "Bài viết đã bị xoá", HttpStatus.NOT_FOUND),
+    TOPIC_NOTEXISTED(1011, "Bài viết đã bị xoá", HttpStatus.NOT_FOUND),
     ;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

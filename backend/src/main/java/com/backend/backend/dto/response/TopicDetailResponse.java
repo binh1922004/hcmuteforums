@@ -13,10 +13,10 @@ import java.util.Date;
 public class TopicDetailResponse {
     String fullName;
     String title;
-    String description;
+    String content;
     Date createdAt;
     int likeCount;
     int replyCount;
     boolean isLiked;
-    boolean isYours;
+    boolean isOwner;
 }
