@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.ui.activity.user;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -13,6 +14,7 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.ui.fragment.HomeFragment;
 import com.example.hcmuteforums.ui.fragment.NotificationFragment;
 import com.example.hcmuteforums.ui.fragment.ProfileFragment;
+import com.example.hcmuteforums.ui.fragment.ProfileUserFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class UserMainActivity extends AppCompatActivity {
@@ -20,6 +22,7 @@ public class UserMainActivity extends AppCompatActivity {
     Fragment profileFragment = new ProfileFragment();
     NotificationFragment notificationFragment = new NotificationFragment();
     HomeFragment homeFragment = new HomeFragment();
+    ProfileUserFragment profileUserFragment = new ProfileUserFragment();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,9 +62,19 @@ public class UserMainActivity extends AppCompatActivity {
                setCurrentFragment(notificationFragment);
            }
            if (itemId == R.id.itemProfile){
-               setCurrentFragment(profileFragment);
+               if(isLoggedIn()){
+                   setCurrentFragment(profileUserFragment);
+               }
+               else{
+                   setCurrentFragment(profileFragment);
+               }
+
            }
            return true;
         });
+    }
+    private boolean isLoggedIn() {
+        SharedPreferences preferences = getSharedPreferences("User", MODE_PRIVATE);
+        return preferences.getBoolean("isLoggedIn", false); // Mặc định là false nếu chưa đăng nhập
     }
 }

@@ -84,7 +84,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/tv_Username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -96,7 +96,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/imageView6" />
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/tv_Email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Mail của bạn"
@@ -275,8 +275,8 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="32dp"
+                android:id="@+id/logOut"
                 android:layout_marginBottom="16dp">
-
 
                 <ImageView
                     android:id="@+id/imageView9"
