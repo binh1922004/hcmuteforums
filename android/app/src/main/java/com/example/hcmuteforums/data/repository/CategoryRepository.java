@@ -26,8 +26,7 @@ public class CategoryRepository {
     MutableLiveData<Boolean> getError = new MutableLiveData<>();
 
     public CategoryRepository(){
-        LocalRetrofit localRetrofit = new LocalRetrofit();
-        categoryApi = localRetrofit.getRetrofit().create(CategoryApi.class);
+        categoryApi = LocalRetrofit.getRetrofit().create(CategoryApi.class);
     }
 
     public static CategoryRepository getInstance(){

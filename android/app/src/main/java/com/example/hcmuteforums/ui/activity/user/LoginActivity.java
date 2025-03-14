@@ -16,9 +16,20 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hcmuteforums.MainActivity;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.data.remote.api.UserApi;
+import com.example.hcmuteforums.data.remote.interceptor.LocalAuthInterceptor;
+import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
+import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
+import com.example.hcmuteforums.model.dto.response.UserResponse;
+import com.example.hcmuteforums.model.entity.User;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
+import com.google.gson.Gson;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -87,6 +98,12 @@ public class LoginActivity extends AppCompatActivity {
                     editor.putString("email", response.getResult().getEmail());
                     editor.apply();
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    //gan JWT sau khi login vao interceptor
+                    editor.putString("jwtLocal", response.getResult().getToken());
+                    editor.apply();
+                    LocalAuthInterceptor.setInstance(LoginActivity.this);
+                    LocalRetrofit.setInterceptor();
+
                     Intent intent = new Intent(LoginActivity.this, UserMainActivity.class);
                     startActivity(intent);
                 }

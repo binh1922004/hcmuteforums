@@ -22,8 +22,7 @@ public class AuthenticationRepository {
     private MutableLiveData<Boolean> loginError = new MutableLiveData<>();
     private AuthenticationApi authenticationApi;
     public AuthenticationRepository(){
-        LocalRetrofit localRetrofit = new LocalRetrofit();
-        authenticationApi = localRetrofit.getRetrofit().create(AuthenticationApi.class);
+        authenticationApi = LocalRetrofit.getRetrofit().create(AuthenticationApi.class);
     }
     public static AuthenticationRepository getInstance() {
         if (instance == null)
