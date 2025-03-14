@@ -1,14 +1,20 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,12 +61,35 @@ public class ProfileUserFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-    }
 
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile_user, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile_user, container, false);
+        TextView tv_username = view.findViewById(R.id.tv_Username);
+        TextView tv_email = view.findViewById(R.id.tv_Email);
+
+        SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
+        String username = preferences.getString("username" , "Chưa có tên người dùng");
+        String email = preferences.getString("email", "Chưa có Email");
+        tv_email.setText(email);
+        tv_username.setText(username);
+
+        //Nut logout
+        ConstraintLayout logOutButton = view.findViewById(R.id.logOut);
+
+        logOutButton.setOnClickListener(v-> {
+            //Xoá thông tin đăng nhập ở sharepreferences
+            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
+            sharedPreferences.edit().clear().apply();
+            //Chuyen ve trang chu
+            Intent intent = new Intent(requireActivity(), UserMainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
+            startActivity(intent);
+        });
+        return  view;
+
     }
 }

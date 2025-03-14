@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.fragment)
     testImplementation(libs.junit)
     implementation(libs.material)
+    implementation(libs.okhttp.logging)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }

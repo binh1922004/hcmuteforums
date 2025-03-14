@@ -1,9 +1,13 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,10 +70,18 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         Button btn = view.findViewById(R.id.btnLogin);
         btn.setOnClickListener(v -> {
-            Intent myIntent = new Intent(this.getContext(), LoginActivity.class);
-            startActivity(myIntent);
+                Intent intent = new Intent(this.getContext(), LoginActivity.class);
+                startActivity(intent);
         });
         // Inflate the layout for this fragment
         return view;
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        if (getActivity() == null) return;
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.flFragment, fragment); // Thay thế fragment_container bằng ID của layout chứa fragment
+        transaction.addToBackStack(null); // Cho phép quay lại fragment trước đó
+        transaction.commit();
     }
 }

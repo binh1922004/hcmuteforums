@@ -1,7 +1,9 @@
 package com.example.hcmuteforums.ui.activity.user;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -12,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.hcmuteforums.MainActivity;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
@@ -77,7 +80,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onChanged(ApiResponse<AuthenticationResponse> response) {
                 if (response != null) {
+                    SharedPreferences preferences = getSharedPreferences("User", MODE_PRIVATE); //Set danh dau dang nhap
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putBoolean("isLoggedIn", true);
+                    editor.putString("username", response.getResult().getUsername()); // Lưu username
+                    editor.putString("email", response.getResult().getEmail());
+                    editor.apply();
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, UserMainActivity.class);
+                    startActivity(intent);
                 }
             }
         });
