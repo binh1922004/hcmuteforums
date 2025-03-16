@@ -74,13 +74,15 @@ public class ProfileUserFragment extends Fragment {
 
     UserViewModel userViewModel;
     AuthenticationViewModel authenticationViewModel;
-    private void getInfo(){
+    String username, email;
+    private void getInfo(TextView tv_username, TextView tv_email){
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);   //Map viewmodel
         userViewModel.getInfo();
         userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
             @Override
             public void onChanged(UserResponse userResponse) {
-                Toast.makeText(getContext(), userResponse.getUsername(), Toast.LENGTH_SHORT).show();
+                tv_username.setText(userResponse.getUsername());
+                tv_email.setText(userResponse.getEmail());
             }
         });
         userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -107,13 +109,8 @@ public class ProfileUserFragment extends Fragment {
 
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
 
-        String username = preferences.getString("username" , "Chưa có tên người dùng");
-        String email = preferences.getString("email", "Chưa có Email");
-
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
-        tv_email.setText(email);
-        tv_username.setText(username);
         //Nut logout
         ConstraintLayout logOutButton = view.findViewById(R.id.logOut);
         logOutButton.setOnClickListener(v-> {
@@ -128,12 +125,8 @@ public class ProfileUserFragment extends Fragment {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
             startActivity(intent);
         });
-
-
-
-        getInfo();
-
-        return  view;
+        getInfo(tv_username, tv_email);
+        return view;
     }
 
 }

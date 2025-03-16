@@ -17,4 +17,5 @@ public class UserResponse {
     Date dob;
     String address;
     String gender;
+    String email;
 }

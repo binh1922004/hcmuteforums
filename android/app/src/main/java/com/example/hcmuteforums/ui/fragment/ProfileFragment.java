@@ -76,12 +76,4 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         return view;
     }
-
-    private void replaceFragment(Fragment fragment) {
-        if (getActivity() == null) return;
-        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.flFragment, fragment); // Thay thế fragment_container bằng ID của layout chứa fragment
-        transaction.addToBackStack(null); // Cho phép quay lại fragment trước đó
-        transaction.commit();
-    }
 }
