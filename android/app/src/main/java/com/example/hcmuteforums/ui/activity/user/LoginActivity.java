@@ -49,7 +49,6 @@ public class LoginActivity extends AppCompatActivity {
         edtUsername = findViewById(R.id.edtUsername);
         edtpassword = findViewById(R.id.edtPassword);
         btnLogin = findViewById(R.id.btnLogin);
-
         //
         authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
 
@@ -117,5 +116,6 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Đăng nhập thất bại!", Toast.LENGTH_SHORT).show();
                 }
             }
-        });    }
+        });
+    }
 }

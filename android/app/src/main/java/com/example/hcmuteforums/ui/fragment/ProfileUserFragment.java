@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
+import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
 
 /**
@@ -72,6 +73,7 @@ public class ProfileUserFragment extends Fragment {
 
 
     UserViewModel userViewModel;
+    AuthenticationViewModel authenticationViewModel;
     private void getInfo(){
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);   //Map viewmodel
         userViewModel.getInfo();
@@ -115,6 +117,9 @@ public class ProfileUserFragment extends Fragment {
         //Nut logout
         ConstraintLayout logOutButton = view.findViewById(R.id.logOut);
         logOutButton.setOnClickListener(v-> {
+            //xoa du lieu trong viewmodel
+            authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
+            authenticationViewModel.logout();
             //Xoá thông tin đăng nhập ở sharepreferences
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
             sharedPreferences.edit().clear().apply();
@@ -123,6 +128,8 @@ public class ProfileUserFragment extends Fragment {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
             startActivity(intent);
         });
+
+
 
         getInfo();
 
