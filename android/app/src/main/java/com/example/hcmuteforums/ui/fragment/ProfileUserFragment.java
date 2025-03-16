@@ -78,7 +78,7 @@ public class ProfileUserFragment extends Fragment {
         userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
             @Override
             public void onChanged(UserResponse userResponse) {
-
+                Toast.makeText(getContext(), userResponse.getUsername(), Toast.LENGTH_SHORT).show();
             }
         });
         userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
