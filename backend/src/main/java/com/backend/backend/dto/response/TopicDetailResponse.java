@@ -1,5 +1,6 @@
 package com.backend.backend.dto.response;
 
+import com.backend.backend.entity.UserGeneral;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,8 +11,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TopicDetailResponse {
-    String fullName;
+public class  TopicDetailResponse {
+    UserGeneral userGeneral;
     String title;
     String content;
     Date createdAt;

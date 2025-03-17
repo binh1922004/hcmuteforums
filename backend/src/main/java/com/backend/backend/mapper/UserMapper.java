@@ -4,6 +4,7 @@ import com.backend.backend.dto.request.UserCreationRequest;
 import com.backend.backend.dto.request.UserUpdateRequest;
 import com.backend.backend.dto.response.UserResponse;
 import com.backend.backend.entity.User;
+import com.backend.backend.entity.UserGeneral;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
@@ -12,4 +13,5 @@ public interface UserMapper {
     User toUser(UserCreationRequest userCreationRequest);
     UserResponse toUserResponse(User user);
     void updateUser(@MappingTarget User user, UserUpdateRequest userUpdateRequest);
+    UserGeneral toUserGeneral(User user);
 }

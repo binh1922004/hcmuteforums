@@ -28,34 +28,5 @@ public class ReplyService {
     SubCategoryRepository subCategoryRepository;
     TopicRepository topicRepository;
     TopicMapper topicMapper;
-    public boolean postTopic(TopicPostRequest topicPostRequest) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> user = userRepository.findByUsername(username);
-        Optional<SubCategory> subCategory = subCategoryRepository.findById(topicPostRequest.getSubCategoryId());
-        if (user.isEmpty() || subCategory.isEmpty()) {
-            return false;
-        }
-
-        Topic topic = topicMapper.toTopic(topicPostRequest);
-        topic.setUser(user.get());
-        topic.setSubCategory(subCategory.get());
-        topic.setCreatedAt(new Date());
-
-        topicRepository.save(topic);
-        return true;
-    }
-
-    public List<Topic> getAllTopicsBySubCategory(String subCategoryId) {
-        return topicRepository.getTopicsBySubCategory_Id(subCategoryId);
-    }
-
-    public TopicDetailResponse getTopicDetail(String topicId) {
-        Topic topic = topicRepository.findById(topicId).orElseThrow(() ->
-                new AppException(ErrorCode.TOPIC_NOTEXISTED));
-        TopicDetailResponse topicDetailResponse = topicMapper.toTopicDetailResponse(topic);
-        topicDetailResponse.setFullName(topic.getUser().getFullName());
-
-        return topicDetailResponse;
-    }
 
 }
