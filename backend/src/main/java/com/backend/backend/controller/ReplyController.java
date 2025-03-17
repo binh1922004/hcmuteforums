@@ -30,5 +30,10 @@ public class ReplyController {
         return ApiResponse.builder().build();
     }
 
-
+    @DeleteMapping("/delete")
+    @PreAuthorize("@replyService.isOwner(#replyId)")
+    public ApiResponse deleteReply(String replyId){
+        replyService.deleteReply(replyId);
+        return ApiResponse.builder().build();
+    }
 }
