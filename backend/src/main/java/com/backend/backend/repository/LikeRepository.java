@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface LikeRepository extends JpaRepository<Like, String> {
     int countByTopic_Id(String topicId);
     boolean existsLikeByTopic_IdAndUser_Username(String topicId, String username);
+    Like findLikeByTopic_IdAndUser_Username(String topicId, String username);
 }

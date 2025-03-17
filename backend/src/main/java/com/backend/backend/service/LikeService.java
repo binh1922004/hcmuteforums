@@ -1,15 +1,15 @@
 package com.backend.backend.service;
-import com.backend.backend.dto.request.TopicPostRequest;
-import com.backend.backend.dto.response.TopicDetailResponse;
-import com.backend.backend.entity.SubCategory;
+
+import com.backend.backend.entity.Like;
 import com.backend.backend.entity.Topic;
 import com.backend.backend.entity.User;
+
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
-import com.backend.backend.mapper.TopicMapper;
-import com.backend.backend.repository.SubCategoryRepository;
+import com.backend.backend.repository.LikeRepository;
 import com.backend.backend.repository.TopicRepository;
 import com.backend.backend.repository.UserRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,37 +25,25 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LikeService {
     UserRepository userRepository;
-    SubCategoryRepository subCategoryRepository;
     TopicRepository topicRepository;
-    TopicMapper topicMapper;
-    public boolean postTopic(TopicPostRequest topicPostRequest) {
+    LikeRepository likeRepository;
+    public Boolean likeTopic(String topicId){
+        Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOTEXISTED));
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> user = userRepository.findByUsername(username);
-        Optional<SubCategory> subCategory = subCategoryRepository.findById(topicPostRequest.getSubCategoryId());
-        if (user.isEmpty() || subCategory.isEmpty()) {
-            return false;
+        if (likeRepository.existsLikeByTopic_IdAndUser_Username(topicId, username)){
+            Like like = likeRepository.findLikeByTopic_IdAndUser_Username(topicId, username);
+            likeRepository.delete(like);
         }
-
-        Topic topic = topicMapper.toTopic(topicPostRequest);
-        topic.setUser(user.get());
-        topic.setSubCategory(subCategory.get());
-        topic.setCreatedAt(new Date());
-
-        topicRepository.save(topic);
+        else{
+            User user = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+            Like like = Like.builder()
+                    .topic(topic)
+                    .user(user)
+                    .createdAt(new Date())
+                    .build();
+            likeRepository.save(like);
+        }
         return true;
-    }
-
-    public List<Topic> getAllTopicsBySubCategory(String subCategoryId) {
-        return topicRepository.getTopicsBySubCategory_Id(subCategoryId);
-    }
-
-    public TopicDetailResponse getTopicDetail(String topicId) {
-        Topic topic = topicRepository.findById(topicId).orElseThrow(() ->
-                new AppException(ErrorCode.TOPIC_NOTEXISTED));
-        TopicDetailResponse topicDetailResponse = topicMapper.toTopicDetailResponse(topic);
-        topicDetailResponse.setFullName(topic.getUser().getFullName());
-
-        return topicDetailResponse;
     }
 
 }

@@ -5,9 +5,11 @@ import com.backend.backend.dto.response.TopicDetailResponse;
 import com.backend.backend.entity.SubCategory;
 import com.backend.backend.entity.Topic;
 import com.backend.backend.entity.User;
+import com.backend.backend.entity.UserGeneral;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.TopicMapper;
+import com.backend.backend.mapper.UserMapper;
 import com.backend.backend.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class TopicService {
     ReplyRepository replyRepository;
     //mapper
     TopicMapper topicMapper;
+    UserMapper userMapper;
     public boolean postTopic(TopicPostRequest topicPostRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByUsername(username);
@@ -57,8 +60,7 @@ public class TopicService {
         Topic topic = topicRepository.findById(topicId).orElseThrow(() ->
                 new AppException(ErrorCode.TOPIC_NOTEXISTED));
         TopicDetailResponse topicDetailResponse = topicMapper.toTopicDetailResponse(topic);
-        System.out.println(topicDetailResponse.getContent() + " " + topic.getContent());
-        topicDetailResponse.setFullName(topic.getUser().getFullName());
+
         topicDetailResponse.setLikeCount(likeRepository.countByTopic_Id(topicId));
         topicDetailResponse.setReplyCount(replyRepository.countByTopic_Id(topicId));
         //is your topic
@@ -73,6 +75,9 @@ public class TopicService {
                 topicDetailResponse.setOwner(true);
             }
         }
+        //get user
+        UserGeneral userGeneral = userMapper.toUserGeneral(topic.getUser());
+        topicDetailResponse.setUserGeneral(userGeneral);
         return topicDetailResponse;
     }
 
