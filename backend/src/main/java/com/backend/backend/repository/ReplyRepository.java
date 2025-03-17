@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface ReplyRepository extends JpaRepository<Reply, String> {
     int countByTopic_Id(String topicId);
+    Reply findRepliesById(String id);
+    boolean existsRepliesByIdAndUser_Username(String id, String username);
 }

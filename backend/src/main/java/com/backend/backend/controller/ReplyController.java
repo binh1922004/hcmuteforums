@@ -7,6 +7,7 @@ import com.backend.backend.service.ReplyService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,13 @@ public class ReplyController {
     @PostMapping()
     public ApiResponse replyTopic(@RequestBody ReplyPostRequest replyPostRequest) {
         replyService.replyTopic(replyPostRequest);
+        return ApiResponse.builder().build();
+    }
+
+    @PostMapping("/update")
+    @PreAuthorize("@replyService.isOwner(#replyId)")
+    public ApiResponse updateReply(String replyId, String content){
+        replyService.updateReply(replyId, content);
         return ApiResponse.builder().build();
     }
 

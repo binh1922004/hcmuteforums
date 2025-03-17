@@ -46,4 +46,15 @@ public class ReplyService {
         replyRepository.save(reply);
     }
 
+    public void updateReply(String replyId, String content){
+        Reply reply = replyRepository.findRepliesById(replyId);
+        reply.setContent(content);
+        replyRepository.save(reply);
+    }
+
+    public boolean isOwner(String replyId){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return replyRepository.existsRepliesByIdAndUser_Username(replyId, username);
+    }
+
 }
