@@ -55,7 +55,6 @@ public class ReplyService {
     @Transactional
     public void deleteReply(String replyId){
         replyRepository.deleteRepliesByParentReplyId(replyId);
-        System.out.println("Delete Reply");
         replyRepository.deleteById(replyId);
     }
 
