@@ -68,4 +68,8 @@ public class AuthenticationRepository {
     }
 
 
+    public void logout() {
+        loginResponse.setValue(null);
+        loginError.setValue(false);
+    }
 }

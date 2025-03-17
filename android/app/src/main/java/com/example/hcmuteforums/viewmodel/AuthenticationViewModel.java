@@ -23,4 +23,9 @@ public class AuthenticationViewModel extends ViewModel {
     public void login(String username, String password){
         authenticationRepository.login(username, password);
     }
+
+    public void logout() {
+        authenticationRepository.logout();
+    }
+
 }
