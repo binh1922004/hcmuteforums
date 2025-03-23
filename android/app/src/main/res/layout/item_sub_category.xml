@@ -2,15 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
+    android:layout_marginTop="5dp"
+    android:background="@drawable/rounded_bg_sub"
     android:orientation="vertical">
+
     <TextView
-        android:paddingStart="20dp"
         android:id="@+id/tvSubCategoryName"
-        android:text="Category"
-        android:layout_gravity="center_vertical"
-        android:textSize="30sp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:text="Category"
+        android:textColor="#22497c"
+        android:textSize="30sp" />
 
 </LinearLayout>

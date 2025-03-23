@@ -14,8 +14,10 @@ import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.CategoryAdapter;
+import com.example.hcmuteforums.adapter.TopicDetailAdapter;
+import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
-import com.example.hcmuteforums.viewmodel.CategoryViewModel;
+import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private CategoryViewModel categoryViewModel;
+    private TopicViewModel topicViewModel;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -75,36 +77,36 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         //init data
-        categoryViewModel = new CategoryViewModel();
+        topicViewModel = new TopicViewModel();
         //show category
-        showAllCategory(view);
+        showAllTopic(view);
 
 
         return view;
     }
 
-    private void showAllCategory(View view) {
-        RecyclerView rcvCategory = view.findViewById(R.id.rcvCategory);
-        CategoryAdapter categoryAdapter = new CategoryAdapter(getContext());
+    private void showAllTopic(View view) {
+        RecyclerView rcvTopic = view.findViewById(R.id.rcvTopic);
+        TopicDetailAdapter topicDetailAdapter = new TopicDetailAdapter(getContext());
 
         //get data from viewmodel
-        categoryViewModel.fetchCategories();
+        topicViewModel.fetchAllTopics();
         //observe
-        categoryViewModel.getCategoryList().observe(getViewLifecycleOwner(), new Observer<List<Category>>() {
+        topicViewModel.getTopicsLiveData().observe(getViewLifecycleOwner(), new Observer<List<TopicDetailResponse>>() {
             @Override
-            public void onChanged(List<Category> categories) {
-                categoryAdapter.setData(categories);
+            public void onChanged(List<TopicDetailResponse> topicDetailResponses) {
+                topicDetailAdapter.setData(topicDetailResponses);
             }
         });
 
-        categoryViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
+        topicViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
             }
         });
 
-        categoryViewModel.getGetError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        topicViewModel.getTopicError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
                 Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
@@ -112,7 +114,7 @@ public class HomeFragment extends Fragment {
         });
 
         RecyclerView.LayoutManager linearLayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
-        rcvCategory.setLayoutManager(linearLayout);
-        rcvCategory.setAdapter(categoryAdapter);
+        rcvTopic.setLayoutManager(linearLayout);
+        rcvTopic.setAdapter(topicDetailAdapter);
     }
 }
