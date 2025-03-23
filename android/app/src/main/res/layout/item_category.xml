@@ -17,14 +17,15 @@
             android:src="@drawable/message" />
 
         <TextView
-            android:paddingStart="20dp"
             android:id="@+id/tvCategory"
-            android:text="Category"
-            android:layout_gravity="center_vertical"
-            android:textSize="30sp"
-            android:textColor="@color/white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/roboto_bold"
+            android:paddingStart="20dp"
+            android:text="Category"
+            android:textColor="@color/white"
+            android:textSize="30sp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

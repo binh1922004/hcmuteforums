@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.ui.fragment.CategoryFragment;
 import com.example.hcmuteforums.ui.fragment.HomeFragment;
 import com.example.hcmuteforums.ui.fragment.NotificationFragment;
 import com.example.hcmuteforums.ui.fragment.ProfileFragment;
@@ -22,6 +23,7 @@ public class UserMainActivity extends AppCompatActivity {
     Fragment profileFragment = new ProfileFragment();
     NotificationFragment notificationFragment = new NotificationFragment();
     HomeFragment homeFragment = new HomeFragment();
+    CategoryFragment categoryFragment = new CategoryFragment();
     ProfileUserFragment profileUserFragment = new ProfileUserFragment();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +70,9 @@ public class UserMainActivity extends AppCompatActivity {
                else{
                    setCurrentFragment(profileFragment);
                }
-
+           }
+           if (itemId == R.id.itemCategory){
+               setCurrentFragment(categoryFragment);
            }
            return true;
         });
