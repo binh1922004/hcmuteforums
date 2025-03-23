@@ -1,4 +1,4 @@
-package com.backend.backend.entity;
+package com.backend.backend.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

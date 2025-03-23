@@ -5,7 +5,7 @@ import com.backend.backend.dto.response.TopicDetailResponse;
 import com.backend.backend.entity.SubCategory;
 import com.backend.backend.entity.Topic;
 import com.backend.backend.entity.User;
-import com.backend.backend.entity.UserGeneral;
+import com.backend.backend.dto.UserGeneral;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.TopicMapper;
@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,20 @@ public class TopicService {
     //mapper
     TopicMapper topicMapper;
     UserMapper userMapper;
+    public List<TopicDetailResponse> getAllTopics(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : null;
+
+        List<Topic> listTopic = topicRepository.findAll();
+        List<TopicDetailResponse> topicDetailResponseList = new ArrayList<>();
+        //map all topic to topic response
+        listTopic.forEach(topic -> {
+            TopicDetailResponse topicDetailResponse = toTopicDetailResponse(topic, username);
+            topicDetailResponseList.add(topicDetailResponse);
+        });
+
+        return topicDetailResponseList;
+    }
     public boolean postTopic(TopicPostRequest topicPostRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByUsername(username);
@@ -59,26 +74,9 @@ public class TopicService {
     public TopicDetailResponse getTopicDetail(String topicId) {
         Topic topic = topicRepository.findById(topicId).orElseThrow(() ->
                 new AppException(ErrorCode.TOPIC_NOTEXISTED));
-        TopicDetailResponse topicDetailResponse = topicMapper.toTopicDetailResponse(topic);
-
-        topicDetailResponse.setLikeCount(likeRepository.countByTopic_Id(topicId));
-        topicDetailResponse.setReplyCount(replyRepository.countByTopic_Id(topicId));
-        //is your topic
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : null;
-        if (username != null && username.equals(topic.getUser().getUsername())) {
-            topicDetailResponse.setOwner(true);
-        }
-        //is like?
-        if (username != null){
-            if (likeRepository.existsLikeByTopic_IdAndUser_Username(topicId, username)) {
-                topicDetailResponse.setOwner(true);
-            }
-        }
-        //get user
-        UserGeneral userGeneral = userMapper.toUserGeneral(topic.getUser());
-        topicDetailResponse.setUserGeneral(userGeneral);
-        return topicDetailResponse;
+        return toTopicDetailResponse(topic, username);
     }
 
     public void deleteTopic(String topicId) {
@@ -98,5 +96,27 @@ public class TopicService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println(username + " " + topicRepository.existsTopicByIdAndUser_Username(topicId, username));
         return topicRepository.existsTopicByIdAndUser_Username(topicId, username);
+    }
+
+    private TopicDetailResponse toTopicDetailResponse(Topic topic, String username) {
+        String topicId = topic.getId();
+        TopicDetailResponse topicDetailResponse = topicMapper.toTopicDetailResponse(topic);
+
+        topicDetailResponse.setLikeCount(likeRepository.countByTopic_Id(topicId));
+        topicDetailResponse.setReplyCount(replyRepository.countByTopic_Id(topicId));
+        //is your topic
+        if (username != null && username.equals(topic.getUser().getUsername())) {
+            topicDetailResponse.setOwner(true);
+        }
+        //is like?
+        if (username != null){
+            if (likeRepository.existsLikeByTopic_IdAndUser_Username(topicId, username)) {
+                topicDetailResponse.setLiked(true);
+            }
+        }
+        //get user
+        UserGeneral userGeneral = userMapper.toUserGeneral(topic.getUser());
+        topicDetailResponse.setUserGeneral(userGeneral);
+        return topicDetailResponse;
     }
 }
