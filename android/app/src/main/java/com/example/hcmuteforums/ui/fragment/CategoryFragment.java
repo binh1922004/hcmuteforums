@@ -14,19 +14,17 @@ import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.CategoryAdapter;
-import com.example.hcmuteforums.adapter.TopicDetailAdapter;
-import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
-import com.example.hcmuteforums.viewmodel.TopicViewModel;
+import com.example.hcmuteforums.viewmodel.CategoryViewModel;
 
 import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link CategoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class CategoryFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -36,10 +34,9 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private CategoryViewModel categoryViewModel;
 
-    private TopicViewModel topicViewModel;
-
-    public HomeFragment() {
+    public CategoryFragment() {
         // Required empty public constructor
     }
 
@@ -49,11 +46,11 @@ public class HomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
+     * @return A new instance of fragment CategoryFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static CategoryFragment newInstance(String param1, String param2) {
+        CategoryFragment fragment = new CategoryFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -74,39 +71,39 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_category, container, false);
 
         //init data
-        topicViewModel = new TopicViewModel();
+        categoryViewModel = new CategoryViewModel();
         //show category
-        showAllTopic(view);
+        showAllCategory(view);
 
 
         return view;
     }
 
-    private void showAllTopic(View view) {
-        RecyclerView rcvTopic = view.findViewById(R.id.rcvTopic);
-        TopicDetailAdapter topicDetailAdapter = new TopicDetailAdapter(getContext());
+    private void showAllCategory(View view) {
+        RecyclerView rcvCategory = view.findViewById(R.id.rcvCategory);
+        CategoryAdapter categoryAdapter = new CategoryAdapter(getContext());
 
         //get data from viewmodel
-        topicViewModel.fetchAllTopics();
+        categoryViewModel.fetchCategories();
         //observe
-        topicViewModel.getTopicsLiveData().observe(getViewLifecycleOwner(), new Observer<List<TopicDetailResponse>>() {
+        categoryViewModel.getCategoryList().observe(getViewLifecycleOwner(), new Observer<List<Category>>() {
             @Override
-            public void onChanged(List<TopicDetailResponse> topicDetailResponses) {
-                topicDetailAdapter.setData(topicDetailResponses);
+            public void onChanged(List<Category> categories) {
+                categoryAdapter.setData(categories);
             }
         });
 
-        topicViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
+        categoryViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
             }
         });
 
-        topicViewModel.getTopicError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        categoryViewModel.getGetError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
                 Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
@@ -114,7 +111,7 @@ public class HomeFragment extends Fragment {
         });
 
         RecyclerView.LayoutManager linearLayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
-        rcvTopic.setLayoutManager(linearLayout);
-        rcvTopic.setAdapter(topicDetailAdapter);
+        rcvCategory.setLayoutManager(linearLayout);
+        rcvCategory.setAdapter(categoryAdapter);
     }
 }

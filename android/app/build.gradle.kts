@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.pinview)
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.retrofit)
+    implementation(libs.circleimageview)
     implementation(libs.gson)
     implementation(libs.fragment)
     testImplementation(libs.junit)

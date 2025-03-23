@@ -4,7 +4,7 @@ import com.backend.backend.dto.request.UserCreationRequest;
 import com.backend.backend.dto.request.UserUpdateRequest;
 import com.backend.backend.dto.response.UserResponse;
 import com.backend.backend.entity.User;
-import com.backend.backend.entity.UserGeneral;
+import com.backend.backend.dto.UserGeneral;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 

@@ -64,5 +64,10 @@ public class TopicController {
                 .result("Đã cập nhật thông tin bài viết")
                 .build();
     }
-
+    @GetMapping
+    public ApiResponse<List<TopicDetailResponse>> getAllTopics(){
+        return ApiResponse.<List<TopicDetailResponse>>builder()
+                .result(topicService.getAllTopics())
+                .build();
+    }
 }

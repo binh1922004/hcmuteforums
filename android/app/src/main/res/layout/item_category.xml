@@ -2,13 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="5dp"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/linearCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         android:padding="10dp"
         android:background="@drawable/rounded_bg">
         <ImageView
@@ -17,14 +19,15 @@
             android:src="@drawable/message" />
 
         <TextView
-            android:paddingStart="20dp"
             android:id="@+id/tvCategory"
-            android:text="Category"
-            android:layout_gravity="center_vertical"
-            android:textSize="30sp"
-            android:textColor="@color/white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/roboto_bold"
+            android:paddingStart="20dp"
+            android:text="Category"
+            android:textColor="#22497c"
+            android:textSize="30sp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
