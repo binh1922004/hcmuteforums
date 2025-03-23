@@ -11,8 +11,8 @@ public class TopicDetailResponse {
     private Date createdAt;
     private int likeCount;
     private int replyCount;
-    private boolean isLiked;
-    private boolean isOwner;
+    private boolean liked;
+    private boolean owner;
 
     public UserGeneral getUserGeneral() {
         return userGeneral;
@@ -63,18 +63,18 @@ public class TopicDetailResponse {
     }
 
     public boolean isLiked() {
-        return isLiked;
+        return liked;
     }
 
     public void setLiked(boolean liked) {
-        isLiked = liked;
+        this.liked = liked;
     }
 
     public boolean isOwner() {
-        return isOwner;
+        return owner;
     }
 
     public void setOwner(boolean owner) {
-        isOwner = owner;
+        this.owner = owner;
     }
 }
