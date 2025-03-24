@@ -104,14 +104,14 @@ public class ProfileUserFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile_user, container, false);
-        TextView tv_username = view.findViewById(R.id.tv_Username);
-        TextView tv_email = view.findViewById(R.id.tv_Email);
+        TextView tv_username = view.findViewById(R.id.tvName);
+        TextView tv_email = view.findViewById(R.id.tvUsername);
 
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
 
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
-        //Nut logout
+        /*//Nut logout
         ConstraintLayout logOutButton = view.findViewById(R.id.logOut);
         logOutButton.setOnClickListener(v-> {
             //xoa du lieu trong viewmodel
@@ -124,7 +124,7 @@ public class ProfileUserFragment extends Fragment {
             Intent intent = new Intent(requireActivity(), UserMainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
             startActivity(intent);
-        });
+        });*/
         getInfo(tv_username, tv_email);
         return view;
     }
