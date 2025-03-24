@@ -7,10 +7,7 @@ import com.backend.backend.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,6 +20,12 @@ public class AuthenticationController {
     public ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(authenticationService.authenticate(authenticationRequest))
+                .build();
+    }
+    @PostMapping("/introspect")
+    public ApiResponse<Boolean> introspect(@RequestParam String token) {
+        return ApiResponse.<Boolean>builder()
+                .result(authenticationService.introspect(token))
                 .build();
     }
 }
