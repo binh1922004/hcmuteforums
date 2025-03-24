@@ -12,9 +12,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class LocalRetrofit {
     private static Retrofit retrofit;
     public static void setInterceptor(){
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .addInterceptor(LocalAuthInterceptor.getInstance())
-                .build();
+        OkHttpClient client;
+        if (LocalAuthInterceptor.getInstance() != null){
+            client = new OkHttpClient().newBuilder()
+                    .addInterceptor(LocalAuthInterceptor.getInstance())
+                    .build();
+        }
+        else{
+            client = new OkHttpClient().newBuilder()
+                    .build();
+        }
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:8080/ute/")
                 .addConverterFactory(GsonConverterFactory.create(new Gson()))
