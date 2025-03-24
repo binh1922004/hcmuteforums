@@ -17,17 +17,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINT = {"/api/users", "/api/auth/login", "/api/otp/get", "/api/otp/validate",
-    "/api/categories/**", "api/subcategory/**"};
+    "/api/categories/**", "/api/subcategory/**", "/api/auth/introspect"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity, CustomJwtDecoder customJwtDecoder) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/topics/**").permitAll()
-                        //authorization for role admin to get users.
-//                              first way:  .requestMatchers(HttpMethod.GET, "/users").hasAnyAuthority("ROLE_ADMIN")
-                        //second, if use has role, system will find claim has ROLE_ in prefix:
-//                                .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
                         .anyRequest().authenticated());
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
