@@ -1,7 +1,9 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +19,7 @@ import com.example.hcmuteforums.adapter.CategoryAdapter;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
+import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
 import java.util.List;
@@ -38,6 +41,7 @@ public class HomeFragment extends Fragment {
     private String mParam2;
 
     private TopicViewModel topicViewModel;
+    private CardView cvPostTopic;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -78,11 +82,19 @@ public class HomeFragment extends Fragment {
 
         //init data
         topicViewModel = new TopicViewModel();
+        cvPostTopic = view.findViewById(R.id.cvPostTopic);
         //show category
         showAllTopic(view);
-
-
+        //go to post topic
+        postTopic();
         return view;
+    }
+
+    private void postTopic() {
+        cvPostTopic.setOnClickListener(v -> {
+            Intent myIntent = new Intent(getContext(), TopicPostActivity.class);
+            startActivity(myIntent);
+        });
     }
 
     private void showAllTopic(View view) {
