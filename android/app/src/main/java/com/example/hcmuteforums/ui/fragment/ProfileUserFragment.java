@@ -14,11 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
+import com.example.hcmuteforums.ui.activity.user.EditUserActivity;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
@@ -106,9 +108,8 @@ public class ProfileUserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile_user, container, false);
         TextView tv_username = view.findViewById(R.id.tvName);
         TextView tv_email = view.findViewById(R.id.tvUsername);
-
+        Button btn_edit = view.findViewById(R.id.btnEdit);
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
-
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
         /*//Nut logout
@@ -126,7 +127,15 @@ public class ProfileUserFragment extends Fragment {
             startActivity(intent);
         });*/
         getInfo(tv_username, tv_email);
+        //Goi Form EditProfile
+        OpenEditProfile(btn_edit);
         return view;
+    }
+    private void OpenEditProfile(Button btn_edit){
+        btn_edit.setOnClickListener(view -> {
+            Intent intent = new Intent(requireContext(), EditUserActivity.class);
+            startActivity(intent);
+        });
     }
 
 }
