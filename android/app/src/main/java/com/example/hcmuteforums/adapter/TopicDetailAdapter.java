@@ -47,12 +47,12 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
         holder.tvContent.setText(topicDetailResponse.getContent());
 
         boolean like = topicDetailResponse.isLiked();
-        Log.d("Like: ", like ? "isLike": "unlike");
-        holder.btnLike.setSelected(like);
-
-        holder.btnLike.setOnClickListener(v -> {
-            v.setSelected(!v.isSelected());
-        });
+//        Log.d("Like: ", like ? "isLike": "unlike");
+//        holder.btnLike.setSelected(like);
+//
+//        holder.btnLike.setOnClickListener(v -> {
+//            v.setSelected(!v.isSelected());
+//        });
     }
 
 
@@ -74,7 +74,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvContent = itemView.findViewById(R.id.tvContent);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
-            btnLike = itemView.findViewById(R.id.btnLike);
+//            btnLike = itemView.findViewById(R.id.btnLike);
         }
     }
 }
