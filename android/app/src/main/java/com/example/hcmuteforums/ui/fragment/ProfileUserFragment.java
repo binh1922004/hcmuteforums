@@ -1,8 +1,11 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -11,19 +14,22 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
-import com.example.hcmuteforums.ui.activity.user.EditUserActivity;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -133,9 +139,18 @@ public class ProfileUserFragment extends Fragment {
     }
     private void OpenEditProfile(Button btn_edit){
         btn_edit.setOnClickListener(view -> {
-            Intent intent = new Intent(requireContext(), EditUserActivity.class);
+            /*Intent intent = new Intent(requireContext(), EditUserActivity.class);
             startActivity(intent);
+
+*/
+            showBottomDialog();
         });
+    }
+
+    private void showBottomDialog()
+    {
+        EditUserBottomSheet bottomSheet = new EditUserBottomSheet();
+        bottomSheet.show(getParentFragmentManager(), bottomSheet.getTag());
     }
 
 }
