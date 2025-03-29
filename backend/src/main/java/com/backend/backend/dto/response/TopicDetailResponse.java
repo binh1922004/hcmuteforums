@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class  TopicDetailResponse {
+    String id;
     UserGeneral userGeneral;
     String title;
     String content;

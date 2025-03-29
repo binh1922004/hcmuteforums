@@ -4,6 +4,9 @@ server:
     context-path: /ute
 
 spring:
+  multipart:
+    max-file-size: 100MB
+    max-request-size: 1000MB
   mail:
     username: hcmutesending@gmail.com
     password: bbut pbzy uiva pged
@@ -26,3 +29,5 @@ spring:
       port: 6380
 jwt:
   signerKey: "b4ISo6+PT1fY8eppQ564SXabONN945cjuPYa0mTOmPrThHVxEnH7+xxE5RFJCqtk"
+upload:
+  dir: upload/topics/
