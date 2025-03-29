@@ -1,8 +1,11 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -11,9 +14,12 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +28,8 @@ import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -104,14 +112,13 @@ public class ProfileUserFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile_user, container, false);
-        TextView tv_username = view.findViewById(R.id.tv_Username);
-        TextView tv_email = view.findViewById(R.id.tv_Email);
-
+        TextView tv_username = view.findViewById(R.id.tvName);
+        TextView tv_email = view.findViewById(R.id.tvUsername);
+        Button btn_edit = view.findViewById(R.id.btnEdit);
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
-
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
-        //Nut logout
+        /*//Nut logout
         ConstraintLayout logOutButton = view.findViewById(R.id.logOut);
         logOutButton.setOnClickListener(v-> {
             //xoa du lieu trong viewmodel
@@ -124,9 +131,26 @@ public class ProfileUserFragment extends Fragment {
             Intent intent = new Intent(requireActivity(), UserMainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
             startActivity(intent);
-        });
+        });*/
         getInfo(tv_username, tv_email);
+        //Goi Form EditProfile
+        OpenEditProfile(btn_edit);
         return view;
+    }
+    private void OpenEditProfile(Button btn_edit){
+        btn_edit.setOnClickListener(view -> {
+            /*Intent intent = new Intent(requireContext(), EditUserActivity.class);
+            startActivity(intent);
+
+*/
+            showBottomDialog();
+        });
+    }
+
+    private void showBottomDialog()
+    {
+        EditUserBottomSheet bottomSheet = new EditUserBottomSheet();
+        bottomSheet.show(getParentFragmentManager(), bottomSheet.getTag());
     }
 
 }

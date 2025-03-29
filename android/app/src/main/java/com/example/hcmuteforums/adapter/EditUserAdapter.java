@@ -15,8 +15,15 @@ import java.util.List;
 
 public class EditUserAdapter extends RecyclerView.Adapter<EditUserAdapter.ViewHolder> {
     private List<String> itemList;
-    public EditUserAdapter(List<String> itemList){
+    private OnItemClickListener onItemClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public EditUserAdapter(List<String> itemList, OnItemClickListener onItemClickListener) {
         this.itemList = itemList;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -30,6 +37,14 @@ public class EditUserAdapter extends RecyclerView.Adapter<EditUserAdapter.ViewHo
     public void onBindViewHolder(@NonNull EditUserAdapter.ViewHolder holder, int position) {
         String title = itemList.get(position);
         holder.tvTitle.setText(title);
+
+        holder.itemView.setOnClickListener(view -> {
+            if(onItemClickListener!=null){
+                onItemClickListener.onItemClick(position);
+            }
+        });
+
+
     }
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle;

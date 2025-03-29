@@ -6,7 +6,6 @@
     android:background="@android:color/white">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/icon_arrowback"/>
@@ -15,9 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginTop="100dp"
-        android:paddingBottom="16dp">
+        android:gravity="center">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_User"
@@ -48,6 +45,9 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/listview_border"/>
+        android:background="@drawable/listview_border"
+        android:scrollbars="none"
+        android:clipToPadding="false"
+        android:clipChildren="false"/>
 
 </LinearLayout>
