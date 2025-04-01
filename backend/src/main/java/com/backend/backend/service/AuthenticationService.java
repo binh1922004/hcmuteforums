@@ -73,7 +73,7 @@ public class AuthenticationService {
                 .issuer("ball") //issure: JWT from ?
                 .issueTime(new Date())
                 .expirationTime(new Date
-                        (Instant.now().plus(1, ChronoUnit.MINUTES).toEpochMilli()))
+                        (Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .build();
 
