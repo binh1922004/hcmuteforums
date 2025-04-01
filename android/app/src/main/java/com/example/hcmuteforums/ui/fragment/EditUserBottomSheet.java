@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EditUserBottomSheet extends BottomSheetDialogFragment {
-
+    private ViewGroup containerView;
     public EditUserBottomSheet() {
         // Required empty public constructor
     }
@@ -58,31 +59,52 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setupRecyclerView(view);
+    }
+    private void switchToEditNameLayout() {
+        View view = getView();
+        if (view == null) return;
 
+        ViewGroup parent = (ViewGroup) view.findViewById(R.id.bottomSheetContainer);
+        if (parent == null) return;
+
+        parent.removeAllViews(); // Xóa tất cả view cũ
+
+        View editNameView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_edit_name, parent, false);
+        parent.addView(editNameView);
+
+        Button btnSave = editNameView.findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(v -> switchToMainLayout());
+    }
+
+    private void switchToMainLayout() {
+        View view = getView();
+        if (view == null) return;
+
+        ViewGroup parent = (ViewGroup) view.findViewById(R.id.bottomSheetContainer);
+        if (parent == null) return;
+
+        parent.removeAllViews();
+
+        View mainView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_bottom_sheet_edit_user_dialog, parent, false);
+        parent.addView(mainView);
+
+        setupRecyclerView(mainView); // Set lại RecyclerView
+    }
+
+    private void setupRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         List<String> items = Arrays.asList("Tên", "Số điện thoại", "Ngày Sinh", "Địa Chỉ", "Giới Tính");
 
-        // Kiểm tra Log để biết danh sách có dữ liệu không
-        Log.d("EditUserBottomSheet", "Danh sách item: " + items);
-
-        EditUserAdapter adapter = new EditUserAdapter(items, new EditUserAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Toast.makeText(getContext(), "Clicked: " + items.get(position), Toast.LENGTH_SHORT).show();
-                if (position == 0) { // Nếu click vào "Tên"
-                    Intent intent = new Intent(getActivity(), EditNameActivity.class);
-                    intent.putExtra("firstName", "Nghĩa");
-                    intent.putExtra("middleName", "");
-                    intent.putExtra("lastName", "Trần");
-                    startActivity(intent);
-                }
+        EditUserAdapter adapter = new EditUserAdapter(items, position -> {
+            if (position == 0) {
+                switchToEditNameLayout();
             }
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-        int dividerColor = getResources().getColor(android.R.color.darker_gray);
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), dividerColor, 4));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), getResources().getColor(android.R.color.darker_gray), 4));
     }
 
 
