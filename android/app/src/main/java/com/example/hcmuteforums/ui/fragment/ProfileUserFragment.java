@@ -78,8 +78,6 @@ public class ProfileUserFragment extends Fragment {
         }
 
     }
-
-
     UserViewModel userViewModel;
     AuthenticationViewModel authenticationViewModel;
     String username, email;
