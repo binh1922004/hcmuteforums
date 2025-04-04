@@ -1,8 +1,9 @@
 package com.example.hcmuteforums.model.dto.response;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class UserResponse {
+public class UserResponse implements Serializable {
     String username;
     String fullName;
     String phone;

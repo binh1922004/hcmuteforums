@@ -7,10 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,15 +22,37 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.EditUserAdapter;
 import com.example.hcmuteforums.decoration.DividerItemDecoration;
 import com.example.hcmuteforums.decoration.RecyclerViewBorderDecoration;
+import com.example.hcmuteforums.model.dto.request.UserUpdateRequest;
+import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.EditNameActivity;
+import com.example.hcmuteforums.ui.activity.user.VerifyOTPActivity;
+import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
+import com.example.hcmuteforums.viewmodel.UserViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EditUserBottomSheet extends BottomSheetDialogFragment {
     private ViewGroup containerView;
+
+   UserUpdateRequest userUpdateRequest;
+    public static final String ARG_USER = "user";
+    public static EditUserBottomSheet newInstance(UserResponse user)
+    {
+        EditUserBottomSheet fragment = new EditUserBottomSheet();
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_USER, user);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
     public EditUserBottomSheet() {
         // Required empty public constructor
     }
@@ -61,21 +87,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         setupRecyclerView(view);
     }
-    private void switchToEditNameLayout() {
-        View view = getView();
-        if (view == null) return;
 
-        ViewGroup parent = (ViewGroup) view.findViewById(R.id.bottomSheetContainer);
-        if (parent == null) return;
-
-        parent.removeAllViews(); // Xóa tất cả view cũ
-
-        View editNameView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_edit_name, parent, false);
-        parent.addView(editNameView);
-
-        Button btnSave = editNameView.findViewById(R.id.btnSave);
-        btnSave.setOnClickListener(v -> switchToMainLayout());
-    }
 
     private void switchToMainLayout() {
         View view = getView();
@@ -107,5 +119,139 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), getResources().getColor(android.R.color.darker_gray), 4));
     }
 
+    UserViewModel userViewModel;
+    AuthenticationViewModel authenticationViewModel;
+    EditText edt_ho, edt_tendem, edt_ten;
+    String fullname;
+    String ho = "" , ten="", tendem = "";
+
+    private void getInfo()
+    {
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        userViewModel.getInfo();
+        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
+            @Override
+            public void onChanged(UserResponse userResponse) {
+                if(userResponse!=null){
+                    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    Date dob = null;
+
+                    try {
+                        dob = inputFormat.parse(userResponse.getDob().toString());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    fullname = userResponse.getFullName();
+                    userUpdateRequest = new UserUpdateRequest(
+                            userResponse.getFullName(),
+                            userResponse.getPhone(),
+                            dob,
+                            userResponse.getAddress(),
+                            userResponse.getGender()
+                    );
+                }
+
+            }
+        });
+        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+            }
+        });
+        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void NameSplitter()
+    {
+        String[] parts = fullname.trim().split("\\s+");
+        if(parts.length ==1){
+            ten = parts[0];
+        }
+        else if(parts.length == 2){
+            ho = parts[0];
+            ten = parts[1];
+        }
+        else{
+            ho = parts[0];
+            ten = parts[parts.length-1];
+            tendem = String.join(" ", java.util.Arrays.copyOfRange(parts,1,parts.length-1));
+        }
+    }
+
+    private void switchToEditNameLayout() {
+        View view = getView();
+        if (view == null) return;
+
+        ViewGroup parent = (ViewGroup) view.findViewById(R.id.bottomSheetContainer);
+        if (parent == null) return;
+
+        parent.removeAllViews(); // Xóa tất cả view cũ
+
+        View editNameView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_edit_name, parent, false);
+        SetEdtName(editNameView);
+        //Event
+        updateName(editNameView);
+        parent.addView(editNameView);
+
+    }
+    private void SetEdtName(View editNameView)
+    {
+        //Lay thong tin ra
+        getInfo();
+
+
+        edt_ho = editNameView.findViewById(R.id.edtHo);
+        edt_tendem = editNameView.findViewById(R.id.edtTenDem);
+        edt_ten = editNameView.findViewById(R.id.edtTen);
+
+        //Tach ho, tendem, ten
+        NameSplitter();
+
+        edt_ho.setText(ho);
+        edt_tendem.setText(tendem);
+        edt_ten.setText(ten);
+    }
+
+    private void updateName(View editNameView){
+        Button btnSave = editNameView.findViewById(R.id.btnSave);
+        edt_ho = editNameView.findViewById(R.id.edtHo);
+        edt_tendem = editNameView.findViewById(R.id.edtTenDem);
+        edt_ten = editNameView.findViewById(R.id.edtTen);
+        btnSave.setOnClickListener(v -> {
+            String NewFullName = edt_ho.getText().toString() + " " + edt_tendem.getText().toString() + " "+
+                    edt_ten.getText().toString();
+            Log.d("Error Fullname", NewFullName);
+            if(NewFullName!=null)
+            {
+                userUpdateRequest.setFullName(NewFullName);
+                userViewModel.updateUser(userUpdateRequest);
+            }
+
+        });
+        userViewModel.getMessageError().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                Toast.makeText(requireContext(), s,Toast.LENGTH_SHORT).show();
+            }
+        });
+        userViewModel.getUserUpdateError().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Toast.makeText(requireContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+            }
+        });
+        userViewModel.getUserUpdate().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Toast.makeText(requireContext(), "Cập nhật tên thành công", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 }

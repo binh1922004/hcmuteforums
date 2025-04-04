@@ -9,6 +9,7 @@ import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.request.UserCreationRequest;
+import com.example.hcmuteforums.model.dto.request.UserUpdateRequest;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.google.gson.Gson;
 
@@ -25,6 +26,11 @@ public class UserRepository {
     private MutableLiveData<UserResponse> userInfo = new MutableLiveData<>();
 
     private MutableLiveData<Boolean> userInfoError = new MutableLiveData<>();
+    private MutableLiveData<UserResponse> userUpdate = new MutableLiveData<>();
+
+    private MutableLiveData<Boolean> userUpdateError = new MutableLiveData<>();
+    private MutableLiveData<Boolean> updateResponse = new MutableLiveData<>();
+
 
     private UserApi userApi;
 
@@ -110,6 +116,40 @@ public class UserRepository {
             }
         });
     }
+    public void updateUser(UserUpdateRequest userUpdateRequest)
+    {
+        userApi.updateUser(userUpdateRequest).enqueue(new Callback<ApiResponse<UserResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<UserResponse>> call, Response<ApiResponse<UserResponse>> response) {
+                if(response.isSuccessful() && response.body()!=null){
+                    ApiResponse<UserResponse> apiRes = response.body();
+                    if(apiRes.getResult()!=null){
+                        updateResponse.setValue(true);
+
+                    }else {
+                        userUpdateError.setValue(true);
+                    }
+                }
+                else{
+                    if (response.errorBody() != null) {
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        messageError.setValue(apiError.getMessage());
+                    }
+                    else {
+                        updateResponse.setValue(true);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<UserResponse>> call, Throwable throwable) {
+                Log.d("Error Update User", throwable.getMessage());
+                userUpdateError.setValue(true);
+            }
+        });
+    }
 
     public MutableLiveData<Boolean> getRegisterResponse() {
         return registerResponse;
@@ -122,8 +162,15 @@ public class UserRepository {
     public MutableLiveData<Boolean> getRegisterError() {
         return regiserError;
     }
+    public MutableLiveData<Boolean> getUserUpdateError(){
+        return userUpdateError;
+    }
+    public MutableLiveData<Boolean> getUpdateResponse(){
+        return updateResponse;
+    }
 
     public MutableLiveData<Boolean> getUserInfoError() {
         return userInfoError;
     }
+
 }
