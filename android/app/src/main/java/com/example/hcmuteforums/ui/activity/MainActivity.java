@@ -1,44 +1,42 @@
-package com.example.hcmuteforums;
+package com.example.hcmuteforums.ui.activity;
 
-import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.data.remote.api.AuthenticationApi;
-import com.example.hcmuteforums.data.remote.interceptor.LocalAuthInterceptor;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
-import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
-import com.example.hcmuteforums.model.dto.response.UserResponse;
-import com.google.gson.Gson;
+import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MyApp extends Application {
-    private ProgressBar loadingProgressBar;
+public class MainActivity extends AppCompatActivity {
+    ProgressBar loadingProgressBar;
     @Override
-    public void onCreate() {
-        super.onCreate();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        loadingProgressBar = findViewById(R.id.loadingProgressBar);
 
         // Lấy token từ SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("User", MODE_PRIVATE);
         String jwt = sharedPreferences.getString("jwtLocal", null);
-
+        // Hiển thị ProgressBar
+        showLoading();
         if (jwt != null) {
-            // Hiển thị ProgressBar
-            showLoading();
-
             // Sử dụng ExecutorService để kiểm tra token trong nền
             ExecutorService executor = Executors.newSingleThreadExecutor();
-
             executor.execute(() -> {
                 if (!isTokenValid(jwt)) {
                     removeJwt();
@@ -46,6 +44,9 @@ public class MyApp extends Application {
                 // Gọi callback hoặc cập nhật UI ở đây
                 onTokenVerificationCompleted();
             });
+        }
+        else{
+            onTokenVerificationCompleted();
         }
     }
 
@@ -70,12 +71,13 @@ public class MyApp extends Application {
         editor.remove("isLoggedIn");
         editor.apply();
     }
+
     private void showLoading() {
         loadingProgressBar.setVisibility(View.VISIBLE);
     }
 
     private void hideLoading() {
-        loadingProgressBar.setVisibility(View.GONE);
+//        loadingProgressBar.setVisibility(View.GONE);
     }
 
     private void onTokenVerificationCompleted() {
@@ -84,8 +86,8 @@ public class MyApp extends Application {
         // Chuyển sang Activity tiếp theo hoặc thực hiện các tác vụ khác
         Log.d("TokenCheck", "Token verification completed.");
         // Ví dụ:
-        // Intent intent = new Intent(this, NextActivity.class);
-        // startActivity(intent);
-        // finish();
+         Intent intent = new Intent(this, UserMainActivity.class);
+         startActivity(intent);
+         finish();
     }
 }
