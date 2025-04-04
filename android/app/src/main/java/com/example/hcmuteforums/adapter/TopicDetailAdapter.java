@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -47,8 +48,10 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
         holder.tvContent.setText(topicDetailResponse.getContent());
 
         boolean like = topicDetailResponse.isLiked();
-//        Log.d("Like: ", like ? "isLike": "unlike");
-//        holder.btnLike.setSelected(like);
+        Log.d("Like: ", like ? "isLike": "unlike");
+        if (like){
+            holder.btnLike.setImageResource(R.drawable.love_click);
+        }
 //
 //        holder.btnLike.setOnClickListener(v -> {
 //            v.setSelected(!v.isSelected());
@@ -65,7 +68,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
 
     public static class TopicDetailViewHolder extends RecyclerView.ViewHolder{
         TextView tvName, tvTime, tvTitle, tvContent;
-        Button btnLike;
+        ImageView btnLike;
         CircleImageView imgAvatar;
         public TopicDetailViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,7 +77,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvContent = itemView.findViewById(R.id.tvContent);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
-//            btnLike = itemView.findViewById(R.id.btnLike);
+            btnLike = itemView.findViewById(R.id.btnLike);
         }
     }
 }

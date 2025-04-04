@@ -11,6 +11,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.data.remote.interceptor.LocalAuthInterceptor;
+import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.ui.fragment.CategoryFragment;
 import com.example.hcmuteforums.ui.fragment.HomeFragment;
 import com.example.hcmuteforums.ui.fragment.NotificationFragment;
@@ -30,6 +32,12 @@ public class UserMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_user_home);
+
+        //dung trong viec inject JWT
+        // Khởi tạo Interceptor với Application Context
+        LocalAuthInterceptor.setInstance(this);
+        // Cấu hình Retrofit với Interceptor đã khởi tạo
+        LocalRetrofit.setInterceptor();
 
         //mapping
         bottomNavigationView = findViewById(R.id.bottomNavigationView);

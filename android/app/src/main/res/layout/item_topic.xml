@@ -82,6 +82,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
+                    android:id="@+id/btnLike"
                     android:src="@drawable/love_unclick"
                     android:layout_width="wrap_content"
                     android:layout_weight="1"
