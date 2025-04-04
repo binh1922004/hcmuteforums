@@ -1,53 +1,60 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottomSheetContainer"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:layout_height="wrap_content">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_arrowback"/>
-
+    <!-- Layout gốc của BottomSheet -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center">
+        android:padding="16dp"
+        android:background="@drawable/dialogbg">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_User"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/user_2"
-            android:scaleType="centerCrop"
-            />
-
-        <TextView
-            android:id="@+id/tv_Fullname"
-            android:text="Nghĩa Trần"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:gravity="center"/>
+            android:src="@drawable/icon_arrowback"
+            android:id="@+id/img_Back" />
 
-        <TextView
-            android:text="HCMUTE FORUMS"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/darker_gray"
-            android:gravity="center"/>
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_User"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/user_2"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/tv_Fullname"
+                android:text="Nghĩa Trần"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:text="HCMUTE FORUMS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/darker_gray"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/listview_border"
+            android:scrollbars="none"
+            android:clipToPadding="false"
+            android:clipChildren="false" />
     </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/listview_border"
-        android:scrollbars="none"
-        android:clipToPadding="false"
-        android:clipChildren="false"/>
-
-</LinearLayout>
+</FrameLayout>

@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,17 +79,19 @@ public class ProfileUserFragment extends Fragment {
         }
 
     }
-
-
     UserViewModel userViewModel;
     AuthenticationViewModel authenticationViewModel;
     String username, email;
+
+    UserResponse currentUserResponse;   //Xac nhan co ton du lieu nguoi dung hay chua
+
     private void getInfo(TextView tv_username, TextView tv_email){
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);   //Map viewmodel
         userViewModel.getInfo();
         userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
             @Override
             public void onChanged(UserResponse userResponse) {
+                currentUserResponse = userResponse;
                 tv_username.setText(userResponse.getUsername());
                 tv_email.setText(userResponse.getEmail());
             }
@@ -115,12 +118,12 @@ public class ProfileUserFragment extends Fragment {
         TextView tv_username = view.findViewById(R.id.tvName);
         TextView tv_email = view.findViewById(R.id.tvUsername);
         Button btn_edit = view.findViewById(R.id.btnEdit);
+        ImageView btn_logout = view.findViewById(R.id.btnSetting);  //logout
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
-        /*//Nut logout
-        ConstraintLayout logOutButton = view.findViewById(R.id.logOut);
-        logOutButton.setOnClickListener(v-> {
+        //Nut logout
+        btn_logout.setOnClickListener(v-> {
             //xoa du lieu trong viewmodel
             authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
             authenticationViewModel.logout();
@@ -131,7 +134,7 @@ public class ProfileUserFragment extends Fragment {
             Intent intent = new Intent(requireActivity(), UserMainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
             startActivity(intent);
-        });*/
+        });
         getInfo(tv_username, tv_email);
         //Goi Form EditProfile
         OpenEditProfile(btn_edit);
@@ -139,18 +142,18 @@ public class ProfileUserFragment extends Fragment {
     }
     private void OpenEditProfile(Button btn_edit){
         btn_edit.setOnClickListener(view -> {
-            /*Intent intent = new Intent(requireContext(), EditUserActivity.class);
-            startActivity(intent);
-
-*/
             showBottomDialog();
         });
     }
 
     private void showBottomDialog()
     {
-        EditUserBottomSheet bottomSheet = new EditUserBottomSheet();
-        bottomSheet.show(getParentFragmentManager(), bottomSheet.getTag());
+        if (currentUserResponse != null) {
+            EditUserBottomSheet bottomSheet = EditUserBottomSheet.newInstance(currentUserResponse);
+            bottomSheet.show(getParentFragmentManager(), bottomSheet.getTag());
+        } else {
+            Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
