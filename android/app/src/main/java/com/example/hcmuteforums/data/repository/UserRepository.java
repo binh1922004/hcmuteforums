@@ -135,7 +135,11 @@ public class UserRepository {
                         Gson gson = new Gson();
                         ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
                                 ApiErrorResponse.class);
-                        messageError.setValue(apiError.getMessage());
+                        if (apiError.getMessage() != null && !apiError.getMessage().trim().isEmpty()) {
+                            messageError.setValue(apiError.getMessage());
+                        } else {
+                            messageError.setValue("Đã xảy ra lỗi không xác định.");
+                        }
                     }
                     else {
                         updateResponse.setValue(true);
