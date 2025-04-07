@@ -1,19 +1,20 @@
 package com.example.hcmuteforums.model.dto.request;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class UserUpdateRequest implements Serializable {
     String fullName;
     String phone;
-    Date dob;
+    String dob;
     String address;
     String gender;
 
     public UserUpdateRequest() {
     }
 
-    public UserUpdateRequest(String fullName, String phone, Date dob, String address, String gender) {
+    public UserUpdateRequest(String fullName, String phone, String dob, String address, String gender) {
         this.fullName = fullName;
         this.phone = phone;
         this.dob = dob;
@@ -37,11 +38,11 @@ public class UserUpdateRequest implements Serializable {
         this.phone = phone;
     }
 
-    public Date getDob() {
+    public String getDob() {
         return dob;
     }
 
-    public void setDob(Date dob) {
+    public void setDob(String dob) {
         this.dob = dob;
     }
 

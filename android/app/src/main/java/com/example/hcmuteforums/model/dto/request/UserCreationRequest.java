@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.model.dto.request;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class UserCreationRequest {
@@ -7,11 +8,11 @@ public class UserCreationRequest {
     String password;
     String email;
     String fullName;
-    Date dob;
+    String dob;
     String otp;
     String gender;
 
-    public UserCreationRequest(String username, String password, String email, String fullName, Date dob, String otp, String gender) {
+    public UserCreationRequest(String username, String password, String email, String fullName, String dob, String otp, String gender) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -53,12 +54,20 @@ public class UserCreationRequest {
         this.fullName = fullName;
     }
 
-    public Date getDob() {
+    public String getDob() {
         return dob;
     }
 
-    public void setDob(Date dob) {
+    public void setDob(String dob) {
         this.dob = dob;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getOtp() {

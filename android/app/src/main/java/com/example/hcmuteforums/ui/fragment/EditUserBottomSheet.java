@@ -132,24 +132,10 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onChanged(UserResponse userResponse) {
                 if(userResponse!=null){
-                    String pattern = "yyyy-MM-dd";
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern, Locale.US); // Định dạng phù hợp với chuỗi
-                    Date dob = null;
-                    try {
-                        // Phân tích chuỗi thành đối tượng Date
-                        dob = simpleDateFormat.parse(userResponse.getDob().toString());
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-
-
-                    Log.d("Ngay sinh", dob.toString());
                     userUpdateRequest = new UserUpdateRequest(
                             userResponse.getFullName(),
                             userResponse.getPhone(),
-                            dob,
+                            userResponse.getDob(),
                             userResponse.getAddress(),
                             userResponse.getGender()
                     );
@@ -220,29 +206,6 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         edt_tendem.setText(tendem);
         edt_ten.setText(ten);
     }
-    private Date convertToYyyyMmDd(String originalDateStr, String originalPattern) {
-        if (originalDateStr == null || originalDateStr.trim().isEmpty()) {
-            Log.e("DATE_CONVERT", "Date string is empty");
-            return null;
-        }
-        try {
-            // Bước 1: Parse từ định dạng gốc
-            SimpleDateFormat originalFormat = new SimpleDateFormat(originalPattern, Locale.US);
-            Date date = originalFormat.parse(originalDateStr);
-
-            // Bước 2: Format lại để loại bỏ thời gian nếu cần (nếu bạn muốn Date chỉ chứa yyyy-MM-dd)
-            SimpleDateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            String formatted = targetFormat.format(date);  // Format lại ngày
-
-            // Bước 3: Parse lại về Date (đã chuẩn hóa thành yyyy-MM-dd, loại bỏ giờ/phút/giây)
-            return targetFormat.parse(formatted);
-
-        } catch (ParseException e) {
-            Log.e("DATE_CONVERT", "Error converting date: " + originalDateStr, e);
-            return null;
-        }
-    }
-
 
 
     private void updateName(View editNameView){
