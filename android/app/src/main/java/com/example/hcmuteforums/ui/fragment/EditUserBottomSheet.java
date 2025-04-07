@@ -122,10 +122,9 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     UserViewModel userViewModel;
     AuthenticationViewModel authenticationViewModel;
     EditText edt_ho, edt_tendem, edt_ten;
-    String fullname;
     String ho = "" , ten="", tendem = "";
 
-    private void getInfo()
+    private void getProfileInfo(View editNameView)
     {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         userViewModel.getInfo();
@@ -133,23 +132,15 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onChanged(UserResponse userResponse) {
                 if(userResponse!=null){
-                    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    Date dob = null;
-
-                    try {
-                        dob = inputFormat.parse(userResponse.getDob().toString());
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    fullname = userResponse.getFullName();
                     userUpdateRequest = new UserUpdateRequest(
                             userResponse.getFullName(),
                             userResponse.getPhone(),
-                            dob,
+                            userResponse.getDob(),
                             userResponse.getAddress(),
                             userResponse.getGender()
                     );
                 }
+                SetEdtName(editNameView, userResponse.getFullName());
 
             }
         });
@@ -167,7 +158,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         });
     }
 
-    private void NameSplitter()
+    private void NameSplitter(String fullname)
     {
         String[] parts = fullname.trim().split("\\s+");
         if(parts.length ==1){
@@ -194,29 +185,28 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         parent.removeAllViews(); // Xóa tất cả view cũ
 
         View editNameView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_edit_name, parent, false);
-        SetEdtName(editNameView);
+        getProfileInfo(editNameView);
         //Event
         updateName(editNameView);
         parent.addView(editNameView);
 
     }
-    private void SetEdtName(View editNameView)
+    private void SetEdtName(View editNameView, String fullname)
     {
         //Lay thong tin ra
-        getInfo();
-
 
         edt_ho = editNameView.findViewById(R.id.edtHo);
         edt_tendem = editNameView.findViewById(R.id.edtTenDem);
         edt_ten = editNameView.findViewById(R.id.edtTen);
 
         //Tach ho, tendem, ten
-        NameSplitter();
+        NameSplitter(fullname);
 
         edt_ho.setText(ho);
         edt_tendem.setText(tendem);
         edt_ten.setText(ten);
     }
+
 
     private void updateName(View editNameView){
         Button btnSave = editNameView.findViewById(R.id.btnSave);

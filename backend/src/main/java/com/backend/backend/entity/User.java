@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -21,7 +22,7 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private Date dob;
+    private LocalDate dob;
     private String fullName;
     private String gender;
     //not need

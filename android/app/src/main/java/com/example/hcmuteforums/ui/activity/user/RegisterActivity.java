@@ -29,6 +29,7 @@ import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -167,11 +168,7 @@ public class RegisterActivity extends AppCompatActivity {
             edt_password.requestFocus();
             return false;
         }
-        if (gender.isEmpty()) {
-            return false;
-        }
-
-        return true;
+        return !gender.isEmpty();
     }
     private void showDatePickerDialog() {
         new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
@@ -201,16 +198,22 @@ public class RegisterActivity extends AppCompatActivity {
         String dateOfBirth = etDateOfBirth.getText().toString().trim();
         String gender = getSelectedGender();
 
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Date dob = null;
-
-        try {
-            dob = inputFormat.parse(dateOfBirth);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        dateOfBirth = mappingToLocalDateString(dateOfBirth);
 
         // Tạo đối tượng UserCreationRequest
-        return new UserCreationRequest(username, password, email, fullname, dob, "", gender);
+        return new UserCreationRequest(username, password, email, fullname, dateOfBirth, "", gender);
+    }
+
+    private String mappingToLocalDateString(String dateOfBirth) {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < dateOfBirth.length(); i++){
+            if (dateOfBirth.charAt(i) == '/'){
+                res.append("-");
+            }
+            else{
+                res.append(dateOfBirth.charAt(i));
+            }
+        }
+        return res.toString();
     }
 }

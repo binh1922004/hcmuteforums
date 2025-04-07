@@ -1,13 +1,13 @@
 package com.example.hcmuteforums.model.dto.response;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class UserResponse implements Serializable {
     String username;
     String fullName;
     String phone;
-    Date dob;
+    String dob;
     String address;
     String gender;
     String email;
@@ -36,11 +36,11 @@ public class UserResponse implements Serializable {
         this.address = address;
     }
 
-    public Date getDob() {
+    public String getDob() {
         return dob;
     }
 
-    public void setDob(Date dob) {
+    public void setDob(String dob) {
         this.dob = dob;
     }
 

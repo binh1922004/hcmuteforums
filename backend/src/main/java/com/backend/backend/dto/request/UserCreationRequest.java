@@ -3,7 +3,9 @@ package com.backend.backend.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+
+import java.time.LocalDate;
+
 
 @Builder
 @Data
@@ -15,7 +17,7 @@ public class UserCreationRequest {
     String password;
     String email;
     String fullName;
-    Date dob;
+    LocalDate dob;
     String otp;
     String gender;
 }
