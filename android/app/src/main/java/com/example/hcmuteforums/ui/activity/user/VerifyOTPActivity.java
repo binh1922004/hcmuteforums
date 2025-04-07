@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.chaos.view.PinView;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.request.UserCreationRequest;
 import com.example.hcmuteforums.viewmodel.VerifyOTPViewModel;
 import com.google.gson.Gson;
@@ -75,23 +76,35 @@ public class VerifyOTPActivity extends AppCompatActivity {
             }
         });
 
-        verifyOTPViewModel.getMessageError().observe(this, new Observer<String>() {
+        verifyOTPViewModel.getMessageError().observe(this, new Observer<Event<String>>() {
             @Override
-            public void onChanged(String s) {
-                Toast.makeText(VerifyOTPActivity.this, s, Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<String> event) {
+                String message = event.getContent(); // Lấy thông báo lỗi chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(VerifyOTPActivity.this, message, Toast.LENGTH_SHORT).show();
+                }
             }
         });
-        verifyOTPViewModel.getRegisterError().observe(this, new Observer<Boolean>() {
+
+        verifyOTPViewModel.getRegisterError().observe(this, new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(VerifyOTPActivity.this, "Đã xảy ra lỗi trong quá trình xác thực", Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent(); // Lấy lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(VerifyOTPActivity.this, "Đã xảy ra lỗi trong quá trình xác thực", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-        verifyOTPViewModel.getRegisterResponse().observe(this, new Observer<Boolean>() {
+
+        verifyOTPViewModel.getRegisterResponse().observe(this, new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(VerifyOTPActivity.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<Boolean> event) {
+                Boolean registerSuccess = event.getContent(); // Lấy kết quả đăng ký chưa được xử lý
+                if (registerSuccess != null && registerSuccess) {
+                    Toast.makeText(VerifyOTPActivity.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
     }
 }

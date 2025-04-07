@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.hcmuteforums.data.remote.api.CategoryApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.entity.Category;
@@ -22,8 +23,8 @@ public class CategoryRepository {
     CategoryApi categoryApi;
 
     MutableLiveData<List<Category>> categoryList = new MutableLiveData<>();
-    MutableLiveData<String> messageError = new MutableLiveData<>();
-    MutableLiveData<Boolean> getError = new MutableLiveData<>();
+    MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
+    MutableLiveData<Event<Boolean>> getError = new MutableLiveData<>();
 
     public CategoryRepository(){
         categoryApi = LocalRetrofit.getRetrofit().create(CategoryApi.class);
@@ -35,28 +36,24 @@ public class CategoryRepository {
         return instance;
     }
 
-    public void getAllCategory(){
+    public void getAllCategory() {
         categoryApi.getAllCategories().enqueue(new Callback<ApiResponse<List<Category>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Category>>> call, Response<ApiResponse<List<Category>>> response) {
-                if (response.isSuccessful() && response.body() != null){
+                if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<List<Category>> apiRes = response.body();
-                    if (apiRes.getCode() == 200){
-                        categoryList.setValue(apiRes.getResult());
+                    if (apiRes.getCode() == 200) {
+                        categoryList.setValue(apiRes.getResult()); // ❗️Lỗi bạn quên từ khóa `Event<>`
+                    } else {
+                        getError.setValue(new Event<>(true));
                     }
-                    else{
-                        getError.setValue(true);
-                    }
-                }
-                else{
+                } else {
                     if (response.errorBody() != null) {
                         Gson gson = new Gson();
-                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
-                                ApiErrorResponse.class);
-                        messageError.setValue(apiError.getMessage());
-                    }
-                    else {
-                        getError.setValue(true);
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(), ApiErrorResponse.class);
+                        messageError.setValue(new Event<>(apiError.getMessage())); // ❗️Gói lỗi trong `Event<>`
+                    } else {
+                        getError.setValue(new Event<>(true));
                     }
                 }
             }
@@ -64,20 +61,24 @@ public class CategoryRepository {
             @Override
             public void onFailure(Call<ApiResponse<List<Category>>> call, Throwable throwable) {
                 Log.d("Error Get Category", throwable.getMessage());
-                getError.setValue(true);
+                getError.setValue(new Event<>(true));
             }
         });
+    }
+
+    public CategoryApi getCategoryApi() {
+        return categoryApi;
     }
 
     public MutableLiveData<List<Category>> getCategoryList() {
         return categoryList;
     }
 
-    public MutableLiveData<String> getMessageError() {
+    public MutableLiveData<Event<String>> getMessageError() {
         return messageError;
     }
 
-    public MutableLiveData<Boolean> getGetError() {
+    public MutableLiveData<Event<Boolean>> getGetError() {
         return getError;
     }
 }

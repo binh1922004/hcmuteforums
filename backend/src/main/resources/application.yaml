@@ -8,8 +8,8 @@ spring:
     max-file-size: 100MB
     max-request-size: 1000MB
   mail:
-    username: hcmutesending@gmail.com
-    password: bbut pbzy uiva pged
+    username: sending060425@gmail.com
+    password: qrwb kauf juku gyqt
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true

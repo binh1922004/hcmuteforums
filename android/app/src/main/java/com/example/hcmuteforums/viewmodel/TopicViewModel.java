@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.hcmuteforums.data.repository.TopicRepository;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 
 import java.util.List;
@@ -19,11 +20,11 @@ public class TopicViewModel extends ViewModel {
         return topicRepository.getTopicsLiveData();
     }
 
-    public LiveData<Boolean> getTopicError() {
+    public LiveData<Event<Boolean>> getTopicError() {
         return topicRepository.getTopicError();
     }
 
-    public LiveData<String> getMessageError() {
+    public LiveData<Event<String>> getMessageError() {
         return topicRepository.getMessageError();
     }
 

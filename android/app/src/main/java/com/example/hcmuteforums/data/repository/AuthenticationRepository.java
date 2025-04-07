@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.hcmuteforums.data.remote.api.AuthenticationApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.request.AuthenticationRequest;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
@@ -18,8 +19,8 @@ import retrofit2.Response;
 
 public class AuthenticationRepository {
     public static AuthenticationRepository instance;
-    private MutableLiveData<ApiResponse<AuthenticationResponse>> loginResponse = new MutableLiveData<>();
-    private MutableLiveData<Boolean> loginError = new MutableLiveData<>();
+    private MutableLiveData<Event<AuthenticationResponse>> loginResponse = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> loginError = new MutableLiveData<>();
     private AuthenticationApi authenticationApi;
     public AuthenticationRepository(){
         authenticationApi = LocalRetrofit.getRetrofit().create(AuthenticationApi.class);
@@ -44,32 +45,31 @@ public class AuthenticationRepository {
                 }
 
                 if (apiResp.getCode() == 200){
-                    loginResponse.setValue((ApiResponse<AuthenticationResponse>) apiResp);
+                    loginResponse.setValue(new Event<>((AuthenticationResponse) apiResp.getResult()));
                 }
                 else{
-                    loginError.setValue(true);
+                    loginError.setValue(new Event<>(true));
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<AuthenticationResponse>> call, Throwable throwable) {
                 Log.d("Loi", throwable.getMessage());
-                loginError.setValue(true);
+                loginError.setValue(new Event<>(true));
             }
         });
     }
 
-    public MutableLiveData<ApiResponse<AuthenticationResponse>> getLoginResponse() {
+    public MutableLiveData<Event<AuthenticationResponse>> getLoginResponse() {
         return loginResponse;
     }
 
-    public MutableLiveData<Boolean> getLoginError() {
+    public MutableLiveData<Event<Boolean>> getLoginError() {
         return loginError;
     }
 
-
     public void logout() {
-        loginResponse.setValue(null);
-        loginError.setValue(false);
+//        loginResponse.setValue(null);
+//        loginError.setValue(false);
     }
 }

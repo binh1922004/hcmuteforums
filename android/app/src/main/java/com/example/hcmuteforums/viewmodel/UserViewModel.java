@@ -5,6 +5,7 @@
 
     import com.example.hcmuteforums.data.repository.OtpRepository;
     import com.example.hcmuteforums.data.repository.UserRepository;
+    import com.example.hcmuteforums.event.Event;
     import com.example.hcmuteforums.model.dto.request.UserUpdateRequest;
     import com.example.hcmuteforums.model.dto.response.UserResponse;
 
@@ -14,10 +15,10 @@
             userRepository = UserRepository.getInstance();
         }
 
-        public LiveData<Boolean> getUserInfoError(){
+        public LiveData<Event<Boolean>> getUserInfoError(){
             return userRepository.getUserInfoError();
         }
-        public LiveData<String> getMessageError(){
+        public LiveData<Event<String>> getMessageError(){
             return userRepository.getMessageError();
         }
         public LiveData<UserResponse> getUserInfo(){
@@ -29,10 +30,10 @@
         public void updateUser(UserUpdateRequest userUpdateRequest){
             userRepository.updateUser(userUpdateRequest);
         }
-        public LiveData<Boolean> getUserUpdateError(){
+        public LiveData<Event<Boolean>> getUserUpdateError(){
             return userRepository.getUserUpdateError();
         }
-        public LiveData<Boolean> getUserUpdate(){
+        public LiveData<Event<Boolean>> getUserUpdate(){
             return userRepository.getUpdateResponse();
         }
 

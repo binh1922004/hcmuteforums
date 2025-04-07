@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.CategoryAdapter;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.entity.Category;
 import com.example.hcmuteforums.viewmodel.CategoryViewModel;
 
@@ -88,7 +89,8 @@ public class CategoryFragment extends Fragment {
 
         //get data from viewmodel
         categoryViewModel.fetchCategories();
-        //observe
+
+        //observer
         categoryViewModel.getCategoryList().observe(getViewLifecycleOwner(), new Observer<List<Category>>() {
             @Override
             public void onChanged(List<Category> categories) {
@@ -96,16 +98,16 @@ public class CategoryFragment extends Fragment {
             }
         });
 
-        categoryViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
+        categoryViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
-            public void onChanged(String s) {
-                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<String> stringEvent) {
+                Toast.makeText(getContext(), stringEvent.getContent(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        categoryViewModel.getGetError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        categoryViewModel.getGetError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
+            public void onChanged(Event<Boolean> booleanEvent) {
                 Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
             }
         });

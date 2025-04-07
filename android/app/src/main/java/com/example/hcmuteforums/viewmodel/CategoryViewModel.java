@@ -5,33 +5,28 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.hcmuteforums.data.repository.CategoryRepository;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.entity.Category;
 
 import java.util.List;
 
 public class CategoryViewModel extends ViewModel {
     private final CategoryRepository categoryRepository;
-    private final MutableLiveData<List<Category>> categoryList;
-    private final MutableLiveData<String> messageError;
-    private final MutableLiveData<Boolean> getError;
 
     public CategoryViewModel() {
         categoryRepository = CategoryRepository.getInstance();
-        categoryList = categoryRepository.getCategoryList();
-        messageError = categoryRepository.getMessageError();
-        getError = categoryRepository.getGetError();
     }
 
     public LiveData<List<Category>> getCategoryList() {
-        return categoryList;
+        return categoryRepository.getCategoryList();
     }
 
-    public LiveData<String> getMessageError() {
-        return messageError;
+    public LiveData<Event<String>> getMessageError() {
+        return categoryRepository.getMessageError();
     }
 
-    public LiveData<Boolean> getGetError() {
-        return getError;
+    public LiveData<Event<Boolean>> getGetError() {
+        return categoryRepository.getGetError();
     }
 
     public void fetchCategories() {

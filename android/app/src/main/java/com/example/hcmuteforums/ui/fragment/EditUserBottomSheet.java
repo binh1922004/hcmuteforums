@@ -22,6 +22,7 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.EditUserAdapter;
 import com.example.hcmuteforums.decoration.DividerItemDecoration;
 import com.example.hcmuteforums.decoration.RecyclerViewBorderDecoration;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.request.UserUpdateRequest;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.EditNameActivity;
@@ -144,18 +145,16 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
 
             }
         });
-        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent();
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
-            }
-        });
+
     }
 
     private void NameSplitter(String fullname)
@@ -224,22 +223,36 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
             }
 
         });
-        userViewModel.getMessageError().observe(this, new Observer<String>() {
+        // Quan sát lỗi cập nhật thông tin người dùng
+        userViewModel.getUserUpdateError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(String s) {
-                Toast.makeText(requireContext(), s,Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent();
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-        userViewModel.getUserUpdateError().observe(this, new Observer<Boolean>() {
+
+        // Quan sát thông báo cập nhật thành công
+        userViewModel.getUserUpdate().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(requireContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<Boolean> event) {
+                Boolean updateSuccess = event.getContent();
+                if (updateSuccess != null && updateSuccess) {
+                    Toast.makeText(getContext(), "Cập nhật tên thành công", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-        userViewModel.getUserUpdate().observe(this, new Observer<Boolean>() {
+
+        // Quan sát thông báo lỗi
+        userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(requireContext(), "Cập nhật tên thành công", Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<String> event) {
+                String errorMessage = event.getContent();
+                if (errorMessage != null) {
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
@@ -96,18 +97,26 @@ public class ProfileUserFragment extends Fragment {
                 tv_email.setText(userResponse.getEmail());
             }
         });
-        userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
+        userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
-            public void onChanged(String s) {
-                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<String> event) {
+                String message = event.getContent(); // Lấy nội dung sự kiện chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                }
             }
         });
-        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+
+        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent(); // Lấy lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
     }
 
     @Override

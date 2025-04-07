@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.CategoryAdapter;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
@@ -111,19 +112,26 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        topicViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<String>() {
+        topicViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
-            public void onChanged(String s) {
-                Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<String> event) {
+                String message = event.getContent(); // Lấy thông báo lỗi chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        topicViewModel.getTopicError().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        topicViewModel.getTopicError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent(); // Lấy lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
 
         RecyclerView.LayoutManager linearLayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         rcvTopic.setLayoutManager(linearLayout);
