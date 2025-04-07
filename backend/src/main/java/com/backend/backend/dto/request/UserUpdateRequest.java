@@ -3,6 +3,7 @@ package com.backend.backend.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Builder
@@ -13,7 +14,7 @@ import java.util.Date;
 public class UserUpdateRequest {
     String fullName;
     String phone;
-    Date dob;
+    LocalDate dob;
     String address;
     String gender;
 }
