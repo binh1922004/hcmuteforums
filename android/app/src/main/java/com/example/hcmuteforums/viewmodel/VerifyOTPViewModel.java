@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.hcmuteforums.data.repository.UserRepository;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.request.UserCreationRequest;
 
 public class VerifyOTPViewModel extends ViewModel {
@@ -17,15 +18,15 @@ public class VerifyOTPViewModel extends ViewModel {
         userRepository.register(userCreationRequest);
     }
 
-    public LiveData<Boolean> getRegisterResponse() {
+    public LiveData<Event<Boolean>> getRegisterResponse() {
         return userRepository.getRegisterResponse();
     }
 
-    public LiveData<String> getMessageError() {
+    public LiveData<Event<String>> getMessageError() {
         return userRepository.getMessageError();
     }
 
-    public LiveData<Boolean> getRegisterError() {
+    public LiveData<Event<Boolean>> getRegisterError() {
         return userRepository.getRegisterError();
     }
 }

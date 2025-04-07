@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.data.remote.interceptor.LocalAuthInterceptor;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
@@ -75,19 +76,20 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        authenticationViewModel.getLoginResponse().observe(this, new Observer<ApiResponse<AuthenticationResponse>>() {
+        authenticationViewModel.getLoginResponse().observe(this, new Observer<Event<AuthenticationResponse>>() {
             @Override
-            public void onChanged(ApiResponse<AuthenticationResponse> response) {
+            public void onChanged(Event<AuthenticationResponse> event) {
+                AuthenticationResponse response = event.getContent(); // Lấy giá trị chưa được xử lý
                 if (response != null) {
                     SharedPreferences preferences = getSharedPreferences("User", MODE_PRIVATE); //Set danh dau dang nhap
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean("isLoggedIn", true);
-                    editor.putString("username", response.getResult().getUsername()); // Lưu username
-                    editor.putString("email", response.getResult().getEmail());
+                    editor.putString("username", response.getUsername()); // Lưu username
+                    editor.putString("email", response.getEmail());
                     editor.apply();
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    //gan JWT sau khi login vao interceptor
-                    editor.putString("jwtLocal", response.getResult().getToken());
+                    //Gán JWT sau khi login vào interceptor
+                    editor.putString("jwtLocal", response.getToken());
                     editor.apply();
                     LocalAuthInterceptor.setInstance(LoginActivity.this);
                     LocalRetrofit.setInterceptor();
@@ -98,13 +100,15 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        authenticationViewModel.getLoginError().observe(this, new Observer<Boolean>() {
+        authenticationViewModel.getLoginError().observe(this, new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean isError) {
-                if (isError) {
+            public void onChanged(Event<Boolean> event) {
+                Boolean isError = event.getContent(); // Lấy giá trị chưa được xử lý
+                if (isError != null && isError) {
                     Toast.makeText(LoginActivity.this, "Đăng nhập thất bại!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
     }
 }

@@ -22,6 +22,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.request.UserCreationRequest;
 import com.example.hcmuteforums.ui.fragment.LoadingDialogFragment;
 import com.example.hcmuteforums.viewmodel.RegisterViewModel;
@@ -96,30 +97,41 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        registerViewModel.getSendOtpResponse().observe(this, new Observer<Boolean>() {
+        registerViewModel.getSendOtpResponse().observe(this, new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean isSent) {
-                Intent intent = new Intent(RegisterActivity.this, VerifyOTPActivity.class);
-                Gson gson = new Gson();
-                String userJson = gson.toJson(getUserCreation());
-                intent.putExtra("user_request_json", userJson);
-                startActivity(intent);
+            public void onChanged(Event<Boolean> event) {
+                Boolean isSent = event.getContent(); // Lấy giá trị chưa được xử lý
+                if (isSent != null && isSent) {
+                    // Nếu OTP đã được gửi thành công
+                    Intent intent = new Intent(RegisterActivity.this, VerifyOTPActivity.class);
+                    Gson gson = new Gson();
+                    String userJson = gson.toJson(getUserCreation());
+                    intent.putExtra("user_request_json", userJson);
+                    startActivity(intent);
+                }
             }
         });
 
-        registerViewModel.getMessageError().observe(this, new Observer<String>() {
+        registerViewModel.getMessageError().observe(this, new Observer<Event<String>>() {
             @Override
-            public void onChanged(String s) {
-                Toast.makeText(RegisterActivity.this, s, Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<String> event) {
+                String message = event.getContent(); // Lấy thông báo lỗi chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        registerViewModel.getSendOtpError().observe(this, new Observer<Boolean>() {
+        registerViewModel.getSendOtpError().observe(this, new Observer<Event<Boolean>>() {
             @Override
-            public void onChanged(Boolean aBoolean) {
-                Toast.makeText(RegisterActivity.this, "Da co loi xay ra", Toast.LENGTH_SHORT).show();
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent(); // Lấy giá trị lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(RegisterActivity.this, "Đã có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
         registerViewModel.getIsLoading().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isLoading) {
