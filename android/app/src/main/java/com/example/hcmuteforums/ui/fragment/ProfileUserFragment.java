@@ -24,14 +24,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
+import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -81,7 +86,9 @@ public class ProfileUserFragment extends Fragment {
 
     }
     UserViewModel userViewModel;
+    ProfileViewModel profileViewModel;
     AuthenticationViewModel authenticationViewModel;
+    ProfileResponse currentProfileResponse;
     String username, email;
 
     UserResponse currentUserResponse;   //Xac nhan co ton du lieu nguoi dung hay chua
@@ -93,7 +100,7 @@ public class ProfileUserFragment extends Fragment {
             @Override
             public void onChanged(UserResponse userResponse) {
                 currentUserResponse = userResponse;
-                tv_username.setText(userResponse.getUsername());
+                tv_username.setText(userResponse.getFullName());
                 tv_email.setText(userResponse.getEmail());
             }
         });
@@ -113,6 +120,40 @@ public class ProfileUserFragment extends Fragment {
                 Boolean errorOccurred = event.getContent(); // Lấy lỗi chưa được xử lý
                 if (errorOccurred != null && errorOccurred) {
                     Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+    String avatarProfile, coverProfile, bioProfile;
+    private void getProfile(){
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        profileViewModel.getProfile();
+        profileViewModel.getProfileInfo().observe(getViewLifecycleOwner(), new Observer<ProfileResponse>() {
+            @Override
+            public void onChanged(ProfileResponse profileResponse) {
+                avatarProfile = profileResponse.getAvatarUrl();
+                Log.d("DUong dan anh", avatarProfile);
+                coverProfile = profileResponse.getCoverUrl();
+                bioProfile = profileResponse.getBio();
+            }
+        });
+
+        profileViewModel.getProfileInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> booleanEvent) {
+                Boolean errorOccurred = booleanEvent.getContent(); // Lấy lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        profileViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> stringEvent) {
+                String message = stringEvent.getContent(); // Lấy nội dung sự kiện chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -145,9 +186,18 @@ public class ProfileUserFragment extends Fragment {
             startActivity(intent);
         });
         getInfo(tv_username, tv_email);
+        getProfile();
+        loadImage(view);
         //Goi Form EditProfile
         OpenEditProfile(btn_edit);
         return view;
+    }
+    private void loadImage(View viewProfile){
+        CircleImageView avatar = (CircleImageView)viewProfile.findViewById(R.id.imgAvatar);
+        Glide.with(requireContext()).load(avatarProfile)
+                .placeholder(R.drawable.avatar_boy)
+                .error(R.drawable.user_2)
+                .into(avatar);
     }
     private void OpenEditProfile(Button btn_edit){
         btn_edit.setOnClickListener(view -> {
