@@ -6,12 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragment.ProfileUserFragment">
 
-    <LinearLayout
+
+    <!--<LinearLayout
         android:id="@+id/headerProfile"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:background="@drawable/coverurl"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -41,86 +43,132 @@
             android:layout_marginEnd="10dp"
             android:contentDescription="Back"
             android:src="@drawable/icon_setting" />
-    </LinearLayout>
+    </LinearLayout>-->
 
+    <ImageButton
+        android:id="@+id/btnSetting"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/circle_button_background"
+        android:contentDescription="Camera"
+        android:elevation="4dp"
+        android:padding="12dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/icon_setting"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <!-- Khu vực thông tin người dùng -->
+    <ImageView
+        android:id="@+id/coverPhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/coverurl"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <ImageButton
+        android:id="@+id/coverCameraButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/circle_button_background"
+        android:contentDescription="Camera"
+        android:elevation="4dp"
+        android:padding="12dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_camera"
+        app:layout_constraintBottom_toBottomOf="@+id/coverPhoto"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgAvatar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/avatar_boy"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="-50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/coverPhoto"
+        tools:ignore="MissingConstraints"
+        />
+
+    <ImageButton
+        android:id="@+id/uploadAvatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="-15dp"
+        android:background="@drawable/circle_button_background"
+        android:contentDescription="Camera"
+        android:elevation="4dp"
+        android:padding="10dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_camera"
+        app:layout_constraintBottom_toBottomOf="@+id/imgAvatar"
+        app:layout_constraintEnd_toEndOf="@+id/imgAvatar" />
+
+
+
     <LinearLayout
         android:id="@+id/FrameUser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp"
+        android:orientation="vertical"
+        android:padding="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/headerProfile">
+        app:layout_constraintTop_toBottomOf="@+id/imgAvatar">
 
-        <!-- Ảnh đại diện -->
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imgAvatar"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/avatar_boy" />
+        <!-- Thông tin user -->
 
-        <!-- Thông tin user và nút Edit -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <!-- Thông tin user -->
-            <LinearLayout
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:text="Aaliah Maya"
+                android:layout_marginStart="4dp"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tvName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Aaliah Maya"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvUsername"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="maya75"
-                    android:textColor="#888888"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
+            <TextView
+                android:id="@+id/tvUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="maya75"
+                android:layout_marginStart="4dp"
+                android:textColor="#888888"
+                android:textSize="14sp" />
             <!-- Nút Edit -->
             <Button
                 android:id="@+id/btnEdit"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:textSize="15sp"
+                android:background="@drawable/custom_buton_profile"
                 android:backgroundTint="#E0E0E0"
-                android:text="Edit" />
+                android:text="Chỉnh sửa trang cá nhân" />
         </LinearLayout>
-    </LinearLayout>
-
-
-
     <!-- Thông tin tương tác -->
-    <LinearLayout
+    <!--<LinearLayout
         android:id="@+id/layoutStats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
-        android:gravity="center"
         android:background="@drawable/border_box"
+        android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -129,9 +177,9 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
             android:gravity="center"
             android:orientation="vertical"
-            android:layout_marginEnd="20dp"
             android:padding="8dp">
 
             <TextView
@@ -156,15 +204,15 @@
         <View
             android:layout_width="1dp"
             android:layout_height="40dp"
-            android:background="#DDDDDD"/>
+            android:background="#DDDDDD" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             android:gravity="center"
             android:orientation="vertical"
-            android:layout_marginEnd="15dp"
-            android:layout_marginStart="15dp"
             android:padding="8dp">
 
             <TextView
@@ -185,16 +233,18 @@
                 android:textColor="#888888"
                 android:textSize="14sp" />
         </LinearLayout>
+
         <View
             android:layout_width="1dp"
             android:layout_height="40dp"
-            android:background="#DDDDDD"/>
+            android:background="#DDDDDD" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:gravity="center"
             android:orientation="vertical"
-            android:layout_marginStart="20dp"
             android:padding="8dp">
 
             <TextView
@@ -216,7 +266,7 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-    </LinearLayout>
+    </LinearLayout>-->
 
     <!-- Tabs: Post | Details -->
     <LinearLayout
@@ -231,28 +281,28 @@
         android:weightSum="2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutStats">
+        app:layout_constraintTop_toBottomOf="@id/FrameUser">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
-            app:tabIndicatorColor="@android:color/black"
+            app:tabIndicatorColor="@color/blue"
             app:tabIndicatorFullWidth="true"
             app:tabIndicatorHeight="2dp"
-            app:tabSelectedTextColor="@android:color/black"
-            app:tabTextColor="@android:color/darker_gray">
+            app:tabSelectedTextColor="@color/blue"
+            app:tabTextColor="@color/black">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Post" />
+                android:text="Bài viết" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Details" />
+                android:text="Ảnh" />
         </com.google.android.material.tabs.TabLayout>
     </LinearLayout>
 

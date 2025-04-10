@@ -17,9 +17,9 @@ legacySupportV4 = "1.0.0"
 recyclerview = "1.3.0"
 glide = "4.14.2"
 
-
 [libraries]
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
+imagepicker = { module = "com.github.dhaval2404:imagepicker", version = "2.1" }
 fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

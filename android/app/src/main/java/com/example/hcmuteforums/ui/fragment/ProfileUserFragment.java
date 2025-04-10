@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -168,7 +170,7 @@ public class ProfileUserFragment extends Fragment {
         TextView tv_username = view.findViewById(R.id.tvName);
         TextView tv_email = view.findViewById(R.id.tvUsername);
         Button btn_edit = view.findViewById(R.id.btnEdit);
-        ImageView btn_logout = view.findViewById(R.id.btnSetting);  //logout
+        ImageButton btn_logout = view.findViewById(R.id.btnSetting);  //logout
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
@@ -190,6 +192,9 @@ public class ProfileUserFragment extends Fragment {
         loadImage(view);
         //Goi Form EditProfile
         OpenEditProfile(btn_edit);
+
+        //Upload anh
+        upLoadImage(view);
         return view;
     }
     private void loadImage(View viewProfile){
@@ -213,6 +218,24 @@ public class ProfileUserFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    //Xu li up anh len
+    ImageView coverPhoto;
+    ImageButton uploadAvatar, uploadCover;
+    private void upLoadImage(View view)
+    {
+        coverPhoto = (ImageView)view.findViewById(R.id.coverPhoto);
+        uploadAvatar = (ImageButton) view.findViewById(R.id.uploadAvatar);
+        uploadCover = (ImageButton) view.findViewById(R.id.coverCameraButton);
+
+        uploadCover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImagePicker.Companion.with(requireActivity())
+                        .start();
+            }
+        });
     }
 
 }
