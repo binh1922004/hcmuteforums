@@ -19,8 +19,6 @@ import retrofit2.Response;
 
 public class AuthenticationRepository {
     public static AuthenticationRepository instance;
-    private MutableLiveData<Event<AuthenticationResponse>> loginResponse = new MutableLiveData<>();
-    private MutableLiveData<Event<Boolean>> loginError = new MutableLiveData<>();
     private AuthenticationApi authenticationApi;
     public AuthenticationRepository(){
         authenticationApi = LocalRetrofit.getRetrofit().create(AuthenticationApi.class);
@@ -31,45 +29,9 @@ public class AuthenticationRepository {
         return instance;
     }
 
-    public void login(String username, String password){
+    public void login(String username, String password, Callback<ApiResponse<AuthenticationResponse>> callback) {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(username, password);
-        authenticationApi.login(authenticationRequest).enqueue(new Callback<ApiResponse<AuthenticationResponse>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<AuthenticationResponse>> call, Response<ApiResponse<AuthenticationResponse>> response) {
-                ApiResponse<?> apiResp;
-                if (response.isSuccessful() && response.body() != null){
-                    apiResp = response.body();
-                }
-                else{
-                    apiResp = ApiErrorHandler.parseError(response);
-                }
-
-                if (apiResp.getCode() == 200){
-                    loginResponse.setValue(new Event<>((AuthenticationResponse) apiResp.getResult()));
-                }
-                else{
-                    loginError.setValue(new Event<>(true));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<AuthenticationResponse>> call, Throwable throwable) {
-                Log.d("Loi", throwable.getMessage());
-                loginError.setValue(new Event<>(true));
-            }
-        });
-    }
-
-    public MutableLiveData<Event<AuthenticationResponse>> getLoginResponse() {
-        return loginResponse;
-    }
-
-    public MutableLiveData<Event<Boolean>> getLoginError() {
-        return loginError;
-    }
-
-    public void logout() {
-//        loginResponse.setValue(null);
-//        loginError.setValue(false);
+        Call<ApiResponse<AuthenticationResponse>> call = authenticationApi.login(authenticationRequest);
+        call.enqueue(callback);
     }
 }

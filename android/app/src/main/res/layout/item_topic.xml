@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardElevation="4dp"
@@ -68,11 +69,17 @@
                 android:textStyle="bold" />
 
             <!-- Nội dung -->
-            <TextView
+            <io.github.glailton.expandabletextview.ExpandableTextView
                 android:id="@+id/tvContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
+                expandableTextView:collapsedLines="3"
+                expandableTextView:animDuration="500"
+                expandableTextView:readMoreText="xem thêm"
+                expandableTextView:readLessText="thu gọn"
+                expandableTextView:textMode="line"
+                app:expandType="layout"
                 android:text="Content" />
 
             <LinearLayout

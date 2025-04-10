@@ -1,6 +1,7 @@
 [versions]
 agp = "8.7.3"
 circleimageview = "3.1.0"
+expandabletextview = "1.0.4"
 fragment = "1.8.6"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -19,6 +20,7 @@ glide = "4.14.2"
 
 [libraries]
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
+expandabletextview = { module = "io.github.glailton.expandabletextview:expandabletextview", version.ref = "expandabletextview" }
 imagepicker = { module = "com.github.dhaval2404:imagepicker", version = "2.1" }
 fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

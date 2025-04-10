@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.circleimageview)
     implementation(libs.gson)
     implementation(libs.fragment)
+    implementation(libs.expandabletextview)
     implementation(libs.legacy.support.v4)
     implementation(libs.recyclerview)
     testImplementation(libs.junit)

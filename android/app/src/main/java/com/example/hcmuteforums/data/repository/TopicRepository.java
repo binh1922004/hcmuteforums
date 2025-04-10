@@ -36,35 +36,9 @@ public class TopicRepository {
         topicApi = LocalRetrofit.getRetrofit().create(TopicApi.class);
     }
 
-    public void getAllTopics() {
-        topicApi.getAllTopic().enqueue(new Callback<ApiResponse<List<TopicDetailResponse>>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<List<TopicDetailResponse>>> call, Response<ApiResponse<List<TopicDetailResponse>>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<List<TopicDetailResponse>> apiRes = response.body();
-                    if (apiRes.getResult() != null) {
-                        topicsLiveData.setValue(apiRes.getResult());  // ✅ Không dùng Event
-                    } else {
-                        topicError.setValue(new Event<>(true));       // ✅ Dùng Event
-                    }
-                } else {
-                    if (response.errorBody() != null) {
-                        Gson gson = new Gson();
-                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
-                                ApiErrorResponse.class);
-                        messageError.setValue(new Event<>(apiError.getMessage()));  // ✅ Dùng Event
-                    } else {
-                        topicError.setValue(new Event<>(true));
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<List<TopicDetailResponse>>> call, Throwable throwable) {
-                Log.d("Error Topic", throwable.getMessage());
-                topicError.setValue(new Event<>(true));
-            }
-        });
+    public void getAllTopics(Callback<ApiResponse<List<TopicDetailResponse>>> callback) {
+        var call = topicApi.getAllTopic();
+        call.enqueue(callback);
     }
 
     public MutableLiveData<List<TopicDetailResponse>> getTopicsLiveData() {
