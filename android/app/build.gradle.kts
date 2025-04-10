@@ -54,4 +54,7 @@ dependencies {
     implementation(libs.okhttp.logging)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.glide)
+    annotationProcessor(libs.glide.compiler)
+    implementation(libs.imagepicker)
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="RoundedImage">
+    <!--<style name="RoundedImage">
         <item name="cornerSize">50%</item>
-        <item name="cornerFamily">rounded</item><!-- Bo tròn toàn bộ -->
-    </style>
+        <item name="cornerFamily">rounded</item>&lt;!&ndash; Bo tròn toàn bộ &ndash;&gt;
+    </style>-->
     <style name="BottomSheetTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -12,4 +12,9 @@
         <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
     </style>
+   <!-- <style name="RoundedFab">
+        <item name="backgroundTint">@color/gray</item>
+        <item name="elevation">6dp</item>
+        <item name="rippleColor">?attr/colorOnPrimary</item>
+    </style>-->
 </resources>

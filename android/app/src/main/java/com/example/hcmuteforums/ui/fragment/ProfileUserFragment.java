@@ -20,18 +20,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
+import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -81,7 +88,9 @@ public class ProfileUserFragment extends Fragment {
 
     }
     UserViewModel userViewModel;
+    ProfileViewModel profileViewModel;
     AuthenticationViewModel authenticationViewModel;
+    ProfileResponse currentProfileResponse;
     String username, email;
 
     UserResponse currentUserResponse;   //Xac nhan co ton du lieu nguoi dung hay chua
@@ -93,7 +102,7 @@ public class ProfileUserFragment extends Fragment {
             @Override
             public void onChanged(UserResponse userResponse) {
                 currentUserResponse = userResponse;
-                tv_username.setText(userResponse.getUsername());
+                tv_username.setText(userResponse.getFullName());
                 tv_email.setText(userResponse.getEmail());
             }
         });
@@ -118,6 +127,40 @@ public class ProfileUserFragment extends Fragment {
         });
 
     }
+    String avatarProfile, coverProfile, bioProfile;
+    private void getProfile(){
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        profileViewModel.getProfile();
+        profileViewModel.getProfileInfo().observe(getViewLifecycleOwner(), new Observer<ProfileResponse>() {
+            @Override
+            public void onChanged(ProfileResponse profileResponse) {
+                avatarProfile = profileResponse.getAvatarUrl();
+                Log.d("DUong dan anh", avatarProfile);
+                coverProfile = profileResponse.getCoverUrl();
+                bioProfile = profileResponse.getBio();
+            }
+        });
+
+        profileViewModel.getProfileInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> booleanEvent) {
+                Boolean errorOccurred = booleanEvent.getContent(); // Lấy lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        profileViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> stringEvent) {
+                String message = stringEvent.getContent(); // Lấy nội dung sự kiện chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -127,7 +170,7 @@ public class ProfileUserFragment extends Fragment {
         TextView tv_username = view.findViewById(R.id.tvName);
         TextView tv_email = view.findViewById(R.id.tvUsername);
         Button btn_edit = view.findViewById(R.id.btnEdit);
-        ImageView btn_logout = view.findViewById(R.id.btnSetting);  //logout
+        ImageButton btn_logout = view.findViewById(R.id.btnSetting);  //logout
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
@@ -145,9 +188,21 @@ public class ProfileUserFragment extends Fragment {
             startActivity(intent);
         });
         getInfo(tv_username, tv_email);
+        getProfile();
+        loadImage(view);
         //Goi Form EditProfile
         OpenEditProfile(btn_edit);
+
+        //Upload anh
+        upLoadImage(view);
         return view;
+    }
+    private void loadImage(View viewProfile){
+        CircleImageView avatar = (CircleImageView)viewProfile.findViewById(R.id.imgAvatar);
+        Glide.with(requireContext()).load(avatarProfile)
+                .placeholder(R.drawable.avatar_boy)
+                .error(R.drawable.user_2)
+                .into(avatar);
     }
     private void OpenEditProfile(Button btn_edit){
         btn_edit.setOnClickListener(view -> {
@@ -163,6 +218,24 @@ public class ProfileUserFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    //Xu li up anh len
+    ImageView coverPhoto;
+    ImageButton uploadAvatar, uploadCover;
+    private void upLoadImage(View view)
+    {
+        coverPhoto = (ImageView)view.findViewById(R.id.coverPhoto);
+        uploadAvatar = (ImageButton) view.findViewById(R.id.uploadAvatar);
+        uploadCover = (ImageButton) view.findViewById(R.id.coverCameraButton);
+
+        uploadCover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImagePicker.Companion.with(requireActivity())
+                        .start();
+            }
+        });
     }
 
 }

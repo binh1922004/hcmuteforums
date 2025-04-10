@@ -42,7 +42,9 @@ import java.util.Locale;
 public class EditUserBottomSheet extends BottomSheetDialogFragment {
     private ViewGroup containerView;
 
-   UserUpdateRequest userUpdateRequest;
+    UserUpdateRequest userUpdateRequest;
+    UserUpdateRequest user;
+    UserResponse userCurrent;
     public static final String ARG_USER = "user";
     public static EditUserBottomSheet newInstance(UserResponse user)
     {
@@ -80,12 +82,33 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         return inflater.inflate(R.layout.fragment_bottom_sheet_edit_user_dialog, container, false);
     }
-
+    String fullname, dob, gender, address, phone;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        TextView tv_fullname = view.findViewById(R.id.tv_Fullname);
+        if(getArguments()!=null){
+            userCurrent = (UserResponse) getArguments().getSerializable("user");
+        }
+        fullname = userCurrent.getFullName().toString();
+        dob = userCurrent.getDob().toString();
+        gender = userCurrent.getGender().toString();
+        if(userCurrent.getAddress().toString()!=null)
+        {
+            address = userCurrent.getAddress().toString();
+        }else if (userCurrent.getAddress().toString() == null)
+        {
+            address = "Chưa có địa chỉ";
+        } else if (userCurrent.getPhone().toString()!=null) {
+            phone = userCurrent.getPhone().toString();
+        } else if (userCurrent.getPhone().toString() == null) {
+            phone = "Chưa có số điện thoại";
+        }
+        Log.d("Fullname", fullname);
+        tv_fullname.setText(userCurrent.getFullName());
         setupRecyclerView(view);
     }
 
@@ -100,6 +123,8 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         parent.removeAllViews();
 
         View mainView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_bottom_sheet_edit_user_dialog, parent, false);
+        TextView tv_fullname = mainView.findViewById(R.id.tv_Fullname);
+        tv_fullname.setText(userCurrent.getFullName());
         parent.addView(mainView);
 
         setupRecyclerView(mainView); // Set lại RecyclerView
@@ -125,8 +150,51 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     EditText edt_ho, edt_tendem, edt_ten;
     String ho = "" , ten="", tendem = "";
 
+    private void getInfo(View mainView, UserUpdateRequest userUpdateRequest)
+    {
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        userViewModel.getInfo();
+        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
+            @Override
+            public void onChanged(UserResponse userResponse) {
+                if(userResponse!=null){
+                    userUpdateRequest.setDob(userResponse.getDob());
+                    userUpdateRequest.setAddress(userResponse.getAddress());
+                    userUpdateRequest.setGender(userResponse.getGender());
+                    userUpdateRequest.setPhone(userResponse.getPhone());
+                    userUpdateRequest.setFullName(userResponse.getFullName());
+                }
+
+            }
+        });
+        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> booleanEvent) {
+                Boolean errorOccurred = booleanEvent.getContent();
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
     private void getProfileInfo(View editNameView)
     {
+       /* String name = fullname;
+        if(name!=null)
+        {
+            Log.d("Name Edit", name);
+
+        }
+        else{
+            Log.d("Name Edit"  , "Null");
+            return;
+        }
+        userUpdateRequest.setFullName(name.toString());
+        userUpdateRequest.setDob(dob);
+        userUpdateRequest.setPhone(phone);
+        userUpdateRequest.setGender(gender);
+        userUpdateRequest.setAddress(address);
+        SetEdtName(editNameView, userUpdateRequest.getFullName());*/
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         userViewModel.getInfo();
         userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
@@ -154,6 +222,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 }
             }
         });
+
 
     }
 
@@ -220,6 +289,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
             {
                 userUpdateRequest.setFullName(NewFullName);
                 userViewModel.updateUser(userUpdateRequest);
+                userCurrent.setFullName(NewFullName);   //Lay ra ten duoc cap nhat dem ve cho MainSheet
             }
 
         });
@@ -241,6 +311,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 Boolean updateSuccess = event.getContent();
                 if (updateSuccess != null && updateSuccess) {
                     Toast.makeText(getContext(), "Cập nhật tên thành công", Toast.LENGTH_SHORT).show();
+                    switchToMainLayout();   //Chuyen ve mainSheet
                 }
             }
         });
