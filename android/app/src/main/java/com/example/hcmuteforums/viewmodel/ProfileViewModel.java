@@ -9,6 +9,8 @@ import com.example.hcmuteforums.model.dto.request.ProfileUpdateRequest;
 import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 
+import java.io.File;
+
 public class ProfileViewModel extends ViewModel {
     private ProfileRepository profileRepository;
     public ProfileViewModel(){
@@ -34,6 +36,9 @@ public class ProfileViewModel extends ViewModel {
     }
     public void updateProfile(ProfileUpdateRequest profileUpdateRequest){
         profileRepository.updateProfile(profileUpdateRequest);
+    }
+    public void uploadCoverImage(File imageFile){
+        profileRepository.uploadCoverImagae(imageFile);
     }
 
 }

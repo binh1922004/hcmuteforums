@@ -128,7 +128,7 @@ public class ProfileUserFragment extends Fragment {
 
     }
     String avatarProfile, coverProfile, bioProfile;
-    private void getProfile(){
+    private void getProfile(View view){
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         profileViewModel.getProfile();
         profileViewModel.getProfileInfo().observe(getViewLifecycleOwner(), new Observer<ProfileResponse>() {
@@ -138,6 +138,7 @@ public class ProfileUserFragment extends Fragment {
                 Log.d("DUong dan anh", avatarProfile);
                 coverProfile = profileResponse.getCoverUrl();
                 bioProfile = profileResponse.getBio();
+                loadImage(view);
             }
         });
 
@@ -188,8 +189,8 @@ public class ProfileUserFragment extends Fragment {
             startActivity(intent);
         });
         getInfo(tv_username, tv_email);
-        getProfile();
-        loadImage(view);
+        getProfile(view);
+
         //Goi Form EditProfile
         OpenEditProfile(btn_edit);
 
@@ -199,10 +200,17 @@ public class ProfileUserFragment extends Fragment {
     }
     private void loadImage(View viewProfile){
         CircleImageView avatar = (CircleImageView)viewProfile.findViewById(R.id.imgAvatar);
-        Glide.with(requireContext()).load(avatarProfile)
+        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" +avatarProfile)
                 .placeholder(R.drawable.avatar_boy)
                 .error(R.drawable.user_2)
                 .into(avatar);
+        ImageView cover = (ImageView) viewProfile.findViewById(R.id.coverPhoto);
+        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/"+coverProfile)
+                .placeholder(R.drawable.avatar_boy)
+                .error(R.drawable.user_2)
+                .centerCrop()
+                .into(cover);
+
     }
     private void OpenEditProfile(Button btn_edit){
         btn_edit.setOnClickListener(view -> {
@@ -237,5 +245,6 @@ public class ProfileUserFragment extends Fragment {
             }
         });
     }
+
 
 }

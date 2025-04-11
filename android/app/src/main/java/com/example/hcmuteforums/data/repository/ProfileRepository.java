@@ -14,6 +14,11 @@ import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.google.gson.Gson;
 
+import java.io.File;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,7 +35,8 @@ public class ProfileRepository {
     private final MutableLiveData<Event<Boolean>> profileUpdateError = new MutableLiveData<>();
 
     private final ProfileApi profileApi;
-    public static ProfileRepository getInstance(){
+
+    public static ProfileRepository getInstance() {
         if (instance == null)
             instance = new ProfileRepository();
         return instance;
@@ -39,16 +45,16 @@ public class ProfileRepository {
     public ProfileRepository() {
         profileApi = LocalRetrofit.getRetrofit().create(ProfileApi.class);
     }
-    public void getProfile(){
+
+    public void getProfile() {
         profileApi.myProfile().enqueue(new Callback<ApiResponse<ProfileResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<ProfileResponse>> call, Response<ApiResponse<ProfileResponse>> response) {
-                if(response.isSuccessful() && response.body()!=null){
+                if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<ProfileResponse> apiResponse = response.body();
-                    if(apiResponse.getResult()!=null){
+                    if (apiResponse.getResult() != null) {
                         profileInfo.setValue(apiResponse.getResult());
-                    }
-                    else{
+                    } else {
                         profileInfoError.setValue(new Event<>(true));
                     }
                 }
@@ -61,7 +67,8 @@ public class ProfileRepository {
             }
         });
     }
-    public void updateProfile(ProfileUpdateRequest profileUpdateRequest){
+
+    public void updateProfile(ProfileUpdateRequest profileUpdateRequest) {
         profileApi.updateProfile(profileUpdateRequest).enqueue(new Callback<ApiResponse<ProfileResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<ProfileResponse>> call, Response<ApiResponse<ProfileResponse>> response) {
@@ -72,7 +79,7 @@ public class ProfileRepository {
                     } else {
                         profileUpdateError.setValue(new Event<>(true));
                     }
-                }else {
+                } else {
                     if (response.errorBody() != null) {
                         Gson gson = new Gson();
                         ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(), ApiErrorResponse.class);
@@ -91,6 +98,28 @@ public class ProfileRepository {
             public void onFailure(Call<ApiResponse<ProfileResponse>> call, Throwable throwable) {
                 Log.d("Error Profile User", throwable.getMessage());
                 profileUpdateError.setValue(new Event<>(true));
+            }
+        });
+    }
+
+    public void uploadCoverImagae(File imageFile){
+        RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), imageFile);
+        MultipartBody.Part part = MultipartBody.Part.createFormData("coverImage",
+                imageFile.getName(), requestBody);
+        Call<ApiResponse<Boolean>> call = profileApi.uploadCoverImage(part);
+        call.enqueue(new Callback<ApiResponse<Boolean>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {
+                if(response.isSuccessful() && response.body()!=null){
+                    profileUpdateResponse.postValue(new Event<>(response.body().getResult()));
+                }else {
+                    profileUpdateError.postValue(new Event<>(true));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Boolean>> call, Throwable throwable) {
+                messageError.postValue(new Event<>("Upload ảnh bìa thất bại: " + throwable.getMessage()));
             }
         });
     }
