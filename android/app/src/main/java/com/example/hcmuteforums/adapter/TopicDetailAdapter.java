@@ -58,7 +58,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
     }
 
     public class TopicDetailViewHolder extends RecyclerView.ViewHolder{
-        TextView tvName, tvTime, tvTitle, tvContent;
+        TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount;
         ImageView btnLike;
         CircleImageView imgAvatar;
         ViewPager2 viewPagerImages;
@@ -71,6 +71,8 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
             btnLike = itemView.findViewById(R.id.btnLike);
             viewPagerImages = itemView.findViewById(R.id.viewPagerImages);
+            tvReplyCount = itemView.findViewById(R.id.tvReplyCount);
+            tvLikeCount = itemView.findViewById(R.id.tvLikeCount);
         }
 
         public void bind(TopicDetailResponse topic) {
@@ -86,9 +88,13 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
             } else {
                 viewPagerImages.setVisibility(View.GONE);
             }
+
+            //biding for like
+            tvLikeCount.setText(String.valueOf(topic.getLikeCount()));
             boolean like = topic.isLiked();
             Log.d("Like: ", like ? "isLike": "unlike");
             if (like){
+                btnLike.setSelected(true);
                 btnLike.setImageResource(R.drawable.love_click);
             }
 
@@ -104,7 +110,15 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
                 if (topicLikeListener != null){
                     topicLikeListener.likeTopic(topic.getId());
                 }
+                int currentLike = topic.getLikeCount();
+
+                currentLike += (v.isSelected() ? 1 : -1);
+                tvLikeCount.setText(String.valueOf(currentLike));
             });
+
+
+            //biding for reply
+            tvReplyCount.setText(String.valueOf(topic.getReplyCount()));
         }
     }
 }
