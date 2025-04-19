@@ -8,12 +8,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.data.remote.api.AuthenticationApi;
-import com.example.hcmuteforums.data.remote.interceptor.LocalAuthInterceptor;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
-import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
-import com.example.hcmuteforums.model.dto.response.UserResponse;
-import com.google.gson.Gson;
+
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

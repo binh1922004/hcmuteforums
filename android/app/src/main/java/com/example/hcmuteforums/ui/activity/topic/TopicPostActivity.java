@@ -30,6 +30,7 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.ImageUploadAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.listeners.ImageActionListener;
+import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.viewmodel.TopicPostViewModel;
 
 public class TopicPostActivity extends AppCompatActivity implements ImageActionListener {
@@ -88,16 +89,16 @@ public class TopicPostActivity extends AppCompatActivity implements ImageActionL
         tvPost.setOnClickListener(v -> {
             String title = edtTitle.getText().toString();
             String content = edtContent.getText().toString();
-            String subCategoryId = "8dd3ad6b-ff4a-11ef-ae63-0242ac120003";
-            Toast.makeText(this, "Go", Toast.LENGTH_SHORT).show();
-            topicPostViewModel.postTopic(title, content, subCategoryId);
+            topicPostViewModel.postTopic(title, content);
         });
 
-        topicPostViewModel.getTopicPostSuccess().observe(this, new Observer<Event<Boolean>>() {
+        topicPostViewModel.getTopicPostSuccess().observe(this, new Observer<Event<TopicDetailResponse>>() {
             @Override
-            public void onChanged(Event<Boolean> event) {
-                if (event.getContent() != null){
+            public void onChanged(Event<TopicDetailResponse> topic) {
+                TopicDetailResponse topicDetailResponse = topic.getContent();
+                if (topicDetailResponse != null){
                     Toast.makeText(TopicPostActivity.this, "Post thanhg cong", Toast.LENGTH_SHORT).show();
+                    topicPostViewModel.uploadImage(topicDetailResponse.getId(), imageAdapter.getImageList(), TopicPostActivity.this);
                 }
             }
         });
@@ -117,6 +118,15 @@ public class TopicPostActivity extends AppCompatActivity implements ImageActionL
                 String mess = stringEvent.getContent();
                 if (mess != null){
                     Toast.makeText(TopicPostActivity.this, mess, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        topicPostViewModel.getImageUploadSuccess().observe(this, new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> booleanEvent) {
+                if (booleanEvent.getContent() != null){
+                    finish();
                 }
             }
         });

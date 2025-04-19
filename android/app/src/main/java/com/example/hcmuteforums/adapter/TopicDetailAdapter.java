@@ -53,9 +53,11 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
             holder.btnLike.setImageResource(R.drawable.love_click);
         }
 //
-//        holder.btnLike.setOnClickListener(v -> {
-//            v.setSelected(!v.isSelected());
-//        });
+        holder.btnLike.setOnClickListener(v -> {
+            v.setSelected(!v.isSelected());
+
+        });
+
     }
 
 
