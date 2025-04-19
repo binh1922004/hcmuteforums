@@ -31,6 +31,7 @@ import com.example.hcmuteforums.adapter.ImageUploadAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.listeners.ImageActionListener;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
+import com.example.hcmuteforums.ui.fragment.LoadingDialogFragment;
 import com.example.hcmuteforums.viewmodel.TopicPostViewModel;
 
 public class TopicPostActivity extends AppCompatActivity implements ImageActionListener {
@@ -46,6 +47,8 @@ public class TopicPostActivity extends AppCompatActivity implements ImageActionL
     LinearLayout layoutAddImage;
     //viewmodel
     TopicPostViewModel topicPostViewModel;
+    //fragment
+    LoadingDialogFragment loadingDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +82,8 @@ public class TopicPostActivity extends AppCompatActivity implements ImageActionL
         recyclerViewImages.setAdapter(imageAdapter);
         //viewmodel
         topicPostViewModel = new ViewModelProvider(this).get(TopicPostViewModel.class);
+        //fragment
+        loadingDialog = new LoadingDialogFragment();
     }
     private void cancelClickEvent(){
         tvCancel.setOnClickListener(v -> {
@@ -127,6 +132,18 @@ public class TopicPostActivity extends AppCompatActivity implements ImageActionL
             public void onChanged(Event<Boolean> booleanEvent) {
                 if (booleanEvent.getContent() != null){
                     finish();
+                }
+            }
+        });
+
+        topicPostViewModel.getIsLoading().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isLoading) {
+                if (isLoading){
+                    loadingDialog.show(getSupportFragmentManager(), "LoadingDiaglog");
+                }
+                else{
+                    loadingDialog.dismiss();
                 }
             }
         });

@@ -18,9 +18,11 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.CategoryAdapter;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
+import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
 import java.util.List;
@@ -30,7 +32,7 @@ import java.util.List;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements TopicLikeListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -42,6 +44,7 @@ public class HomeFragment extends Fragment {
     private String mParam2;
 
     private TopicViewModel topicViewModel;
+    private TopicDetailViewModel topicDetailViewModel;
     private CardView cvPostTopic;
 
     public HomeFragment() {
@@ -83,6 +86,7 @@ public class HomeFragment extends Fragment {
 
         //init data
         topicViewModel = new TopicViewModel();
+        topicDetailViewModel = new TopicDetailViewModel();
         cvPostTopic = view.findViewById(R.id.cvPostTopic);
         //show category
         showAllTopic(view);
@@ -100,7 +104,7 @@ public class HomeFragment extends Fragment {
 
     private void showAllTopic(View view) {
         RecyclerView rcvTopic = view.findViewById(R.id.rcvTopic);
-        TopicDetailAdapter topicDetailAdapter = new TopicDetailAdapter(getContext());
+        TopicDetailAdapter topicDetailAdapter = new TopicDetailAdapter(getContext(), this);
 
         //get data from viewmodel
         topicViewModel.fetchAllTopics();
@@ -137,4 +141,10 @@ public class HomeFragment extends Fragment {
         rcvTopic.setLayoutManager(linearLayout);
         rcvTopic.setAdapter(topicDetailAdapter);
     }
+
+    @Override
+    public void likeTopic(String topicId) {
+        topicDetailViewModel.likeTopic(topicId);
+    }
+
 }

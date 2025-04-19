@@ -3,6 +3,7 @@ package com.example.hcmuteforums.model.dto.response;
 import com.example.hcmuteforums.model.dto.UserGeneral;
 
 import java.util.Date;
+import java.util.List;
 
 public class TopicDetailResponse {
     private String id;
@@ -14,6 +15,7 @@ public class TopicDetailResponse {
     private int replyCount;
     private boolean liked;
     private boolean owner;
+    private List<String> imgUrls;
 
     public UserGeneral getUserGeneral() {
         return userGeneral;
@@ -85,5 +87,9 @@ public class TopicDetailResponse {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public List<String> getImgUrls() {
+        return imgUrls;
     }
 }

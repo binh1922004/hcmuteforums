@@ -26,6 +26,7 @@ public class TopicPostViewModel extends ViewModel {
     private MutableLiveData<Event<TopicDetailResponse>> topicPostSuccess = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> imageUploadSuccess = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> imageUploadError = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> topicPostError = new MutableLiveData<>();
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
     public TopicPostViewModel() {
@@ -33,6 +34,7 @@ public class TopicPostViewModel extends ViewModel {
     }
 
     public void postTopic(String title, String content){
+        isLoading.setValue(true);
         topicRepository.postTopic(title, content, new Callback<ApiResponse<TopicDetailResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<TopicDetailResponse>> call, Response<ApiResponse<TopicDetailResponse>> response) {
@@ -83,11 +85,13 @@ public class TopicPostViewModel extends ViewModel {
                         imageUploadError.setValue(new Event<>(true));
                     }
                 }
+                isLoading.setValue(false);
             }
 
             @Override
             public void onFailure(Call<ApiResponse<Boolean>> call, Throwable throwable) {
                 Log.d("Error post", throwable.getMessage());
+                isLoading.setValue(false);
                 imageUploadError.setValue(new Event<>(true));
             }
         });
@@ -112,5 +116,9 @@ public class TopicPostViewModel extends ViewModel {
 
     public MutableLiveData<Event<Boolean>> getImageUploadError() {
         return imageUploadError;
+    }
+
+    public MutableLiveData<Boolean> getIsLoading() {
+        return isLoading;
     }
 }

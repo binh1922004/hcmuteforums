@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.hcmuteforums.data.remote.api.LikeApi;
 import com.example.hcmuteforums.data.remote.api.TopicApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.event.Event;
@@ -31,6 +32,7 @@ public class TopicRepository {
     private static TopicRepository instance;
 
     private TopicApi topicApi;
+    private LikeApi likeApi;
 
     public static TopicRepository getInstance() {
         if (instance == null)
@@ -40,6 +42,7 @@ public class TopicRepository {
 
     public TopicRepository() {
         topicApi = LocalRetrofit.getRetrofit().create(TopicApi.class);
+        likeApi = LocalRetrofit.getRetrofit().create(LikeApi.class);
     }
 
     public void getAllTopics(Callback<ApiResponse<List<TopicDetailResponse>>> callback) {
@@ -62,6 +65,11 @@ public class TopicRepository {
             parts.add(part);
         }
         var call = topicApi.uploadImages(topicId, parts);
+        call.enqueue(callback);
+    }
+
+    public void likeTopic(String topicId, Callback<ApiResponse<Boolean>> callback){
+        var call = likeApi.likeTopic(topicId);
         call.enqueue(callback);
     }
 
