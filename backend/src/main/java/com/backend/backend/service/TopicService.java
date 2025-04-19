@@ -50,25 +50,18 @@ public class TopicService {
 
         return topicDetailResponseList;
     }
-    public boolean postTopic(TopicPostRequest topicPostRequest) {
+    public TopicDetailResponse postTopic(TopicPostRequest topicPostRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByUsername(username);
-        Optional<SubCategory> subCategory = subCategoryRepository.findById(topicPostRequest.getSubCategoryId());
-        if (user.isEmpty() || subCategory.isEmpty()) {
-            return false;
+        if (user.isEmpty()) {
+            return null;
         }
 
         Topic topic = topicMapper.toTopic(topicPostRequest);
         topic.setUser(user.get());
-        topic.setSubCategory(subCategory.get());
         topic.setCreatedAt(new Date());
 
-        topicRepository.save(topic);
-        return true;
-    }
-
-    public List<Topic> getAllTopicsBySubCategory(String subCategoryId) {
-        return topicRepository.getTopicsBySubCategory_Id(subCategoryId);
+        return toTopicDetailResponse(topicRepository.save(topic), username);
     }
 
     public TopicDetailResponse getTopicDetail(String topicId) {
@@ -87,8 +80,6 @@ public class TopicService {
         Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOTEXISTED));
         topicMapper.updateTopic(topic, topicUpdateRequest);
         Optional<SubCategory> subCategory = subCategoryRepository.findById(topicUpdateRequest.getSubCategoryId());
-        subCategory.ifPresent(topic::setSubCategory);
-
         topicRepository.save(topic);
     }
 

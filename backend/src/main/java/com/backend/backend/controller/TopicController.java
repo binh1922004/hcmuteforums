@@ -26,19 +26,19 @@ public class TopicController {
     TopicService topicService;
 
     @PostMapping("/post")
-    public ApiResponse<Boolean> postTopic(@RequestBody TopicPostRequest topicPostRequest) {
+    public ApiResponse<TopicDetailResponse> postTopic(@RequestBody TopicPostRequest topicPostRequest) {
         System.out.println("GET POST TOPIC");
-        return ApiResponse.<Boolean>builder()
+        return ApiResponse.<TopicDetailResponse>builder()
                 .result(topicService.postTopic(topicPostRequest))
                 .build();
     }
 
-    @GetMapping("/list/{id}")
-    public ApiResponse<List<Topic>> getAllTopicsBySubCategory(@PathVariable String id) {
-        return ApiResponse.<List<Topic>>builder()
-                .result(topicService.getAllTopicsBySubCategory(id))
-                .build();
-    }
+//    @GetMapping("/list/{id}")
+//    public ApiResponse<List<Topic>> getAllTopicsBySubCategory(@PathVariable String id) {
+//        return ApiResponse.<List<Topic>>builder()
+//                .result(topicService.getAllTopicsBySubCategory(id))
+//                .build();
+//    }
 
     @GetMapping("/detail/{id}")
     public ApiResponse<TopicDetailResponse> topicDetail(@PathVariable String id) {

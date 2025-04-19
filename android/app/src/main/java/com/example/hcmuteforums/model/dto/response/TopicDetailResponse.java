@@ -5,6 +5,7 @@ import com.example.hcmuteforums.model.dto.UserGeneral;
 import java.util.Date;
 
 public class TopicDetailResponse {
+    private String id;
     private UserGeneral userGeneral;
     private String title;
     private String content;
@@ -76,5 +77,13 @@ public class TopicDetailResponse {
 
     public void setOwner(boolean owner) {
         this.owner = owner;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
