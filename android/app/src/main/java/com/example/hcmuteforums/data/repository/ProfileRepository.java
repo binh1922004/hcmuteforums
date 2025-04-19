@@ -102,11 +102,27 @@ public class ProfileRepository {
         });
     }
 
-    public void uploadCoverImagae(File imageFile){
-        RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), imageFile);
-        MultipartBody.Part part = MultipartBody.Part.createFormData("coverImage",
-                imageFile.getName(), requestBody);
-        Call<ApiResponse<Boolean>> call = profileApi.uploadCoverImage(part);
+    public void uploadAvatarImage(MultipartBody.Part avatarPart)
+    {
+        Call<ApiResponse<Boolean>> call = profileApi.uploadAvatarImage(avatarPart);
+        call.enqueue(new Callback<ApiResponse<Boolean>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {
+                if(response.isSuccessful() && response.body()!=null){
+                    profileUpdateResponse.postValue(new Event<>(response.body().getResult()));
+                }else {
+                    profileUpdateError.postValue(new Event<>(true));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Boolean>> call, Throwable throwable) {
+                messageError.postValue(new Event<>("Upload ảnh bìa thất bại: " + throwable.getMessage()));
+            }
+        });
+    }
+    public void uploadCoverImagae(MultipartBody.Part coverPart){
+        Call<ApiResponse<Boolean>> call = profileApi.uploadCoverImage(coverPart);
         call.enqueue(new Callback<ApiResponse<Boolean>>() {
             @Override
             public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {

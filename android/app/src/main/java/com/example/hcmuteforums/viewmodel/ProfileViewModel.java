@@ -11,6 +11,10 @@ import com.example.hcmuteforums.model.dto.response.UserResponse;
 
 import java.io.File;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+
 public class ProfileViewModel extends ViewModel {
     private ProfileRepository profileRepository;
     public ProfileViewModel(){
@@ -38,7 +42,17 @@ public class ProfileViewModel extends ViewModel {
         profileRepository.updateProfile(profileUpdateRequest);
     }
     public void uploadCoverImage(File imageFile){
-        profileRepository.uploadCoverImagae(imageFile);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), imageFile);
+        MultipartBody.Part part = MultipartBody.Part.createFormData("avatarImage", imageFile.getName(), requestBody);
+
+        profileRepository.uploadCoverImagae(part);
+    }
+    public void uploadAvatarImage(File AvatarImageFile)
+    {
+        RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), AvatarImageFile);
+        MultipartBody.Part part = MultipartBody.Part.createFormData("avatarImage", AvatarImageFile.getName(), requestBody);
+
+        profileRepository.uploadAvatarImage(part);
     }
 
 }

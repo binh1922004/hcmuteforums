@@ -53,9 +53,9 @@ public class ProfileController {
         return ResponseEntity.ok("Avatar uploaded");
     }
     @PostMapping("/upload-cover")
-    public ResponseEntity<?> uploadCover(@RequestParam MultipartFile file) {
+    public ResponseEntity<?> uploadCover(@RequestParam MultipartFile file) {    
 
         coverImageService.uploadCoverImage(file);
         return ResponseEntity.ok("Cover uploaded");
-    },
+    }
 }
