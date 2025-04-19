@@ -20,7 +20,7 @@ public interface TopicApi {
     Call<ApiResponse<List<TopicDetailResponse>>> getAllTopic();
 
     @POST("api/topics/post")
-    Call<ApiResponse<Boolean>> postTopic(@Body TopicPostRequest topicPostRequest);
+    Call<ApiResponse<TopicDetailResponse>> postTopic(@Body TopicPostRequest topicPostRequest);
 
     @Multipart
     @POST("api/topic-images/{topicId}/upload")

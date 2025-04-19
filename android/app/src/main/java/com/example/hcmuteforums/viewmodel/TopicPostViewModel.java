@@ -1,5 +1,7 @@
 package com.example.hcmuteforums.viewmodel;
 
+import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -21,19 +23,21 @@ import retrofit2.Response;
 public class TopicPostViewModel extends ViewModel {
     private TopicRepository topicRepository;
 
-    private MutableLiveData<Event<Boolean>> topicPostSuccess = new MutableLiveData<>();
+    private MutableLiveData<Event<TopicDetailResponse>> topicPostSuccess = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> imageUploadSuccess = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> imageUploadError = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> topicPostError = new MutableLiveData<>();
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
     public TopicPostViewModel() {
         topicRepository = TopicRepository.getInstance();
     }
 
-    public void postTopic(String title, String content, String categoryId){
-        topicRepository.postTopic(title, content, categoryId, new Callback<ApiResponse<Boolean>>() {
+    public void postTopic(String title, String content){
+        topicRepository.postTopic(title, content, new Callback<ApiResponse<TopicDetailResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {
+            public void onResponse(Call<ApiResponse<TopicDetailResponse>> call, Response<ApiResponse<TopicDetailResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<Boolean> apiRes = response.body();
+                    ApiResponse<TopicDetailResponse> apiRes = response.body();
                     if (apiRes.getResult() != null) {
                         topicPostSuccess.setValue(new Event<>(apiRes.getResult()));  // ✅ Không dùng Event
                     } else {
@@ -52,15 +56,45 @@ public class TopicPostViewModel extends ViewModel {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<Boolean>> call, Throwable throwable) {
+            public void onFailure(Call<ApiResponse<TopicDetailResponse>> call, Throwable throwable) {
                 Log.d("Error post", throwable.getMessage());
                 topicPostError.setValue(new Event<>(true));
             }
         });
     }
+    public void uploadImage(String topicId, List<Uri> images, Context context){
+        topicRepository.uploadImage(topicId, images, context, new Callback<ApiResponse<Boolean>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<Boolean> apiRes = response.body();
+                    if (apiRes.getResult() != null) {
+                        imageUploadSuccess.setValue(new Event<>(apiRes.getResult()));  // ✅ Không dùng Event
+                    } else {
+                        imageUploadError.setValue(new Event<>(true));       // ✅ Dùng Event
+                    }
+                } else {
+                    if (response.errorBody() != null) {
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        messageError.setValue(new Event<>(apiError.getMessage()));  // ✅ Dùng Event
+                    } else {
+                        imageUploadError.setValue(new Event<>(true));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Boolean>> call, Throwable throwable) {
+                Log.d("Error post", throwable.getMessage());
+                imageUploadError.setValue(new Event<>(true));
+            }
+        });
+    }
 
 
-    public MutableLiveData<Event<Boolean>> getTopicPostSuccess() {
+    public MutableLiveData<Event<TopicDetailResponse>> getTopicPostSuccess() {
         return topicPostSuccess;
     }
 
@@ -70,5 +104,13 @@ public class TopicPostViewModel extends ViewModel {
 
     public MutableLiveData<Event<String>> getMessageError() {
         return messageError;
+    }
+
+    public MutableLiveData<Event<Boolean>> getImageUploadSuccess() {
+        return imageUploadSuccess;
+    }
+
+    public MutableLiveData<Event<Boolean>> getImageUploadError() {
+        return imageUploadError;
     }
 }

@@ -47,8 +47,8 @@ public class TopicRepository {
         call.enqueue(callback);
     }
 
-    public void postTopic(String title, String content, String categoryId, Callback<ApiResponse<Boolean>> callback){
-        TopicPostRequest topicPostRequest = new TopicPostRequest(title, content, categoryId);
+    public void postTopic(String title, String content, Callback<ApiResponse<TopicDetailResponse>> callback){
+        TopicPostRequest topicPostRequest = new TopicPostRequest(title, content);
         var call = topicApi.postTopic(topicPostRequest);
         call.enqueue(callback);
     }
@@ -61,8 +61,8 @@ public class TopicRepository {
             MultipartBody.Part part = MultipartBody.Part.createFormData("images", file.getName(), requestFile);
             parts.add(part);
         }
-
         var call = topicApi.uploadImages(topicId, parts);
         call.enqueue(callback);
     }
+
 }

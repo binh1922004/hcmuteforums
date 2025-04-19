@@ -22,6 +22,10 @@ public class ImageUploadAdapter extends RecyclerView.Adapter<ImageUploadAdapter.
     private List<Uri> imageList;
     private ImageActionListener imageActionListener;
 
+    public List<Uri> getImageList() {
+        return imageList;
+    }
+
     public ImageUploadAdapter(Context context, ImageActionListener imageActionListener) {
         this.context = context;
         this.imageActionListener = imageActionListener;

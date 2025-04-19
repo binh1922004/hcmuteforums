@@ -3,12 +3,10 @@ package com.example.hcmuteforums.model.dto.request;
 public class TopicPostRequest {
     String title;
     String content;
-    String subCategoryId;
 
-    public TopicPostRequest(String title, String content, String subCategoryId) {
+    public TopicPostRequest(String title, String content) {
         this.title = title;
         this.content = content;
-        this.subCategoryId = subCategoryId;
     }
 
     public String getTitle() {
@@ -27,11 +25,4 @@ public class TopicPostRequest {
         this.content = content;
     }
 
-    public String getSubCategoryId() {
-        return subCategoryId;
-    }
-
-    public void setSubCategoryId(String subCategoryId) {
-        this.subCategoryId = subCategoryId;
-    }
 }
