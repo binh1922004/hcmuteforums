@@ -68,7 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
         //support
         loadingDialog = new LoadingDialogFragment();
         //viewmodel
-        registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
+        registerViewModel = new RegisterViewModel();
 
         //event handler
         imgBackLogin.setOnClickListener(view -> {

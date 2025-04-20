@@ -5,6 +5,7 @@ import com.backend.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,4 +14,5 @@ public interface ReplyRepository extends JpaRepository<Reply, String> {
     Reply findRepliesById(String id);
     boolean existsRepliesByIdAndUser_Username(String id, String username);
     void deleteRepliesByParentReplyId(String id);
+    List<Reply> getAllByTopic_Id(String topicId);
 }

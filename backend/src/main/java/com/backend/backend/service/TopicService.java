@@ -4,6 +4,7 @@ import com.backend.backend.dto.request.TopicUpdateRequest;
 import com.backend.backend.dto.response.TopicDetailResponse;
 import com.backend.backend.entity.SubCategory;
 import com.backend.backend.entity.Topic;
+import com.backend.backend.entity.TopicImage;
 import com.backend.backend.entity.User;
 import com.backend.backend.dto.UserGeneral;
 import com.backend.backend.exception.AppException;
@@ -29,6 +30,7 @@ import java.util.Optional;
 public class TopicService {
     //repo
     UserRepository userRepository;
+    ProfileRepository profileRepository;
     SubCategoryRepository subCategoryRepository;
     TopicRepository topicRepository;
     LikeRepository likeRepository;
@@ -107,7 +109,12 @@ public class TopicService {
         }
         //get user
         UserGeneral userGeneral = userMapper.toUserGeneral(topic.getUser());
+        userGeneral.setAvt(profileRepository.findAvatarUrlByUserName(username));
         topicDetailResponse.setUserGeneral(userGeneral);
+        //map all url from topic image to imgUrls
+        topicDetailResponse.setImgUrls(topic.getListImages().stream().map(v -> {
+            return "http://10.0.2.2:8080/ute/" + v.getImageUrl();
+        }).toList());
         return topicDetailResponse;
     }
 }

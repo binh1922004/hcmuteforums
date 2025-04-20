@@ -4,23 +4,16 @@ import com.backend.backend.dto.UserGeneral;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class  TopicDetailResponse {
+public class ReplyResponse {
     String id;
-    UserGeneral userGeneral;
-    String title;
     String content;
-    Date createdAt;
-    int likeCount;
-    int replyCount;
-    boolean isLiked;
-    boolean isOwner;
-    List<String> imgUrls;
+    String parentReplyId;
+    UserGeneral userGeneral;
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -34,5 +35,6 @@ public class Topic {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TopicImage> listImages;
 }
