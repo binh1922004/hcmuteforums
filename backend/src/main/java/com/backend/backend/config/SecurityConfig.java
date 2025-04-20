@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINT = {"/api/users", "/api/auth/login", "/api/otp/get", "/api/otp/validate",
     "/api/categories/**", "/api/subcategory/**", "/api/auth/introspect"};
-    private final String[] PUBLIC_ENDPOINT_GET = {"/api/topics/**", "/upload/**"};
+    private final String[] PUBLIC_ENDPOINT_GET = {"/api/topics/**", "/upload/**", "/api/reply/**"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity, CustomJwtDecoder customJwtDecoder) throws Exception {

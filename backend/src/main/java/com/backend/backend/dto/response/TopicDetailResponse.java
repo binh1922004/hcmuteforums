@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -21,4 +22,5 @@ public class  TopicDetailResponse {
     int replyCount;
     boolean isLiked;
     boolean isOwner;
+    List<String> imgUrls;
 }
