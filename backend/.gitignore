@@ -38,5 +38,5 @@ upload/**
 !upload/avatar/
 !upload/cover/
 
-!upload/avatar/img_avatar.png
-!upload/cover/img_cover.png
+!upload/avatars/img_avatar.png
+!upload/covers/img_cover.png
