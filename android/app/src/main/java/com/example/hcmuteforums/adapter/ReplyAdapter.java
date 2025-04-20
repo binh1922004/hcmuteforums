@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -56,7 +57,6 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     public int getItemCount() {
         if (replyList == null)
             return 0;
-        Log.d("Reply Size", replyList.size()+"");
         return replyList.size();
     }
 

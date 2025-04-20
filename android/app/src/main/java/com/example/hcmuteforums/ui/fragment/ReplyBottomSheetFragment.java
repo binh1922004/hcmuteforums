@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
@@ -38,6 +39,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
     private RecyclerView recyclerView;
     private EditText edtComment;
     private ImageButton btnSend;
+    private LinearLayout layoutText;
 
     //adapter config
     private ReplyAdapter replyAdapter;
@@ -62,9 +64,11 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reply_bottom_sheet, container, false);
+        //mapping data
         recyclerView = view.findViewById(R.id.recyclerReplies);
         edtComment = view.findViewById(R.id.edtComment);
         btnSend = view.findViewById(R.id.btnSend);
+        layoutText = view.findViewById(R.id.layoutText);
         replyViewModel = new ReplyViewModel();
         topicId = getArguments().getString("topicId");
 
@@ -105,7 +109,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
             if (bottomSheet != null) {
                 // Đặt chiều cao mong muốn (90% chiều cao màn hình)
                 ViewGroup.LayoutParams layoutParams = bottomSheet.getLayoutParams();
-                layoutParams.height = (int)(getResources().getDisplayMetrics().heightPixels * 0.9);
+                layoutParams.height = (int)(getResources().getDisplayMetrics().heightPixels * 0.7);
                 bottomSheet.setLayoutParams(layoutParams);
 
                 // Cho mở rộng luôn khi hiển thị
@@ -123,7 +127,12 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
         replyViewModel.getReplyLiveData().observe(getViewLifecycleOwner(), new Observer<List<ReplyResponse>>() {
             @Override
             public void onChanged(List<ReplyResponse> replyResponses) {
-                replyAdapter.setData(replyResponses);
+                if (replyResponses == null || replyResponses.isEmpty()){
+                    layoutText.setVisibility(View.VISIBLE);
+                }
+                else {
+                    replyAdapter.setData(replyResponses);
+                }
             }
         });
     }

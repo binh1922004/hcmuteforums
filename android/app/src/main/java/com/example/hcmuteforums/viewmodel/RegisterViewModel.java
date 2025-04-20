@@ -18,9 +18,9 @@ import retrofit2.Response;
 
 public class RegisterViewModel extends ViewModel {
     private OtpRepository otpRepository;
-    private MutableLiveData<Event<Boolean>> sendOtpError;
-    private MutableLiveData<Event<Boolean>> sendOtpResponse;
-    private MutableLiveData<Event<String>> messageError;
+    private MutableLiveData<Event<Boolean>> sendOtpError = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> sendOtpResponse = new MutableLiveData<>();
+    private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
     public RegisterViewModel(){
