@@ -55,11 +55,25 @@ public class ProfileViewModel extends ViewModel {
       profileRepository.getProfile(new Callback<ApiResponse<ProfileResponse>>() {
           @Override
           public void onResponse(Call<ApiResponse<ProfileResponse>> call, Response<ApiResponse<ProfileResponse>> response) {
-              ApiResponse<ProfileResponse> apiResponse = response.body();
-              if (apiResponse.getResult() != null) {
-                  profileInfo.setValue(apiResponse.getResult());
+              if (response.isSuccessful() && response.body() != null) {
+                  ApiResponse<ProfileResponse> apiRes = response.body();
+                  if (apiRes.getResult() != null) {
+                      profileInfo.setValue(apiRes.getResult());
+                  } else {
+                      profileInfoError.setValue(new Event<>(true));
+                  }
               } else {
-                  profileInfoError.setValue(new Event<>(true));
+                  if (response.errorBody() != null) {
+                      Gson gson = new Gson();
+                      ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(), ApiErrorResponse.class);
+                      if (apiError.getMessage() != null && !apiError.getMessage().trim().isEmpty()) {
+                          messageError.setValue(new Event<>(apiError.getMessage()));
+                      } else {
+                          messageError.setValue(new Event<>("Đã xảy ra lỗi không xác định."));
+                      }
+                  } else {
+                      profileUpdateResponse.setValue(new Event<>(true));
+                  }
               }
           }
 
@@ -81,7 +95,8 @@ public class ProfileViewModel extends ViewModel {
                     } else {
                         profileUpdateError.setValue(new Event<>(true));
                     }
-                } else {
+                }
+                else {
                     if (response.errorBody() != null) {
                         Gson gson = new Gson();
                         ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(), ApiErrorResponse.class);
@@ -91,7 +106,7 @@ public class ProfileViewModel extends ViewModel {
                             messageError.setValue(new Event<>("Đã xảy ra lỗi không xác định."));
                         }
                     } else {
-                        profileUpdateResponse.setValue(new Event<>(true));
+                        profileUpdateError.setValue(new Event<>(true));
                     }
                 }
             }

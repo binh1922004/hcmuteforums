@@ -33,4 +33,10 @@ build/
 .vscode/
 
 ### Upload file ###
-/upload
+upload/**
+
+!upload/avatars/
+!upload/covers/
+
+!upload/avatars/img_avatar.png
+!upload/covers/img_cover.png

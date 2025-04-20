@@ -251,7 +251,7 @@ public class ProfileUserFragment extends Fragment {
         tv_email = view.findViewById(R.id.tvUsername);
         uploadAvatar = view.findViewById(R.id.uploadAvatar);
         uploadCover = view.findViewById(R.id.coverCameraButton);
-        Button btn_edit = view.findViewById(R.id.btnEdit);
+        btn_edit = view.findViewById(R.id.btnEdit);
         coverPhoto = view.findViewById(R.id.coverPhoto);
         imgAvatar = view.findViewById(R.id.imgAvatar);
         btn_logout = view.findViewById(R.id.btnSetting);  //logout

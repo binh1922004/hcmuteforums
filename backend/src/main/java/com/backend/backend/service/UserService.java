@@ -20,9 +20,14 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class UserService {
+    //repository
     UserRepository userRepository;
+    //pass encode
     PasswordEncoder passwordEncoder;
+    //mapper
     UserMapper userMapper;
+    //another service
+    ProfileService profileService;
     OtpService otpService;
 
     public boolean createUser(UserCreationRequest userCreationRequest) {
@@ -31,9 +36,9 @@ public class UserService {
         }
 
         userCreationRequest.setPassword(passwordEncoder.encode(userCreationRequest.getPassword()));
-        userRepository.save(userMapper.toUser(userCreationRequest));
+        User user = userMapper.toUser(userCreationRequest);
 
-        return true;
+        return profileService.createProfile(userRepository.save(user)) != null;
     }
 
     public UserResponse getUserInfo(){

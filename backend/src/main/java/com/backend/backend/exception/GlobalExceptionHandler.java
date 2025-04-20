@@ -1,4 +1,4 @@
-/*
+
 package com.backend.backend.exception;
 
 import com.backend.backend.dto.ApiResponse;
@@ -41,4 +41,3 @@ public class GlobalExceptionHandler {
                 );
     }
 }
-*/  
