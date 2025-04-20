@@ -20,6 +20,7 @@ public class Reply {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     private String parentReplyId;
