@@ -35,8 +35,8 @@ build/
 ### Upload file ###
 upload/**
 
-!upload/avatar/
-!upload/cover/
+!upload/avatars/
+!upload/covers/
 
 !upload/avatars/img_avatar.png
 !upload/covers/img_cover.png
