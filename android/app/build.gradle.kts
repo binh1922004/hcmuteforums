@@ -57,4 +57,5 @@ dependencies {
     implementation(libs.glide)
     annotationProcessor(libs.glide.compiler)
     implementation(libs.imagepicker)
+    implementation(libs.ucrop)
 }

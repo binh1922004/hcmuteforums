@@ -31,3 +31,5 @@ jwt:
   signerKey: "b4ISo6+PT1fY8eppQ564SXabONN945cjuPYa0mTOmPrThHVxEnH7+xxE5RFJCqtk"
 upload:
   dir: upload/topics/
+  avatar-dir: upload/avatars/
+  cover-dir: upload/covers/

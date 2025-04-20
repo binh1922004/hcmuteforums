@@ -17,4 +17,13 @@
         <item name="elevation">6dp</item>
         <item name="rippleColor">?attr/colorOnPrimary</item>
     </style>-->
+    <style name="YourCustomImagePickerTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:fitsSystemWindows">true</item>
+    </style>
+    <style name="CustomCropTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:statusBarColor">#000000</item>
+    </style>
 </resources>
