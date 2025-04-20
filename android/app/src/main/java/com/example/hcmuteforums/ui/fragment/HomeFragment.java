@@ -18,7 +18,9 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.CategoryAdapter;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
+import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
@@ -32,7 +34,7 @@ import java.util.List;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements TopicLikeListener {
+public class HomeFragment extends Fragment implements TopicLikeListener, OnReplyClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -104,7 +106,7 @@ public class HomeFragment extends Fragment implements TopicLikeListener {
 
     private void showAllTopic(View view) {
         RecyclerView rcvTopic = view.findViewById(R.id.rcvTopic);
-        TopicDetailAdapter topicDetailAdapter = new TopicDetailAdapter(getContext(), this);
+        TopicDetailAdapter topicDetailAdapter = new TopicDetailAdapter(getContext(), this, this);
 
         //get data from viewmodel
         topicViewModel.fetchAllTopics();
@@ -147,4 +149,8 @@ public class HomeFragment extends Fragment implements TopicLikeListener {
         topicDetailViewModel.likeTopic(topicId);
     }
 
+    @Override
+    public void onReply(String topicId) {
+        ReplyBottomSheetFragment.newInstance(topicId).show(getParentFragmentManager(), "ReplyBottomSheet");
+    }
 }
