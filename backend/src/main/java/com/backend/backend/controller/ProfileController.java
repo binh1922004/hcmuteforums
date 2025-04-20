@@ -47,15 +47,16 @@ public class ProfileController {
                 .build();
     }
     @PostMapping("/upload-avatar")
-    public ResponseEntity<?> uploadAvatar(@RequestParam MultipartFile file) {
-
-        avatarImageService.uploadAvatar(file);
-        return ResponseEntity.ok("Avatar uploaded");
+    public ApiResponse<Boolean> uploadAvatar(@RequestParam("file") MultipartFile file) {
+        return ApiResponse.<Boolean>builder()
+                .result(avatarImageService.uploadAvatar(file))
+                .build();
     }
     @PostMapping("/upload-cover")
-    public ResponseEntity<?> uploadCover(@RequestParam MultipartFile file) {    
+    public ApiResponse<Boolean> uploadCover(@RequestParam("file") MultipartFile file) {
 
-        coverImageService.uploadCoverImage(file);
-        return ResponseEntity.ok("Cover uploaded");
+        return ApiResponse.<Boolean>builder()
+                .result(coverImageService.uploadCoverImage(file))
+                .build();
     }
 }

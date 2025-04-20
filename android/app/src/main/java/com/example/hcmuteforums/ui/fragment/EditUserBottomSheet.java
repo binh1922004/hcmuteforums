@@ -45,6 +45,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     UserUpdateRequest userUpdateRequest;
     UserUpdateRequest user;
     UserResponse userCurrent;
+    String fullname, dob, gender, address, phone;
     public static final String ARG_USER = "user";
     public static EditUserBottomSheet newInstance(UserResponse user)
     {
@@ -85,7 +86,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
 
         return inflater.inflate(R.layout.fragment_bottom_sheet_edit_user_dialog, container, false);
     }
-    String fullname, dob, gender, address, phone;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

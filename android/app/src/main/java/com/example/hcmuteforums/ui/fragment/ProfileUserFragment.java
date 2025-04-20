@@ -96,12 +96,6 @@ public class ProfileUserFragment extends Fragment {
      */
     // TODO: Rename and change types and number of parameters
 
-
-    private static final int PICK_IMAGES_REQUEST = 1;
-    private static final int PERMISSION_REQUEST_CODE = 100;
-
-    private static final int AVATAR_PICKER_REQUEST_CODE = 101;
-    private static final int COVER_PICKER_REQUEST_CODE = 102;
     UserViewModel userViewModel;
     ProfileViewModel profileViewModel;
     AuthenticationViewModel authenticationViewModel;
@@ -110,71 +104,10 @@ public class ProfileUserFragment extends Fragment {
     String avatarProfile, coverProfile, bioProfile;
 
     ImageView coverPhoto;
-
     CircleImageView imgAvatar;
-    private Uri mUri;
-    public static final int MY_REQUEST_CODE = 100;
-    public static final String TAG = ProfileUserFragment.class.getName();
-
-    public static String[] storge_permission ={
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-    };
-
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    public static String[] storge_permission_33 ={
-            Manifest.permission.READ_MEDIA_AUDIO,
-            Manifest.permission.READ_MEDIA_VIDEO,
-            Manifest.permission.READ_MEDIA_IMAGES
-    };
-    public static String[] permission() {
-        String[] p;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            p = storge_permission_33;
-        }else{
-            p = storge_permission;
-        }
-        return p;
-    }
-    private void checkPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            openGallery();
-            return;
-        }
-
-        if (requireContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            openGallery();
-        } else {
-            requestPermissions(permission(), MY_REQUEST_CODE);
-        }
-    }
-    private void openGallery()
-    {
-        Intent intent =new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        mActivityResultLauncher.launch(Intent.createChooser(intent, "Selected Picture"));
-    }
-    private ActivityResultLauncher<Intent> mActivityResultLauncher;
-    private void initLauncher() {
-        mActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Uri uri = result.getData().getData();
-                        mUri = uri;
-                        try {
-                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
-                            imgAvatar.setImageBitmap(bitmap);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-        );
-    }
-
-
+    ImageButton uploadAvatar, uploadCover, btn_logout;
+    TextView tv_username, tv_email;
+    Button btn_edit;
 
     private ActivityResultLauncher<String> permissionLauncher;
     private ActivityResultLauncher<Intent> avatarPickerLauncher;
@@ -276,60 +209,55 @@ public class ProfileUserFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile_user, container, false);
-        TextView tv_username = view.findViewById(R.id.tvName);
-        TextView tv_email = view.findViewById(R.id.tvUsername);
-        ImageButton uploadAvatar, uploadCover;
-        uploadAvatar = view.findViewById(R.id.uploadAvatar);
-        uploadCover = view.findViewById(R.id.coverCameraButton);
-        Button btn_edit = view.findViewById(R.id.btnEdit);
-        ImageButton btn_logout = view.findViewById(R.id.btnSetting);  //logout
+        //Ánh xạ
+        anhxa(view);
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
         //Nut logout
         btn_logout.setOnClickListener(v-> {
-            //xoa du lieu trong viewmodel
-            authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
-            authenticationViewModel.logout();
-            //Xoá thông tin đăng nhập ở sharepreferences
-            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
-            sharedPreferences.edit().clear().apply();
-            //Chuyen ve trang chu
-            Intent intent = new Intent(requireActivity(), UserMainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
-            startActivity(intent);
+           logoutEvent();
         });
+        //Lay thong tin
         getInfo(tv_username, tv_email);
-        getProfile(view);
-        //initLaunchers();
-        if (mActivityResultLauncher == null) {
-            initLauncher();
-        }
 
+        //Load Image
+        getProfile(view);
+
+        //UploadImage
+        initLaunchers();
+        EventUploadAvatar(uploadAvatar);
+        EventUploadCover(uploadCover);
         //Goi Form EditProfile
         OpenEditProfile(btn_edit);
-        //EventUploadAvatar(uploadAvatar);
-        //EventUploadCover(uploadCover);
-
 
         return view;
     }
-
-
-    private void loadImage(View viewProfile){
-        CircleImageView avatar = (CircleImageView)viewProfile.findViewById(R.id.imgAvatar);
-        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" +avatarProfile)
-                .placeholder(R.drawable.avatar_boy)
-                .error(R.drawable.user_2)
-                .into(avatar);
-        ImageView cover = (ImageView) viewProfile.findViewById(R.id.coverPhoto);
-        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/"+coverProfile)
-                .placeholder(R.drawable.avatar_boy)
-                .error(R.drawable.user_2)
-                .centerCrop()
-                .into(cover);
-
+    private void logoutEvent()
+    {
+        //xoa du lieu trong viewmodel
+        authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
+        authenticationViewModel.logout();
+        //Xoá thông tin đăng nhập ở sharepreferences
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
+        sharedPreferences.edit().clear().apply();
+        //Chuyen ve trang chu
+        Intent intent = new Intent(requireActivity(), UserMainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
+        startActivity(intent);
     }
+    void anhxa(View view) {
+        tv_username = view.findViewById(R.id.tvName);
+        tv_email = view.findViewById(R.id.tvUsername);
+        uploadAvatar = view.findViewById(R.id.uploadAvatar);
+        uploadCover = view.findViewById(R.id.coverCameraButton);
+        Button btn_edit = view.findViewById(R.id.btnEdit);
+        coverPhoto = view.findViewById(R.id.coverPhoto);
+        imgAvatar = view.findViewById(R.id.imgAvatar);
+        btn_logout = view.findViewById(R.id.btnSetting);  //logout
+    }
+
+
     private void OpenEditProfile(Button btn_edit){
         btn_edit.setOnClickListener(view -> {
             showBottomDialog();
@@ -347,7 +275,7 @@ public class ProfileUserFragment extends Fragment {
     }
 
     //Xu li up anh len
-    /*public String getFileName(Context context, Uri uri) {
+    public String getFileName(Context context, Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
             Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
@@ -405,10 +333,10 @@ public class ProfileUserFragment extends Fragment {
         avatarPickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                 Uri uri = result.getData().getData();
-                File file = getFileFromUri(requireContext(), uri);
+                File file = getFileFromUri(getActivity(), uri);
                 imgAvatar.setImageURI(uri);
                 uploadAvatarToServer(file);
-                Glide.with(this).load(uri).into(imgAvatar);
+                Glide.with(requireActivity()).load(uri).into(imgAvatar);
             }
         });
 
@@ -416,27 +344,20 @@ public class ProfileUserFragment extends Fragment {
         coverPickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                 Uri uri = result.getData().getData();
-                File file = getFileFromUri(requireContext(), uri);
+                File file = getFileFromUri(getActivity(), uri);
+
                 uploadCoverToServer(file);
-                Glide.with(this).load(uri).into(coverPhoto);
+                Glide.with(requireActivity()).load(uri).into(coverPhoto);
             }
         });
     }
 
     private void checkAndRequestPermission(boolean forAvatar) {
         isPickingAvatar = forAvatar;
-
-        String permission;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permission = Manifest.permission.READ_MEDIA_IMAGES;
+            permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES);
         } else {
-            permission = Manifest.permission.READ_EXTERNAL_STORAGE;
-        }
-
-        if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-            launchImagePicker();
-        } else {
-            permissionLauncher.launch(permission);
+            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
     }
     private void EventUploadAvatar(ImageButton uploadAvatar){
@@ -459,7 +380,7 @@ public class ProfileUserFragment extends Fragment {
          profileViewModel.uploadCoverImage(CoverImageFile);
     }
     private void launchImagePicker() {
-        ImagePicker.Builder builder = ImagePicker.with(this)
+        ImagePicker.Builder builder = ImagePicker.with(requireActivity())
                 .compress(1024)
                 .maxResultSize(1080, 1080);
 
@@ -467,7 +388,7 @@ public class ProfileUserFragment extends Fragment {
         if (isPickingAvatar) {
             builder.cropSquare();
         } else {
-            builder.crop(); // Cắt tự do cho ảnh bìa
+            builder.crop();
         }
 
         // Tạo intent và launch đúng launcher
@@ -476,7 +397,21 @@ public class ProfileUserFragment extends Fragment {
             launcher.launch(intent);
             return null;
         });
-    }*/
+    }
+    private void loadImage(View viewProfile){
+        CircleImageView avatar = (CircleImageView)viewProfile.findViewById(R.id.imgAvatar);
+        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" +avatarProfile)
+                .placeholder(R.drawable.avatar_boy)
+                .error(R.drawable.user_2)
+                .into(avatar);
+        ImageView cover = (ImageView) viewProfile.findViewById(R.id.coverPhoto);
+        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/"+coverProfile)
+                .placeholder(R.drawable.avatar_boy)
+                .error(R.drawable.user_2)
+                .centerCrop()
+                .into(cover);
+
+    }
 
 
 }

@@ -5,8 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.fragment.ProfileUserFragment">
-
-
     <ImageButton
         android:id="@+id/btnSetting"
         android:layout_width="40dp"
@@ -75,8 +73,6 @@
         android:src="@drawable/ic_camera"
         app:layout_constraintBottom_toBottomOf="@+id/imgAvatar"
         app:layout_constraintEnd_toEndOf="@+id/imgAvatar" />
-
-
 
     <LinearLayout
         android:id="@+id/FrameUser"

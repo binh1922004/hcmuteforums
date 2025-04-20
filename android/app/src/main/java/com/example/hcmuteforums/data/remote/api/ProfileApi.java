@@ -24,9 +24,9 @@ public interface ProfileApi {
 
     @Multipart
     @POST("api/profiles/upload-cover")
-    public Call<ApiResponse<Boolean>> uploadCoverImage(@Part MultipartBody.Part coverImage);
+    public Call<ApiResponse<Boolean>> uploadCoverImage(@Part MultipartBody.Part file);
 
     @Multipart
     @POST("api/profiles/upload-avatar")
-    public Call<ApiResponse<Boolean>> uploadAvatarImage(@Part MultipartBody.Part avatarImage);
+    public Call<ApiResponse<Boolean>> uploadAvatarImage(@Part MultipartBody.Part file);
 }
