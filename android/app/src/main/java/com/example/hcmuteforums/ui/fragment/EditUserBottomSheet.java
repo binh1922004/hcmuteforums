@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +64,8 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     EditText edt_ho, edt_tendem, edt_ten;
     Button btn_editDob;
     String ho = "" , ten="", tendem = "";
+    RadioButton rbMale, rbFmale, rbOther;
+    RadioGroup rgGender;
     void anhxa(View view)
     {
         imgClose = view.findViewById(R.id.imgClose);
@@ -133,10 +137,6 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         Log.d("Fullname", fullname);
         tv_fullname.setText(userCurrent.getFullName());
         setupRecyclerView(view);
-        //Event
-        imgClose.setOnClickListener(v -> {
-            dismiss();
-        });
     }
 
 
@@ -150,10 +150,14 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         parent.removeAllViews();
 
         View mainView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_bottom_sheet_edit_user_dialog, parent, false);
+        imgClose = mainView.findViewById(R.id.imgClose);
         TextView tv_fullname = mainView.findViewById(R.id.tv_Fullname);
         tv_fullname.setText(userCurrent.getFullName());
         parent.addView(mainView);
         setupRecyclerView(mainView); // Set lại RecyclerView
+        imgClose.setOnClickListener(v -> {
+            dismiss();
+        });
     }
 
     private void setupRecyclerView(View view) {
@@ -168,6 +172,8 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 switchToViewDobLayout();
             }else if(position==2){
                 switchToEditAddressLayout();
+            } else if (position ==3) {
+                switchToEditGenderLayout();
             }
         });
 
@@ -223,6 +229,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 dob = userResponse.getDob().toString();
                 dobEdit = userResponse.getDob().toString();
                 address = userResponse.getAddress().toString();
+                gender = userResponse.getGender().toString();
 
             }
         });
@@ -250,6 +257,10 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         Button btn_save = (Button) editAddress.findViewById(R.id.btnSaveAddress);
         btn_save.setOnClickListener(v->{
             updateAddress(editAddress, tIEDT_address);
+        });
+        ImageView backMain = (ImageView) editAddress.findViewById(R.id.btnBack);
+        backMain.setOnClickListener(v->{
+            switchToMainLayout();
         });
 
     }
@@ -312,6 +323,30 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
             switchToMainLayout();
         });
     }
+    private void switchToEditGenderLayout(){
+        View view = getView();
+        if(view == null)   return;
+        ViewGroup parent = (ViewGroup) view.findViewById(R.id.bottomSheetContainer);
+        parent.removeAllViews();
+        View viewGender = LayoutInflater.from(getContext()).inflate(R.layout.fragment_bottom_sheet_edit_gender, parent, true);
+        getProfileInfo(viewGender);
+        rbMale = (RadioButton) viewGender.findViewById(R.id.rb_male);
+        rbFmale = (RadioButton) viewGender.findViewById(R.id.rb_female);
+        rbOther =(RadioButton) viewGender.findViewById(R.id.rb_other);
+        rgGender =(RadioGroup) view.findViewById(R.id.rg_gender);
+
+        setGenderChecked(gender);
+
+        Button btn_save = viewGender.findViewById(R.id.btnSaveGender);
+        btn_save.setOnClickListener(v->{
+            updateGender(viewGender);
+        });
+        ImageView backMain = (ImageView) viewGender.findViewById(R.id.btnBack);
+        backMain.setOnClickListener(v->{
+            switchToMainLayout();
+        });
+
+    }
     private void switchToEditDobLayout(String dob){
         View view = getView();
         if(view == null) return;
@@ -371,6 +406,32 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         String formattedDate = convertDate(dob);
         tv_dob.setText(formattedDate);
     }
+    private void SetEdtName(View editNameView, String fullname) {
+        //Lay thong tin ra
+
+        edt_ho = editNameView.findViewById(R.id.edtHo);
+        edt_tendem = editNameView.findViewById(R.id.edtTenDem);
+        edt_ten = editNameView.findViewById(R.id.edtTen);
+
+        //Tach ho, tendem, ten
+        NameSplitter(fullname);
+
+        edt_ho.setText(ho);
+        edt_tendem.setText(tendem);
+        edt_ten.setText(ten);
+    }
+
+    private void setGenderChecked(String gender){
+        if(gender == null)  return;
+        if(gender.equalsIgnoreCase("Nam")){
+            rbMale.setChecked(true);
+        }else if(gender.equalsIgnoreCase("Nữ")){
+            rbFmale.setChecked(true);
+        }else if(gender.equalsIgnoreCase("Không muốn tiết lộ")){
+            rbOther.setChecked(true);
+        }
+    }
+
     private void updateDob(View editDob, TextInputEditText edt_dob){
         Button btnSave = editDob.findViewById(R.id.btnSaveDob);
 
@@ -421,9 +482,6 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         Button btnSave = editAddress.findViewById(R.id.btnSaveAddress);
         btnSave.setOnClickListener(view -> {
             String newAddress = edt_Address.getText().toString();
-            Log.d("New Address", newAddress);
-            Log.d("DEBUG", "userUpdateRequest = " + userUpdateRequest);
-            Log.d("DEBUG", "newAddress = " + newAddress);
             if(newAddress!=null){
                 userUpdateRequest.setAddress(newAddress);
                 userViewModel.updateUser(userUpdateRequest);
@@ -461,22 +519,6 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 }
             }
         });
-    }
-
-    private void SetEdtName(View editNameView, String fullname)
-    {
-        //Lay thong tin ra
-
-        edt_ho = editNameView.findViewById(R.id.edtHo);
-        edt_tendem = editNameView.findViewById(R.id.edtTenDem);
-        edt_ten = editNameView.findViewById(R.id.edtTen);
-
-        //Tach ho, tendem, ten
-        NameSplitter(fullname);
-
-        edt_ho.setText(ho);
-        edt_tendem.setText(tendem);
-        edt_ten.setText(ten);
     }
 
 
@@ -530,6 +572,60 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 }
             }
         });
+    }
+    private void updateGender(View viewGender){
+        Button btn_save = (Button) viewGender.findViewById(R.id.btnSaveGender);
+
+        btn_save.setOnClickListener(v->{
+            int selectedId = rgGender.getCheckedRadioButtonId();
+
+            String gender = "";
+            if (selectedId == R.id.rb_male) {
+                gender = "Nam";
+            } else if (selectedId == R.id.rb_female) {
+                gender = "Nữ";
+            } else if (selectedId == R.id.rb_other) {
+                gender = "Không muốn tiết lộ";
+            }
+            if(gender!=null){
+                userUpdateRequest.setGender(gender);
+                userViewModel.updateUser(userUpdateRequest);
+
+            }
+        });
+        userViewModel.getUserUpdateError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent();
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Quan sát thông báo cập nhật thành công
+        userViewModel.getUserUpdate().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> event) {
+                Boolean updateSuccess = event.getContent();
+                if (updateSuccess != null && updateSuccess) {
+                    Toast.makeText(getContext(), "Cập nhật giới tính thành công", Toast.LENGTH_SHORT).show();
+                    switchToMainLayout();   //Chuyen ve mainSheet
+                }
+            }
+        });
+
+        // Quan sát thông báo lỗi
+        userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> event) {
+                String errorMessage = event.getContent();
+                if (errorMessage != null) {
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
 }
