@@ -18,7 +18,7 @@ public enum ErrorCode {
     EMAIL_EXISTED(1009, "Email existed", HttpStatus.BAD_REQUEST),
     OTP_LIMIT_TIME(1010, "You need to wait 30s for new OTP", HttpStatus.BAD_REQUEST),
     TOPIC_NOTEXISTED(1011, "Bài viết đã bị xoá", HttpStatus.NOT_FOUND),
-    ;
+    REPLY_NOTEXISTED(1012, "Bình luận đã bị xoá", HttpStatus.NOT_FOUND  ),;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;

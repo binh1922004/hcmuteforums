@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -37,4 +38,8 @@ public class Reply {
     @JsonIgnore
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
+    // Optional - for easier access to child replies
+    @OneToMany(mappedBy = "parentReplyId", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Reply> childReplies;
 }

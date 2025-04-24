@@ -2,6 +2,7 @@ package com.backend.backend.controller;
 
 import com.backend.backend.dto.ApiResponse;
 import com.backend.backend.dto.request.ReplyPostRequest;
+import com.backend.backend.dto.response.PageResponse;
 import com.backend.backend.dto.response.ReplyResponse;
 import com.backend.backend.service.LikeService;
 import com.backend.backend.service.ReplyService;
@@ -42,9 +43,25 @@ public class ReplyController {
     }
 
     @GetMapping("/{topicId}")
-    public ApiResponse<List<ReplyResponse>> getAllRepliesByTopicId(@PathVariable("topicId") String topicId){
-        return ApiResponse.<List<ReplyResponse>>builder()
-                .result(replyService.getAllRepliesByTopicId(topicId))
+    public ApiResponse<PageResponse<ReplyResponse>> getAllRepliesByTopicId(
+            @PathVariable("topicId") String topicId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction){
+        return ApiResponse.<PageResponse<ReplyResponse>>builder()
+                .result(replyService.getAllRepliesByTopicId(topicId, page, size, sortBy, direction))
+                .build();
+    }
+    @GetMapping("/parent/{parentReplyId}")
+    public ApiResponse<PageResponse<ReplyResponse>> getAllRepliesByParentReplyId(
+            @PathVariable("parentReplyId") String parentReplyId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction){
+        return ApiResponse.<PageResponse<ReplyResponse>>builder()
+                .result(replyService.getAllRepliesByParentReplyId(parentReplyId, page, size, sortBy, direction))
                 .build();
     }
 }

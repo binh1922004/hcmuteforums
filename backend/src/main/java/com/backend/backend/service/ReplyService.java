@@ -2,6 +2,7 @@ package com.backend.backend.service;
 import com.backend.backend.dto.UserGeneral;
 import com.backend.backend.dto.request.ReplyPostRequest;
 import com.backend.backend.dto.request.TopicPostRequest;
+import com.backend.backend.dto.response.PageResponse;
 import com.backend.backend.dto.response.ReplyResponse;
 import com.backend.backend.dto.response.TopicDetailResponse;
 import com.backend.backend.entity.Reply;
@@ -20,6 +21,10 @@ import com.backend.backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,13 +79,68 @@ public class ReplyService {
         return replyRepository.existsRepliesByIdAndUser_Username(replyId, username);
     }
 
-    public List<ReplyResponse> getAllRepliesByTopicId(String topicId){
-        List<Reply> replies = replyRepository.getAllByTopic_Id(topicId);
+    public PageResponse<ReplyResponse> getAllRepliesByTopicId(
+            String topicId,
+            int page,
+            int size,
+            String sortBy,
+            String direction){
+        if (!topicRepository.existsById(topicId)) {
+            throw new AppException(ErrorCode.TOPIC_NOTEXISTED);
+        }
+        Sort sort = direction.equalsIgnoreCase("DESC")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Reply> replyPage = replyRepository.findByTopic_IdAndParentReplyIdIsNull(topicId, pageable);
+
         List<ReplyResponse> repliesResponse = new ArrayList<>();
-        for(Reply reply : replies){
+        //mapping reply to replyresponse list
+        for(Reply reply : replyPage.getContent()){
             repliesResponse.add(replyMapper.toReplyResponse(reply));
             repliesResponse.getLast().setUserGeneral(userMapper.toUserGeneral(reply.getUser()));
         }
-        return repliesResponse;
+
+        return PageResponse.<ReplyResponse>builder()
+                .content(repliesResponse)
+                .pageNumber(replyPage.getNumber())
+                .pageSize(replyPage.getSize())
+                .totalElements(replyPage.getTotalElements())
+                .totalPages(replyPage.getTotalPages())
+                .last(replyPage.isLast())
+                .build();
+    }
+    public PageResponse<ReplyResponse> getAllRepliesByParentReplyId(
+            String parentReplyId,
+            int page,
+            int size,
+            String sortBy,
+            String direction){
+        if (!replyRepository.existsById(parentReplyId)) {
+            throw new AppException(ErrorCode.REPLY_NOTEXISTED);
+        }
+        Sort sort = direction.equalsIgnoreCase("DESC")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Reply> replyPage = replyRepository.findByParentReplyId(parentReplyId, pageable);
+
+        List<ReplyResponse> repliesResponse = new ArrayList<>();
+        //mapping reply to replyresponse list
+        for(Reply reply : replyPage.getContent()){
+            repliesResponse.add(replyMapper.toReplyResponse(reply));
+            repliesResponse.getLast().setUserGeneral(userMapper.toUserGeneral(reply.getUser()));
+        }
+
+        return PageResponse.<ReplyResponse>builder()
+                .content(repliesResponse)
+                .pageNumber(replyPage.getNumber())
+                .pageSize(replyPage.getSize())
+                .totalElements(replyPage.getTotalElements())
+                .totalPages(replyPage.getTotalPages())
+                .last(replyPage.isLast())
+                .build();
     }
 }
