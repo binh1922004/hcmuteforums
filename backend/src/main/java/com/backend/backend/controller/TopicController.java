@@ -5,6 +5,7 @@ import com.backend.backend.dto.request.TopicPostRequest;
 import com.backend.backend.dto.request.TopicUpdateRequest;
 import com.backend.backend.dto.request.UserCreationRequest;
 import com.backend.backend.dto.request.UserUpdateRequest;
+import com.backend.backend.dto.response.PageResponse;
 import com.backend.backend.dto.response.TopicDetailResponse;
 import com.backend.backend.dto.response.UserResponse;
 import com.backend.backend.entity.Topic;
@@ -65,9 +66,14 @@ public class TopicController {
                 .build();
     }
     @GetMapping
-    public ApiResponse<List<TopicDetailResponse>> getAllTopics(){
-        return ApiResponse.<List<TopicDetailResponse>>builder()
-                .result(topicService.getAllTopics())
+    public ApiResponse<PageResponse<TopicDetailResponse>> getAllTopics(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction
+    ){
+        return ApiResponse.<PageResponse<TopicDetailResponse>>builder()
+                .result(topicService.getAllTopics(page, size, sortBy, direction))
                 .build();
     }
 }
