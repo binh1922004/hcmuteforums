@@ -19,9 +19,11 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
+import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
@@ -152,12 +154,6 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
 
     }
 
-    private void showMoreTopic() {
-        //get data from viewmodel
-        topicViewModel.fetchAllTopics(currentPage);
-        currentPage++;
-    }
-
     private void postTopic() {
         cvPostTopic.setOnClickListener(v -> {
             Intent myIntent = new Intent(getContext(), TopicPostActivity.class);
@@ -220,8 +216,18 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     }
 
     @Override
-    public void onReply(String topicId) {
-        ReplyBottomSheetFragment.newInstance(topicId).show(getParentFragmentManager(), "ReplyBottomSheet");
+    public void onReply(String topicId, int position) {
+        var replyBottomSheetFragment = ReplyBottomSheetFragment.newInstance(topicId);
+        replyBottomSheetFragment.setOnReplyAddedListener(new OnReplyAddedListener() {
+            @Override
+            public void onReplyAdded(ReplyResponse replyResponse) {
+                // ✅ Cập nhật số lượng reply cho topic tương ứng
+                TopicDetailResponse topic = topicDetailAdapter.getData().get(position);
+                topic.setReplyCount(topic.getReplyCount() + 1);
+                topicDetailAdapter.notifyItemChanged(position);
+            }
+        });
+        replyBottomSheetFragment.show(getParentFragmentManager(), "ReplyBottomSheet");
     }
 
     @Override
@@ -234,7 +240,11 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
         }
     }
 
-
+    private void showMoreTopic() {
+        //get data from viewmodel
+        topicViewModel.fetchAllTopics(currentPage);
+        currentPage++;
+    }
     private void resetData() {
         currentPage = 0;
         isLastPage = false;

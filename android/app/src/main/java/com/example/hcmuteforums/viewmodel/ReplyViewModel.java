@@ -27,10 +27,11 @@ public class ReplyViewModel extends ViewModel {
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
     private MutableLiveData<PageResponse<ReplyResponse>> replyLiveData = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> replyError = new MutableLiveData<>();
+    private MutableLiveData<Event<ReplyResponse>> replyPostSuccess = new MutableLiveData<>();
+
     public ReplyViewModel() {
         replyRepository = ReplyRepository.getInstance();
     }
-
 
     public MutableLiveData<Event<String>> getMessageError() {
         return messageError;
@@ -38,6 +39,10 @@ public class ReplyViewModel extends ViewModel {
 
     public MutableLiveData<PageResponse<ReplyResponse>> getReplyLiveData() {
         return replyLiveData;
+    }
+
+    public MutableLiveData<Event<ReplyResponse>> getReplyPostSuccess() {
+        return replyPostSuccess;
     }
 
     public MutableLiveData<Event<Boolean>> getReplyError() {
@@ -69,6 +74,36 @@ public class ReplyViewModel extends ViewModel {
 
             @Override
             public void onFailure(Call<ApiResponse<PageResponse<ReplyResponse>>> call, Throwable throwable) {
+                Log.d("Error Topic", throwable.getMessage());
+                replyError.setValue(new Event<>(true));
+            }
+        });
+    }
+    public void postReply(String content, String parentId, String topicId){
+        replyRepository.postReply(content, parentId, topicId, new Callback<ApiResponse<ReplyResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ReplyResponse>> call, Response<ApiResponse<ReplyResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<ReplyResponse> apiRes = response.body();
+                    if (apiRes.getResult() != null) {
+                        replyPostSuccess.setValue(new Event<>(apiRes.getResult()));  // ✅ Không dùng Event
+                    } else {
+                        replyError.setValue(new Event<>(true));       // ✅ Dùng Event
+                    }
+                } else {
+                    if (response.errorBody() != null) {
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        messageError.setValue(new Event<>(apiError.getMessage()));  // ✅ Dùng Event
+                    } else {
+                        replyError.setValue(new Event<>(true));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ReplyResponse>> call, Throwable throwable) {
                 Log.d("Error Topic", throwable.getMessage());
                 replyError.setValue(new Event<>(true));
             }

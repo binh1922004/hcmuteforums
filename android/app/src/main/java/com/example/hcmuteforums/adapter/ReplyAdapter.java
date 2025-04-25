@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.adapter;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +11,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHolder> {
 
@@ -23,9 +27,11 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
 
     private List<ReplyResponse> replyList;
     private OnReplyClickListener listener;
-    public ReplyAdapter(List<ReplyResponse> replyList, OnReplyClickListener listener) {
+    private Context context;
+    public ReplyAdapter(Context context, List<ReplyResponse> replyList, OnReplyClickListener listener) {
         this.replyList = replyList;
         this.listener = listener;
+        this.context = context;
     }
 
     public void setData(List<ReplyResponse> replyList){
@@ -37,7 +43,10 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         replyList.addAll(newList);
         notifyItemInserted(oldSize);
     }
-
+    public void addNewReply(ReplyResponse newReply){
+        replyList.add(0, newReply);
+        notifyItemInserted(0);
+    }
     @NonNull
     @Override
     public ReplyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -49,12 +58,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     @Override
     public void onBindViewHolder(@NonNull ReplyViewHolder holder, int position) {
         ReplyResponse reply = replyList.get(position);
-        holder.tvUsername.setText(reply.getUserGeneral().getFullName());
-        holder.tvContent.setText(reply.getContent());
-
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onReplyClick(reply);
-        });
+        holder.bind(reply);
     }
 
     @Override
@@ -64,12 +68,26 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         return replyList.size();
     }
 
-    public static class ReplyViewHolder extends RecyclerView.ViewHolder {
+    public class ReplyViewHolder extends RecyclerView.ViewHolder {
         TextView tvUsername, tvContent;
+        CircleImageView imgAvatar;
         public ReplyViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvContent = itemView.findViewById(R.id.tvContent);
+            imgAvatar = itemView.findViewById(R.id.imgAvatar);
+        }
+        public void bind(ReplyResponse reply){
+            tvUsername.setText(reply.getUserGeneral().getFullName());
+            tvContent.setText(reply.getContent());
+            Glide.with(context)
+                    .load(reply.getUserGeneral().getAvt())
+                    .centerCrop()
+                    .into(imgAvatar);
+            itemView.setOnClickListener(v -> {
+                if (listener != null)
+                    listener.onReplyClick(reply);
+            });
         }
     }
 }

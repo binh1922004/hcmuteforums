@@ -16,9 +16,12 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.ReplyAdapter;
+import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.viewmodel.ReplyViewModel;
@@ -35,8 +38,8 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
-
-    private RecyclerView rvcReplies;
+    //element from layout
+    private RecyclerView rcvReplies;
     private EditText edtComment;
     private ImageButton btnSend;
     private LinearLayout layoutText;
@@ -55,6 +58,9 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
     private boolean isFirstLoad = true;
     private int pageSize = 10;
     private int currentPage = 0;
+
+    //listiner interface
+    OnReplyAddedListener onReplyAddedListener;
     public static ReplyBottomSheetFragment newInstance(String topicId) {
         ReplyBottomSheetFragment fragment = new ReplyBottomSheetFragment();
         Bundle args = new Bundle();
@@ -62,7 +68,9 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
         fragment.setArguments(args);
         return fragment;
     }
-
+    public void setOnReplyAddedListener(OnReplyAddedListener onReplyAddedListener){
+        this.onReplyAddedListener = onReplyAddedListener;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -70,7 +78,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reply_bottom_sheet, container, false);
         //mapping data
-        rvcReplies = view.findViewById(R.id.recyclerReplies);
+        rcvReplies = view.findViewById(R.id.recyclerReplies);
         edtComment = view.findViewById(R.id.edtComment);
         btnSend = view.findViewById(R.id.btnSend);
         layoutText = view.findViewById(R.id.layoutText);
@@ -81,31 +89,24 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
 
         loadMoreReplies();
 
+        sendReply();
+
         observeData();
 
         return view;
     }
 
+    //mapping for data
     private void replyAdapterConfig() {
-        rvcReplies.setLayoutManager(new LinearLayoutManager(getContext()));
-        replyAdapter = new ReplyAdapter(replyList, reply -> {
+        rcvReplies.setLayoutManager(new LinearLayoutManager(getContext()));
+        replyAdapter = new ReplyAdapter(getContext(), replyList, reply -> {
             replyingToUser = reply.getUserGeneral().getUsername();
             edtComment.setHint("Reply @" + replyingToUser);
         });
-        rvcReplies.setAdapter(replyAdapter);
+        rcvReplies.setAdapter(replyAdapter);
 
-        btnSend.setOnClickListener(v -> {
-            String comment = edtComment.getText().toString().trim();
-            if (!comment.isEmpty()) {
-                String finalComment = replyingToUser != null ? "@" + replyingToUser + " " + comment : comment;
-                sendReply(finalComment);
-                edtComment.setText("");
-                edtComment.setHint("Viết bình luận...");
-                replyingToUser = null;
-            }
-        });
 
-        rvcReplies.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        rcvReplies.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -126,6 +127,47 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
             }
         });
     }
+
+    private void observeData(){
+        replyViewModel.getReplyLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<ReplyResponse>>() {
+            @Override
+            public void onChanged(PageResponse<ReplyResponse> replyResponses) {
+                if (isFirstLoad && (replyResponses == null || replyResponses.getContent().isEmpty())){
+                    layoutText.setVisibility(View.VISIBLE);
+                }
+                else {
+                    replyAdapter.addData(replyResponses.getContent());
+                    isLastPage = replyResponses.isLast();
+                    isFirstLoad = false;
+                }
+            }
+        });
+
+        replyViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> stringEvent) {
+                String mess = stringEvent.getContent();
+                if (mess != null){
+                    Toast.makeText(getContext(), mess, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        replyViewModel.getReplyPostSuccess().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
+            @Override
+            public void onChanged(Event<ReplyResponse> replyResponseEvent) {
+                ReplyResponse replyResponse = replyResponseEvent.getContent();
+                if (replyResponse != null){
+                    layoutText.setVisibility(View.GONE);
+                    replyAdapter.addNewReply(replyResponse);
+                    rcvReplies.smoothScrollToPosition(0);
+                    if (onReplyAddedListener != null){
+                        onReplyAddedListener.onReplyAdded(replyResponse);
+                    }
+                }
+            }
+        });
+    }
+
 
     @Override
     public void onStart() {
@@ -155,27 +197,18 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
         currentPage++;
     }
 
-    private void observeData(){
-        replyViewModel.getReplyLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<ReplyResponse>>() {
-            @Override
-            public void onChanged(PageResponse<ReplyResponse> replyResponses) {
-                if (isFirstLoad && (replyResponses == null || replyResponses.getContent().isEmpty())){
-                    layoutText.setVisibility(View.VISIBLE);
-                }
-                else {
-                    replyAdapter.addData(replyResponses.getContent());
-                    isLastPage = replyResponses.isLast();
-                    isFirstLoad = false;
-                }
+
+    private void sendReply() {
+//        // TODO: Gửi reply về backend hoặc ViewModel
+        btnSend.setOnClickListener(v -> {
+            String comment = edtComment.getText().toString().trim();
+            if (!comment.isEmpty()) {
+                replyViewModel.postReply(comment, "", topicId);
+                edtComment.setText("");
+                edtComment.setHint("Viết bình luận...");
+                replyingToUser = null;
             }
         });
-    }
-
-    private void sendReply(String content) {
-//        // TODO: Gửi reply về backend hoặc ViewModel
-//        replyList.add();
-//        replyAdapter.notifyItemInserted(replyList.size() - 1);
-//        recyclerView.scrollToPosition(replyList.size() - 1);
     }
 
     public ReplyResponse getDataFromFragment(){
