@@ -17,13 +17,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
-import com.example.hcmuteforums.adapter.CategoryAdapter;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
-import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
@@ -57,9 +55,12 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     RecyclerView rcvTopic;
     //adapter
     TopicDetailAdapter topicDetailAdapter;
-    private boolean isLastPage = false;
-    private boolean isLoading = false;
-    private int currentPage = 0;
+
+    //attribute
+        private boolean isLastPage = false;
+        private boolean isLoading = false;
+        private boolean isFirstLoad = true;
+        private int currentPage = 0;
     private final int pageSize = 6;
 
 
@@ -106,6 +107,7 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
         recyclerViewConfig();
         //show topic
         showMoreTopic();
+        //quan sat data
         observeData();
         //go to post topic
         postTopic();
@@ -115,7 +117,7 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     private void mappingData(View view) {
 
         //init data
-        topicViewModel = new TopicViewModel();
+        topicViewModel = TopicViewModel.getInstance();
         topicDetailViewModel = new TopicDetailViewModel();
         cvPostTopic = view.findViewById(R.id.cvPostTopic);
         rcvTopic = view.findViewById(R.id.rcvTopic);
@@ -170,6 +172,9 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
             public void onChanged(PageResponse<TopicDetailResponse> topicDetailResponses) {
                 topicDetailAdapter.addData(topicDetailResponses.getContent());
                 isLastPage = topicDetailResponses.isLast();
+                //cached data
+                var listCurrent = topicDetailAdapter.getData();
+                topicViewModel.setCachedListTopic(listCurrent);
             }
         });
 
@@ -220,16 +225,15 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-//        resetData();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        resetData();
+        if (!isFirstLoad){
+            resetData();
+        } else {
+            isFirstLoad = false;
+        }
     }
+
 
     private void resetData() {
         currentPage = 0;

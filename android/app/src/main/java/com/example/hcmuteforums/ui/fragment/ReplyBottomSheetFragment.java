@@ -16,10 +16,10 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.ReplyAdapter;
+import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.viewmodel.ReplyViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
 
-    private RecyclerView recyclerView;
+    private RecyclerView rvcReplies;
     private EditText edtComment;
     private ImageButton btnSend;
     private LinearLayout layoutText;
@@ -50,6 +50,11 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
     //attribute
     private String replyingToUser = null; // Username người đang được reply
     private String topicId;
+    private boolean isLastPage = false;
+    private boolean isLoading = false;
+    private boolean isFirstLoad = true;
+    private int pageSize = 10;
+    private int currentPage = 0;
     public static ReplyBottomSheetFragment newInstance(String topicId) {
         ReplyBottomSheetFragment fragment = new ReplyBottomSheetFragment();
         Bundle args = new Bundle();
@@ -65,7 +70,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reply_bottom_sheet, container, false);
         //mapping data
-        recyclerView = view.findViewById(R.id.recyclerReplies);
+        rvcReplies = view.findViewById(R.id.recyclerReplies);
         edtComment = view.findViewById(R.id.edtComment);
         btnSend = view.findViewById(R.id.btnSend);
         layoutText = view.findViewById(R.id.layoutText);
@@ -74,18 +79,20 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
 
         replyAdapterConfig();
 
-        loadReplies();
+        loadMoreReplies();
+
+        observeData();
 
         return view;
     }
 
     private void replyAdapterConfig() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvcReplies.setLayoutManager(new LinearLayoutManager(getContext()));
         replyAdapter = new ReplyAdapter(replyList, reply -> {
             replyingToUser = reply.getUserGeneral().getUsername();
             edtComment.setHint("Reply @" + replyingToUser);
         });
-        recyclerView.setAdapter(replyAdapter);
+        rvcReplies.setAdapter(replyAdapter);
 
         btnSend.setOnClickListener(v -> {
             String comment = edtComment.getText().toString().trim();
@@ -95,6 +102,27 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
                 edtComment.setText("");
                 edtComment.setHint("Viết bình luận...");
                 replyingToUser = null;
+            }
+        });
+
+        rvcReplies.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager == null) return;
+
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+                if (!isLoading && !isLastPage) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                            && firstVisibleItemPosition >= 0
+                            && totalItemCount >= pageSize) {
+                        loadMoreReplies();
+                    }
+                }
             }
         });
     }
@@ -109,7 +137,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
             if (bottomSheet != null) {
                 // Đặt chiều cao mong muốn (90% chiều cao màn hình)
                 ViewGroup.LayoutParams layoutParams = bottomSheet.getLayoutParams();
-                layoutParams.height = (int)(getResources().getDisplayMetrics().heightPixels * 0.7);
+                layoutParams.height = (int)(getResources().getDisplayMetrics().heightPixels * 0.8);
                 bottomSheet.setLayoutParams(layoutParams);
 
                 // Cho mở rộng luôn khi hiển thị
@@ -120,18 +148,24 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
         }
     }
 
-    private void loadReplies() {
+    private void loadMoreReplies() {
         // TODO: Gọi API hoặc lấy từ ViewModel
         // Ví dụ:
-        replyViewModel.getAllRepliesByTopicId(topicId);
-        replyViewModel.getReplyLiveData().observe(getViewLifecycleOwner(), new Observer<List<ReplyResponse>>() {
+        replyViewModel.getAllRepliesByTopicId(topicId, currentPage);
+        currentPage++;
+    }
+
+    private void observeData(){
+        replyViewModel.getReplyLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<ReplyResponse>>() {
             @Override
-            public void onChanged(List<ReplyResponse> replyResponses) {
-                if (replyResponses == null || replyResponses.isEmpty()){
+            public void onChanged(PageResponse<ReplyResponse> replyResponses) {
+                if (isFirstLoad && (replyResponses == null || replyResponses.getContent().isEmpty())){
                     layoutText.setVisibility(View.VISIBLE);
                 }
                 else {
-                    replyAdapter.setData(replyResponses);
+                    replyAdapter.addData(replyResponses.getContent());
+                    isLastPage = replyResponses.isLast();
+                    isFirstLoad = false;
                 }
             }
         });

@@ -54,6 +54,11 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         topicDetailResponsesList.addAll(newList);
         notifyItemRangeInserted(oldSize, newList.size());
     }
+
+    public List<TopicDetailResponse> getData() {
+        return topicDetailResponsesList;
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

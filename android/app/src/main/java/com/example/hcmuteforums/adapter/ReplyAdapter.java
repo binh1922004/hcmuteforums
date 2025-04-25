@@ -32,6 +32,11 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         this.replyList = replyList;
         notifyDataSetChanged();
     }
+    public void addData(List<ReplyResponse> newList){
+        int oldSize = replyList.size();
+        replyList.addAll(newList);
+        notifyItemInserted(oldSize);
+    }
 
     @NonNull
     @Override
@@ -44,7 +49,6 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     @Override
     public void onBindViewHolder(@NonNull ReplyViewHolder holder, int position) {
         ReplyResponse reply = replyList.get(position);
-        Log.d("Testing Reply", reply.getContent());
         holder.tvUsername.setText(reply.getUserGeneral().getFullName());
         holder.tvContent.setText(reply.getContent());
 

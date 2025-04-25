@@ -10,6 +10,7 @@ import com.example.hcmuteforums.data.repository.TopicRepository;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
+import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.google.gson.Gson;
@@ -24,7 +25,7 @@ public class ReplyViewModel extends ViewModel {
     private ReplyRepository replyRepository;
 
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
-    private MutableLiveData<List<ReplyResponse>> replyLiveData = new MutableLiveData<>();
+    private MutableLiveData<PageResponse<ReplyResponse>> replyLiveData = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> replyError = new MutableLiveData<>();
     public ReplyViewModel() {
         replyRepository = ReplyRepository.getInstance();
@@ -35,7 +36,7 @@ public class ReplyViewModel extends ViewModel {
         return messageError;
     }
 
-    public MutableLiveData<List<ReplyResponse>> getReplyLiveData() {
+    public MutableLiveData<PageResponse<ReplyResponse>> getReplyLiveData() {
         return replyLiveData;
     }
 
@@ -43,12 +44,12 @@ public class ReplyViewModel extends ViewModel {
         return replyError;
     }
 
-    public void getAllRepliesByTopicId(String topicId) {
-        replyRepository.getAllRepliesByTopicId(topicId, new Callback<ApiResponse<List<ReplyResponse>>>() {
+    public void getAllRepliesByTopicId(String topicId, int page) {
+        replyRepository.getAllRepliesByTopicId(topicId, page, new Callback<ApiResponse<PageResponse<ReplyResponse>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<ReplyResponse>>> call, Response<ApiResponse<List<ReplyResponse>>> response) {
+            public void onResponse(Call<ApiResponse<PageResponse<ReplyResponse>>> call, Response<ApiResponse<PageResponse<ReplyResponse>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<List<ReplyResponse>> apiRes = response.body();
+                    ApiResponse<PageResponse<ReplyResponse>> apiRes = response.body();
                     if (apiRes.getResult() != null) {
                         replyLiveData.setValue(apiRes.getResult());  // ✅ Không dùng Event
                     } else {
@@ -67,7 +68,7 @@ public class ReplyViewModel extends ViewModel {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<ReplyResponse>>> call, Throwable throwable) {
+            public void onFailure(Call<ApiResponse<PageResponse<ReplyResponse>>> call, Throwable throwable) {
                 Log.d("Error Topic", throwable.getMessage());
                 replyError.setValue(new Event<>(true));
             }

@@ -21,9 +21,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class TopicViewModel extends ViewModel {
+    public static TopicViewModel instance;
+
+    public static TopicViewModel getInstance() {
+        if (instance == null)
+            instance = new TopicViewModel();
+        return instance;
+    }
+
     private TopicRepository topicRepository;
 
     private MutableLiveData<PageResponse<TopicDetailResponse>> topicsLiveData = new MutableLiveData<>();
+    private MutableLiveData<List<TopicDetailResponse>> cachedListTopic = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> topicError = new MutableLiveData<>();
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
@@ -45,6 +54,15 @@ public class TopicViewModel extends ViewModel {
 
     public MutableLiveData<Boolean> getIsLoading() {
         return isLoading;
+    }
+
+    public MutableLiveData<List<TopicDetailResponse>> getCachedListTopic() {
+        return cachedListTopic;
+    }
+
+    public void setCachedListTopic(List<TopicDetailResponse> cachedListTopic) {
+        this.cachedListTopic.setValue(cachedListTopic);
+        Log.d("CACHED SIZE", cachedListTopic.size()+"");
     }
 
     public void fetchAllTopics(int page) {
