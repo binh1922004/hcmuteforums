@@ -20,6 +20,7 @@ import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
+import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
@@ -111,10 +112,10 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
         //get data from viewmodel
         topicViewModel.fetchAllTopics();
         //observe
-        topicViewModel.getTopicsLiveData().observe(getViewLifecycleOwner(), new Observer<List<TopicDetailResponse>>() {
+        topicViewModel.getTopicsLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<TopicDetailResponse>>() {
             @Override
-            public void onChanged(List<TopicDetailResponse> topicDetailResponses) {
-                topicDetailAdapter.setData(topicDetailResponses);
+            public void onChanged(PageResponse<TopicDetailResponse> topicDetailResponses) {
+                topicDetailAdapter.setData(topicDetailResponses.getContent());
             }
         });
 

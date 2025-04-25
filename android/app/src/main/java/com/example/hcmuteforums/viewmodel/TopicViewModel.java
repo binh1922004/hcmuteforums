@@ -10,6 +10,7 @@ import com.example.hcmuteforums.data.repository.TopicRepository;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
+import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.google.gson.Gson;
 
@@ -22,14 +23,14 @@ import retrofit2.Response;
 public class TopicViewModel extends ViewModel {
     private TopicRepository topicRepository;
 
-    private MutableLiveData<List<TopicDetailResponse>> topicsLiveData = new MutableLiveData<>();
+    private MutableLiveData<PageResponse<TopicDetailResponse>> topicsLiveData = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> topicError = new MutableLiveData<>();
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
     public TopicViewModel() {
         topicRepository = TopicRepository.getInstance();
     }
 
-    public MutableLiveData<List<TopicDetailResponse>> getTopicsLiveData() {
+    public MutableLiveData<PageResponse<TopicDetailResponse>> getTopicsLiveData() {
         return topicsLiveData;
     }
 
@@ -42,11 +43,11 @@ public class TopicViewModel extends ViewModel {
     }
 
     public void fetchAllTopics() {
-        topicRepository.getAllTopics(new Callback<ApiResponse<List<TopicDetailResponse>>>() {
+        topicRepository.getAllTopics(0, new Callback<ApiResponse<PageResponse<TopicDetailResponse>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<TopicDetailResponse>>> call, Response<ApiResponse<List<TopicDetailResponse>>> response) {
+            public void onResponse(Call<ApiResponse<PageResponse<TopicDetailResponse>>> call, Response<ApiResponse<PageResponse<TopicDetailResponse>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<List<TopicDetailResponse>> apiRes = response.body();
+                    ApiResponse<PageResponse<TopicDetailResponse>> apiRes = response.body();
                     if (apiRes.getResult() != null) {
                         topicsLiveData.setValue(apiRes.getResult());  // ✅ Không dùng Event
                     } else {
@@ -65,7 +66,7 @@ public class TopicViewModel extends ViewModel {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<TopicDetailResponse>>> call, Throwable throwable) {
+            public void onFailure(Call<ApiResponse<PageResponse<TopicDetailResponse>>> call, Throwable throwable) {
                 Log.d("Error Topic", throwable.getMessage());
                 topicError.setValue(new Event<>(true));
             }
