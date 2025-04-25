@@ -21,7 +21,7 @@ public interface ReplyRepository extends JpaRepository<Reply, String> {
     Page<Reply> getAllByTopic_Id(String topicId, Pageable pageable);
 
     //get all reply which is parent
-    @Query("SELECT r FROM Reply r WHERE r.topic.id = :topicId AND r.parentReplyId = ''")
+    @Query("SELECT r FROM Reply r WHERE r.topic.id = :topicId AND (r.parentReplyId = '' OR r.parentReplyId is null )")
     Page<Reply> findByTopic_IdAndParentReplyIdIsNull(String topicId, Pageable pageable);
 
     Page<Reply> findByParentReplyId(String parentReplyId, Pageable pageable);

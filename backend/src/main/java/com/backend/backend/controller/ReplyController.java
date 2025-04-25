@@ -46,7 +46,7 @@ public class ReplyController {
     public ApiResponse<PageResponse<ReplyResponse>> getAllRepliesByTopicId(
             @PathVariable("topicId") String topicId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String direction){
         return ApiResponse.<PageResponse<ReplyResponse>>builder()
@@ -57,7 +57,7 @@ public class ReplyController {
     public ApiResponse<PageResponse<ReplyResponse>> getAllRepliesByParentReplyId(
             @PathVariable("parentReplyId") String parentReplyId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String direction){
         return ApiResponse.<PageResponse<ReplyResponse>>builder()

@@ -85,6 +85,7 @@ public class ReplyService {
             int size,
             String sortBy,
             String direction){
+
         if (!topicRepository.existsById(topicId)) {
             throw new AppException(ErrorCode.TOPIC_NOTEXISTED);
         }
