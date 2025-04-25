@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,11 +19,12 @@ import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.fragment.ReplyBottomSheetFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.TopicDetailViewHolder>{
+public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private Context context;
     //data
     private List<TopicDetailResponse> topicDetailResponsesList;
@@ -30,30 +32,49 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
     private TopicLikeListener topicLikeListener;
     private OnReplyClickListener onReplyClickListener;
 
+    private static final int ITEM_TYPE_NORMAL = 0;
+    private static final int ITEM_TYPE_LOADING = 1;
+
+    private boolean isLoadingAdded = false;
+
+
     public TopicDetailAdapter(Context context, OnReplyClickListener onReplyClickListener, TopicLikeListener topicLikeListener) {
         this.context = context;
         this.onReplyClickListener = onReplyClickListener;
         this.topicLikeListener = topicLikeListener;
+        topicDetailResponsesList = new ArrayList<>();
     }
 
     public void setData(List<TopicDetailResponse> topicDetailResponses){
         this.topicDetailResponsesList = topicDetailResponses;
         notifyDataSetChanged();
     }
+    public void addData(List<TopicDetailResponse> newList){
+        int oldSize = topicDetailResponsesList.size();
+        topicDetailResponsesList.addAll(newList);
+        notifyItemRangeInserted(oldSize, newList.size());
+    }
     @NonNull
     @Override
-    public TopicDetailViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == ITEM_TYPE_LOADING){
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loading, parent, false);
+            return new LoadingViewHolder(view);
+        }
+
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_topic, parent, false);
         return new TopicDetailViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TopicDetailViewHolder holder, int position) {
-        TopicDetailResponse topicDetailResponse = topicDetailResponsesList.get(position);
-        if (topicDetailResponse == null)
-            return;
-        holder.bind(topicDetailResponse);
-
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof TopicDetailViewHolder){
+            var topicHolder = (TopicDetailViewHolder) holder;
+            TopicDetailResponse topicDetailResponse = topicDetailResponsesList.get(position);
+            if (topicDetailResponse == null)
+                return;
+            topicHolder.bind(topicDetailResponse);
+        }
     }
 
 
@@ -63,6 +84,24 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
             return topicDetailResponsesList.size();
         return 0;
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == topicDetailResponsesList.size() - 1 && isLoadingAdded)
+            return ITEM_TYPE_LOADING;
+        else
+            return ITEM_TYPE_NORMAL;
+    }
+
+
+    public class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progressBar;
+        public LoadingViewHolder(View itemView) {
+            super(itemView);
+            progressBar = itemView.findViewById(R.id.progressBar);
+        }
+    }
+
 
     public class TopicDetailViewHolder extends RecyclerView.ViewHolder{
         TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount;
@@ -133,4 +172,15 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<TopicDetailAdapter.
             });
         }
     }
+
+    public void addLoadingFooter() {
+        isLoadingAdded = true;
+        notifyItemInserted(topicDetailResponsesList.size());
+    }
+
+    public void removeLoadingFooter() {
+        isLoadingAdded = false;
+        notifyItemRemoved(topicDetailResponsesList.size());
+    }
+
 }
