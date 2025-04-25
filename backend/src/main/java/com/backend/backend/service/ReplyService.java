@@ -56,11 +56,7 @@ public class ReplyService {
                 .topic(topic)
                 .createdAt(new Date())
                 .build();
-        ReplyResponse replyResponse = replyMapper.toReplyResponse(replyRepository.save(reply));
-        replyResponse.setUserGeneral(
-                userMapper.toUserGeneral(user)
-        );
-        return replyResponse;
+        return toReplyResponse(replyRepository.save(reply));
     }
 
     public void updateReply(String replyId, String content){
@@ -99,8 +95,7 @@ public class ReplyService {
         List<ReplyResponse> repliesResponse = new ArrayList<>();
         //mapping reply to replyresponse list
         for(Reply reply : replyPage.getContent()){
-            repliesResponse.add(replyMapper.toReplyResponse(reply));
-            repliesResponse.getLast().setUserGeneral(userMapper.toUserGeneral(reply.getUser()));
+            repliesResponse.add(toReplyResponse(reply));
         }
 
         return PageResponse.<ReplyResponse>builder()
@@ -131,8 +126,7 @@ public class ReplyService {
         List<ReplyResponse> repliesResponse = new ArrayList<>();
         //mapping reply to replyresponse list
         for(Reply reply : replyPage.getContent()){
-            repliesResponse.add(replyMapper.toReplyResponse(reply));
-            repliesResponse.getLast().setUserGeneral(userMapper.toUserGeneral(reply.getUser()));
+            repliesResponse.add(toReplyResponse(reply));
         }
 
         return PageResponse.<ReplyResponse>builder()
@@ -143,5 +137,13 @@ public class ReplyService {
                 .totalPages(replyPage.getTotalPages())
                 .last(replyPage.isLast())
                 .build();
+    }
+
+    private ReplyResponse toReplyResponse(Reply reply){
+        ReplyResponse replyResponse = replyMapper.toReplyResponse(reply);
+        UserGeneral userGeneral = userMapper.toUserGeneral(reply.getUser());
+        userGeneral.setAvt("http://10.0.2.2:8080/ute/" + reply.getUser().getProfile().getAvatarUrl());
+        replyResponse.setUserGeneral(userGeneral);
+        return replyResponse;
     }
 }
