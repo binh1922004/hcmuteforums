@@ -1,6 +1,7 @@
 package com.backend.backend.service;
 import com.backend.backend.dto.request.TopicPostRequest;
 import com.backend.backend.dto.request.TopicUpdateRequest;
+import com.backend.backend.dto.response.PageResponse;
 import com.backend.backend.dto.response.TopicDetailResponse;
 import com.backend.backend.entity.SubCategory;
 import com.backend.backend.entity.Topic;
@@ -15,6 +16,10 @@ import com.backend.backend.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -38,20 +44,33 @@ public class TopicService {
     //mapper
     TopicMapper topicMapper;
     UserMapper userMapper;
-    public List<TopicDetailResponse> getAllTopics(){
+    public PageResponse<TopicDetailResponse> getAllTopics(
+            int page,
+            int size,
+            String sortBy,
+            String direction) {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : null;
 
-        List<Topic> listTopic = topicRepository.findAll();
-        List<TopicDetailResponse> topicDetailResponseList = new ArrayList<>();
-        //map all topic to topic response
-        listTopic.forEach(topic -> {
-            TopicDetailResponse topicDetailResponse = toTopicDetailResponse(topic, username);
-            topicDetailResponseList.add(topicDetailResponse);
-        });
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        return topicDetailResponseList;
+        Page<Topic> topicPage = topicRepository.findAll(pageable);
+
+        List<TopicDetailResponse>  content= topicPage.getContent().stream()
+                .map(topic -> toTopicDetailResponse(topic, username))
+                .collect(Collectors.toList());
+
+        return PageResponse.<TopicDetailResponse>builder()
+                .content(content)
+                .pageSize(topicPage.getSize())
+                .totalElements(topicPage.getTotalElements())
+                .totalPages(topicPage.getTotalPages())
+                .last(topicPage.isLast())
+                .build();
     }
+
     public TopicDetailResponse postTopic(TopicPostRequest topicPostRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByUsername(username);

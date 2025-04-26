@@ -3,6 +3,8 @@ package com.example.hcmuteforums.ui.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -20,6 +22,7 @@ import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
+import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.model.entity.Category;
@@ -27,6 +30,7 @@ import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,9 +49,19 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     private String mParam1;
     private String mParam2;
 
+    //view model
     private TopicViewModel topicViewModel;
     private TopicDetailViewModel topicDetailViewModel;
+    //element
     private CardView cvPostTopic;
+    RecyclerView rcvTopic;
+    //adapter
+    TopicDetailAdapter topicDetailAdapter;
+    private boolean isLastPage = false;
+    private boolean isLoading = false;
+    private int currentPage = 0;
+    private final int pageSize = 6;
+
 
     public HomeFragment() {
         // Required empty public constructor
@@ -85,16 +99,61 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        //mapping data
+        mappingData(view);
+
+        //recyclerView
+        recyclerViewConfig();
+        //show topic
+        showMoreTopic();
+        observeData();
+        //go to post topic
+        postTopic();
+        return view;
+    }
+
+    private void mappingData(View view) {
 
         //init data
         topicViewModel = new TopicViewModel();
         topicDetailViewModel = new TopicDetailViewModel();
         cvPostTopic = view.findViewById(R.id.cvPostTopic);
-        //show category
-        showAllTopic(view);
-        //go to post topic
-        postTopic();
-        return view;
+        rcvTopic = view.findViewById(R.id.rcvTopic);
+    }
+
+    private void recyclerViewConfig(){
+        topicDetailAdapter = new TopicDetailAdapter(getContext(), this, this);
+        RecyclerView.LayoutManager linearLayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+        rcvTopic.setLayoutManager(linearLayout);
+        rcvTopic.setAdapter(topicDetailAdapter);
+        rcvTopic.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager == null) return;
+
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+                if (!isLoading && !isLastPage) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                            && firstVisibleItemPosition >= 0
+                            && totalItemCount >= pageSize) {
+                        showMoreTopic();
+                    }
+                }
+            }
+        });
+
+    }
+
+    private void showMoreTopic() {
+        //get data from viewmodel
+        topicViewModel.fetchAllTopics(currentPage);
+        currentPage++;
     }
 
     private void postTopic() {
@@ -104,17 +163,13 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
         });
     }
 
-    private void showAllTopic(View view) {
-        RecyclerView rcvTopic = view.findViewById(R.id.rcvTopic);
-        TopicDetailAdapter topicDetailAdapter = new TopicDetailAdapter(getContext(), this, this);
-
-        //get data from viewmodel
-        topicViewModel.fetchAllTopics();
+    private void observeData() {
         //observe
-        topicViewModel.getTopicsLiveData().observe(getViewLifecycleOwner(), new Observer<List<TopicDetailResponse>>() {
+        topicViewModel.getTopicsLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<TopicDetailResponse>>() {
             @Override
-            public void onChanged(List<TopicDetailResponse> topicDetailResponses) {
-                topicDetailAdapter.setData(topicDetailResponses);
+            public void onChanged(PageResponse<TopicDetailResponse> topicDetailResponses) {
+                topicDetailAdapter.addData(topicDetailResponses.getContent());
+                isLastPage = topicDetailResponses.isLast();
             }
         });
 
@@ -138,12 +193,22 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
             }
         });
 
-
-        RecyclerView.LayoutManager linearLayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
-        rcvTopic.setLayoutManager(linearLayout);
-        rcvTopic.setAdapter(topicDetailAdapter);
+        topicViewModel.getIsLoading().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean loading) {
+                isLoading = loading;
+                if (loading){
+                    topicDetailAdapter.addLoadingFooter();
+                }
+                else{
+                    topicDetailAdapter.removeLoadingFooter();
+                }
+            }
+        });
     }
 
+
+    //override section
     @Override
     public void likeTopic(String topicId) {
         topicDetailViewModel.likeTopic(topicId);
@@ -152,5 +217,24 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     @Override
     public void onReply(String topicId) {
         ReplyBottomSheetFragment.newInstance(topicId).show(getParentFragmentManager(), "ReplyBottomSheet");
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+//        resetData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        resetData();
+    }
+
+    private void resetData() {
+        currentPage = 0;
+        isLastPage = false;
+        topicDetailAdapter.setData(new ArrayList<>()); // Xóa hết dữ liệu hiện có
+        showMoreTopic();            // Gọi lại API trang đầu tiên
     }
 }

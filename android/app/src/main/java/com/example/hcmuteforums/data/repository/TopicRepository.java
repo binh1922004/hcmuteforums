@@ -12,6 +12,7 @@ import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
+import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.request.TopicPostRequest;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.utils.FileUtils;
@@ -45,8 +46,8 @@ public class TopicRepository {
         likeApi = LocalRetrofit.getRetrofit().create(LikeApi.class);
     }
 
-    public void getAllTopics(Callback<ApiResponse<List<TopicDetailResponse>>> callback) {
-        var call = topicApi.getAllTopic();
+    public void getAllTopics(int page, Callback<ApiResponse<PageResponse<TopicDetailResponse>>> callback) {
+        var call = topicApi.getAllTopic(page);
         call.enqueue(callback);
     }
 
