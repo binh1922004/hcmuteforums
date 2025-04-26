@@ -1,4 +1,5 @@
 package com.backend.backend.service;
+import com.backend.backend.dto.NotificationDTO;
 import com.backend.backend.dto.UserGeneral;
 import com.backend.backend.dto.request.ReplyPostRequest;
 import com.backend.backend.dto.request.TopicPostRequest;
@@ -44,6 +45,8 @@ public class ReplyService {
     //mapper
     UserMapper userMapper;
     ReplyMapper replyMapper;
+    //service
+    NotificationService notificationService;
     public ReplyResponse replyTopic(ReplyPostRequest replyPostRequest) {
         Topic topic = topicRepository.findById(replyPostRequest.getTopicId()).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOTEXISTED));
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -56,7 +59,26 @@ public class ReplyService {
                 .topic(topic)
                 .createdAt(new Date())
                 .build();
-        return toReplyResponse(replyRepository.save(reply));
+        Reply savedReply = replyRepository.save(reply);
+        ReplyResponse replyResponse = toReplyResponse(savedReply);
+
+        // Lấy thông tin người cần nhận thông báo - ví dụ là chủ bài viết
+        String targetUserId = topic.getUser().getId();
+
+        // Chỉ gửi thông báo nếu người reply khác chủ bài viết
+        if (!targetUserId.equals(user.getId())) {
+            // Tạo và gửi một notification object thay vì text string
+            NotificationDTO notification = notificationService.createReplyNotification(
+                    targetUserId,
+                    topic.getId(),
+                    savedReply.getId(),
+                    user.getFullName()
+            );
+
+            notificationService.sendStructuredNotificationToUser(targetUserId, notification);
+        }
+
+        return replyResponse;
     }
 
     public void updateReply(String replyId, String content){
