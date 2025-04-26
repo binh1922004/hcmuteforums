@@ -1,4 +1,5 @@
 package com.backend.backend.service;
+import com.backend.backend.dto.NotificationDTO;
 import com.backend.backend.dto.UserGeneral;
 import com.backend.backend.dto.request.ReplyPostRequest;
 import com.backend.backend.dto.request.TopicPostRequest;
@@ -44,6 +45,8 @@ public class ReplyService {
     //mapper
     UserMapper userMapper;
     ReplyMapper replyMapper;
+    //service
+    NotificationService notificationService;
     public ReplyResponse replyTopic(ReplyPostRequest replyPostRequest) {
         Topic topic = topicRepository.findById(replyPostRequest.getTopicId()).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOTEXISTED));
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -56,10 +59,25 @@ public class ReplyService {
                 .topic(topic)
                 .createdAt(new Date())
                 .build();
-        ReplyResponse replyResponse = replyMapper.toReplyResponse(replyRepository.save(reply));
-        replyResponse.setUserGeneral(
-                userMapper.toUserGeneral(user)
-        );
+        Reply savedReply = replyRepository.save(reply);
+        ReplyResponse replyResponse = toReplyResponse(savedReply);
+
+        // Lấy thông tin người cần nhận thông báo - ví dụ là chủ bài viết
+        String targetUserId = topic.getUser().getId();
+
+        // Chỉ gửi thông báo nếu người reply khác chủ bài viết
+        if (!targetUserId.equals(user.getId())) {
+            // Tạo và gửi một notification object thay vì text string
+            NotificationDTO notification = notificationService.createReplyNotification(
+                    targetUserId,
+                    topic.getId(),
+                    savedReply.getId(),
+                    user.getFullName()
+            );
+
+            notificationService.sendStructuredNotificationToUser(targetUserId, notification);
+        }
+
         return replyResponse;
     }
 
@@ -85,6 +103,7 @@ public class ReplyService {
             int size,
             String sortBy,
             String direction){
+
         if (!topicRepository.existsById(topicId)) {
             throw new AppException(ErrorCode.TOPIC_NOTEXISTED);
         }
@@ -98,8 +117,7 @@ public class ReplyService {
         List<ReplyResponse> repliesResponse = new ArrayList<>();
         //mapping reply to replyresponse list
         for(Reply reply : replyPage.getContent()){
-            repliesResponse.add(replyMapper.toReplyResponse(reply));
-            repliesResponse.getLast().setUserGeneral(userMapper.toUserGeneral(reply.getUser()));
+            repliesResponse.add(toReplyResponse(reply));
         }
 
         return PageResponse.<ReplyResponse>builder()
@@ -130,8 +148,7 @@ public class ReplyService {
         List<ReplyResponse> repliesResponse = new ArrayList<>();
         //mapping reply to replyresponse list
         for(Reply reply : replyPage.getContent()){
-            repliesResponse.add(replyMapper.toReplyResponse(reply));
-            repliesResponse.getLast().setUserGeneral(userMapper.toUserGeneral(reply.getUser()));
+            repliesResponse.add(toReplyResponse(reply));
         }
 
         return PageResponse.<ReplyResponse>builder()
@@ -142,5 +159,13 @@ public class ReplyService {
                 .totalPages(replyPage.getTotalPages())
                 .last(replyPage.isLast())
                 .build();
+    }
+
+    private ReplyResponse toReplyResponse(Reply reply){
+        ReplyResponse replyResponse = replyMapper.toReplyResponse(reply);
+        UserGeneral userGeneral = userMapper.toUserGeneral(reply.getUser());
+        userGeneral.setAvt("http://10.0.2.2:8080/ute/" + reply.getUser().getProfile().getAvatarUrl());
+        replyResponse.setUserGeneral(userGeneral);
+        return replyResponse;
     }
 }

@@ -5,6 +5,7 @@
     xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content">
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgAvatar"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:src="@drawable/logoute"
@@ -30,7 +31,7 @@
             app:expandType="layout"/>
         <io.github.glailton.expandabletextview.ExpandableTextView
             android:id="@+id/tvContent"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:text="content"
             android:textColor="#555555"
             android:layout_width="wrap_content"
@@ -41,18 +42,14 @@
             expandableTextView:readLessText="thu gọn"
             expandableTextView:textMode="line"
             app:expandType="layout"/>
-        <io.github.glailton.expandabletextview.ExpandableTextView
+        <TextView
             android:id="@+id/tvReply"
             android:textSize="14sp"
             android:text="trả lời"
+            android:layout_marginTop="3dp"
             android:textColor="@color/gray"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            expandableTextView:collapsedLines="3"
-            expandableTextView:animDuration="500"
-            expandableTextView:readMoreText="xem thêm"
-            expandableTextView:readLessText="thu gọn"
-            expandableTextView:textMode="line"
-            app:expandType="layout"/>
+            />
     </LinearLayout>
 </LinearLayout>
