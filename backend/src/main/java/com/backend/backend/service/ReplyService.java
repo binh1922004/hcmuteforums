@@ -1,22 +1,14 @@
 package com.backend.backend.service;
-import com.backend.backend.dto.NotificationDTO;
 import com.backend.backend.dto.UserGeneral;
 import com.backend.backend.dto.request.ReplyPostRequest;
-import com.backend.backend.dto.request.TopicPostRequest;
 import com.backend.backend.dto.response.PageResponse;
 import com.backend.backend.dto.response.ReplyResponse;
-import com.backend.backend.dto.response.TopicDetailResponse;
-import com.backend.backend.entity.Reply;
-import com.backend.backend.entity.SubCategory;
-import com.backend.backend.entity.Topic;
-import com.backend.backend.entity.User;
+import com.backend.backend.entity.*;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.ReplyMapper;
-import com.backend.backend.mapper.TopicMapper;
 import com.backend.backend.mapper.UserMapper;
 import com.backend.backend.repository.ReplyRepository;
-import com.backend.backend.repository.SubCategoryRepository;
 import com.backend.backend.repository.TopicRepository;
 import com.backend.backend.repository.UserRepository;
 import lombok.AccessLevel;
@@ -33,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -49,33 +40,38 @@ public class ReplyService {
     NotificationService notificationService;
     public ReplyResponse replyTopic(ReplyPostRequest replyPostRequest) {
         Topic topic = topicRepository.findById(replyPostRequest.getTopicId()).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOTEXISTED));
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
 
+        //find info about user send and user received notification
+        String sendUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User sendUser = userRepository.findByUsername(sendUsername).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+        String receivedUsername = topic.getUser().getUsername();
+        User receivedUser = userRepository.findByUsername(receivedUsername).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+
+
+        //create new reply
         Reply reply = Reply.builder()
                 .content(replyPostRequest.getContent())
                 .parentReplyId(replyPostRequest.getParentReplyId())
-                .user(user)
+                .user(sendUser)
                 .topic(topic)
                 .createdAt(new Date())
                 .build();
         Reply savedReply = replyRepository.save(reply);
         ReplyResponse replyResponse = toReplyResponse(savedReply);
 
-        // Lấy thông tin người cần nhận thông báo - ví dụ là chủ bài viết
-        String targetUserId = topic.getUser().getId();
 
         // Chỉ gửi thông báo nếu người reply khác chủ bài viết
-        if (!targetUserId.equals(user.getId())) {
+        if (!receivedUser.getId().equals(sendUser.getId())) {
             // Tạo và gửi một notification object thay vì text string
-            NotificationDTO notification = notificationService.createReplyNotification(
-                    targetUserId,
-                    topic.getId(),
+            Notification notification = notificationService.createNotification(
                     savedReply.getId(),
-                    user.getFullName()
+                    sendUser,
+                    receivedUser,
+                    NotificationContent.REPLY,
+                    topic
             );
 
-            notificationService.sendStructuredNotificationToUser(targetUserId, notification);
+            notificationService.sendStructuredNotificationToUser(notification);
         }
 
         return replyResponse;
