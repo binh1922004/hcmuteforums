@@ -12,7 +12,7 @@
     <item
         android:id="@+id/itemNotification"
         android:title="Notification"
-        android:icon="@drawable/notification"/>
+        android:icon="@drawable/notification_selector"/>
     <item
         android:id="@+id/itemProfile"
         android:icon="@drawable/person"

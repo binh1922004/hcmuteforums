@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Khi có thông báo mới (được active) -->
+    <item android:state_checked="true" android:drawable="@drawable/notification_active" />
+    <!-- Khi không có thông báo mới -->
+    <item android:drawable="@drawable/notification" />
+</selector>
