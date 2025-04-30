@@ -33,3 +33,9 @@ upload:
   dir: upload/topics/
   avatar-dir: upload/avatars/
   cover-dir: upload/covers/
+logging:
+  level:
+    or:
+      springframework:
+        security: DEBUG
+        web.socket: DEBUG

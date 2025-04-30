@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINT = {"/api/users", "/api/auth/login", "/api/otp/get", "/api/otp/validate",
-    "/api/categories/**", "/api/subcategory/**", "/api/auth/introspect"};
+    "/api/categories/**", "/api/subcategory/**", "/api/auth/introspect", "/ws"};
     private final String[] PUBLIC_ENDPOINT_GET = {"/api/topics/**", "/upload/**", "/api/reply/**"};
 
     @Bean
@@ -29,7 +29,7 @@ public class SecurityConfig {
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
-        //cai nay tu bat nen phai tat
+        //cai nay tu bat nen phai ta
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
