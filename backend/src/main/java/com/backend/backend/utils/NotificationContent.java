@@ -1,4 +1,4 @@
-package com.backend.backend.entity;
+package com.backend.backend.utils;
 
 import lombok.Getter;
 

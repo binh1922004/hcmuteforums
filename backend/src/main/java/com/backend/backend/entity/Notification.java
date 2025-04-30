@@ -1,5 +1,6 @@
 package com.backend.backend.entity;
 
+import com.backend.backend.utils.NotificationContent;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,8 @@ public class Notification {
     @Column(name = "create_at")
     private Date createdAt;
 
+    @Builder.Default
+    private boolean isRead = false;
     //user send
     @ManyToOne
     @JoinColumn(name = "send_user_id", nullable = false)

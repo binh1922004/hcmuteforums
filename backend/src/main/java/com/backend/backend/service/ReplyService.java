@@ -11,6 +11,7 @@ import com.backend.backend.mapper.UserMapper;
 import com.backend.backend.repository.ReplyRepository;
 import com.backend.backend.repository.TopicRepository;
 import com.backend.backend.repository.UserRepository;
+import com.backend.backend.utils.NotificationContent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

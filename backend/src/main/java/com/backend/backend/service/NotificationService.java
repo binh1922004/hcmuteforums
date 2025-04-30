@@ -3,7 +3,7 @@ package com.backend.backend.service;
 
 import com.backend.backend.dto.NotificationDTO;
 import com.backend.backend.entity.Notification;
-import com.backend.backend.entity.NotificationContent;
+import com.backend.backend.utils.NotificationContent;
 import com.backend.backend.entity.Topic;
 import com.backend.backend.entity.User;
 import com.backend.backend.repository.NotificationRepository;
