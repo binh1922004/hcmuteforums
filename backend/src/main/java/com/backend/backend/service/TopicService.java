@@ -131,9 +131,11 @@ public class TopicService {
         userGeneral.setAvt(profileRepository.findAvatarUrlByUserName(username));
         topicDetailResponse.setUserGeneral(userGeneral);
         //map all url from topic image to imgUrls
-        topicDetailResponse.setImgUrls(topic.getListImages().stream().map(v -> {
-            return "http://10.0.2.2:8080/ute/" + v.getImageUrl();
-        }).toList());
+        if (topic.getListImages() != null) {
+            topicDetailResponse.setImgUrls(topic.getListImages().stream().map(v -> {
+                return "http://10.0.2.2:8080/ute/" + v.getImageUrl();
+            }).toList());
+        }
         return topicDetailResponse;
     }
 }
