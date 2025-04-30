@@ -1,6 +1,7 @@
 package com.example.hcmuteforums.data.remote.api;
 
 import com.example.hcmuteforums.model.dto.ApiResponse;
+import com.example.hcmuteforums.model.dto.request.PasswordUpdateRequest;
 import com.example.hcmuteforums.model.dto.request.UserCreationRequest;
 import com.example.hcmuteforums.model.dto.request.UserUpdateRequest;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
@@ -18,4 +19,6 @@ public interface UserApi {
     public Call<ApiResponse<UserResponse>> myInfo();
     @PUT("api/users/update")
     public Call<ApiResponse<UserResponse>> updateUser(@Body UserUpdateRequest userUpdateRequest);
+    @PUT("api/users/updatePassword")
+    public Call<ApiResponse<Boolean>> updatePassword(@Body PasswordUpdateRequest passwordUpdateRequest);
 }

@@ -81,7 +81,6 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         return fragment;
     }
 
-
     public EditUserBottomSheet() {
         // Required empty public constructor
     }
@@ -182,33 +181,6 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), getResources().getColor(android.R.color.darker_gray), 4));
     }
 
-    private void getInfo(View mainView, UserUpdateRequest userUpdateRequest)
-    {
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        userViewModel.getInfo();
-        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
-            @Override
-            public void onChanged(UserResponse userResponse) {
-                if(userResponse!=null){
-                    userUpdateRequest.setDob(userResponse.getDob());
-                    userUpdateRequest.setAddress(userResponse.getAddress());
-                    userUpdateRequest.setGender(userResponse.getGender());
-                    userUpdateRequest.setPhone(userResponse.getPhone());
-                    userUpdateRequest.setFullName(userResponse.getFullName());
-                }
-
-            }
-        });
-        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-            @Override
-            public void onChanged(Event<Boolean> booleanEvent) {
-                Boolean errorOccurred = booleanEvent.getContent();
-                if (errorOccurred != null && errorOccurred) {
-                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
     private void getProfileInfo(View editNameView)
     {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);

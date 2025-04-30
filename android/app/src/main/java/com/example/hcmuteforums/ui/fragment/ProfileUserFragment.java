@@ -260,9 +260,21 @@ public class ProfileUserFragment extends Fragment {
 
     private void OpenEditProfile(Button btn_edit){
         btn_edit.setOnClickListener(view -> {
-            showBottomDialog();
+            //showBottomDialog();
+            showBottomDiaglogForgotPassword();
         });
     }
+    private void showBottomDiaglogForgotPassword(){
+        if(currentUserResponse!=null){
+            ForgotPasswordBottomSheetFragment bottomSheetFragment =
+                    ForgotPasswordBottomSheetFragment.newInstance(currentUserResponse);;
+            bottomSheetFragment.show(getParentFragmentManager(), bottomSheetFragment.getTag());
+        }else{
+            Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 
     private void showBottomDialog()
     {

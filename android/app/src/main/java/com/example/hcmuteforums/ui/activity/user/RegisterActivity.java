@@ -85,7 +85,6 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         registerEvent();
-
     }
 
     private void registerEvent() {

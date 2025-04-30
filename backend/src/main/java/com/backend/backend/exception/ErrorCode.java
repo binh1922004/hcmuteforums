@@ -18,7 +18,11 @@ public enum ErrorCode {
     EMAIL_EXISTED(1009, "Email existed", HttpStatus.BAD_REQUEST),
     OTP_LIMIT_TIME(1010, "You need to wait 30s for new OTP", HttpStatus.BAD_REQUEST),
     TOPIC_NOTEXISTED(1011, "Bài viết đã bị xoá", HttpStatus.NOT_FOUND),
-    REPLY_NOTEXISTED(1012, "Bình luận đã bị xoá", HttpStatus.NOT_FOUND  ),;
+    REPLY_NOTEXISTED(1012, "Bình luận đã bị xoá", HttpStatus.NOT_FOUND  ),
+    USER_NOTFOUND(1013, "User not found", HttpStatus.NOT_FOUND),
+    EMAIL_NOTFOUND(1014, "Email not found", HttpStatus.NOT_FOUND),
+    INVALID_OTP(1016, "OTP không hợp lệ hoặc đã hết hạn", HttpStatus.NOT_FOUND),
+    EMAIL_NOT_MATCH_USERNAME(1015, "Email does not match Username", HttpStatus.NOT_FOUND),;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;

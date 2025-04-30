@@ -79,7 +79,7 @@
             app:itemRadius="5dp"
             app:itemWidth="50dp"
             app:lineColor="@color/blue"
-            app:lineWidth="2dp" />
+            app:lineWidth="3dp" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
