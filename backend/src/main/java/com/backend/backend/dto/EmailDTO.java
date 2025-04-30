@@ -12,11 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmailDTO {
-    private List<String> recipients;
-    private List<String> ccList;
-    private List<String> bccList;
-    private String subject;
-    private String body;
-    private Boolean isHtml;
-    private String attachmentPath;
+    List<String> recipients;
+    List<String> ccList;
+    List<String> bccList;
+    String subject;
+    String body;
+    Boolean isHtml;
+    String attachmentPath;
 }

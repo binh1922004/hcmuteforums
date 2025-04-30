@@ -1,23 +1,17 @@
 package com.backend.backend.service;
 import com.backend.backend.dto.UserGeneral;
 import com.backend.backend.dto.request.ReplyPostRequest;
-import com.backend.backend.dto.request.TopicPostRequest;
 import com.backend.backend.dto.response.PageResponse;
 import com.backend.backend.dto.response.ReplyResponse;
-import com.backend.backend.dto.response.TopicDetailResponse;
-import com.backend.backend.entity.Reply;
-import com.backend.backend.entity.SubCategory;
-import com.backend.backend.entity.Topic;
-import com.backend.backend.entity.User;
+import com.backend.backend.entity.*;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.ReplyMapper;
-import com.backend.backend.mapper.TopicMapper;
 import com.backend.backend.mapper.UserMapper;
 import com.backend.backend.repository.ReplyRepository;
-import com.backend.backend.repository.SubCategoryRepository;
 import com.backend.backend.repository.TopicRepository;
 import com.backend.backend.repository.UserRepository;
+import com.backend.backend.utils.NotificationContent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -44,22 +37,44 @@ public class ReplyService {
     //mapper
     UserMapper userMapper;
     ReplyMapper replyMapper;
+    //service
+    NotificationService notificationService;
     public ReplyResponse replyTopic(ReplyPostRequest replyPostRequest) {
         Topic topic = topicRepository.findById(replyPostRequest.getTopicId()).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOTEXISTED));
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
 
+        //find info about user send and user received notification
+        String sendUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User sendUser = userRepository.findByUsername(sendUsername).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+        String receivedUsername = topic.getUser().getUsername();
+        User receivedUser = userRepository.findByUsername(receivedUsername).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+
+
+        //create new reply
         Reply reply = Reply.builder()
                 .content(replyPostRequest.getContent())
                 .parentReplyId(replyPostRequest.getParentReplyId())
-                .user(user)
+                .user(sendUser)
                 .topic(topic)
                 .createdAt(new Date())
                 .build();
-        ReplyResponse replyResponse = replyMapper.toReplyResponse(replyRepository.save(reply));
-        replyResponse.setUserGeneral(
-                userMapper.toUserGeneral(user)
-        );
+        Reply savedReply = replyRepository.save(reply);
+        ReplyResponse replyResponse = toReplyResponse(savedReply);
+
+
+        // Chỉ gửi thông báo nếu người reply khác chủ bài viết
+        if (!receivedUser.getId().equals(sendUser.getId())) {
+            // Tạo và gửi một notification object thay vì text string
+            Notification notification = notificationService.createNotification(
+                    savedReply.getId(),
+                    sendUser,
+                    receivedUser,
+                    NotificationContent.REPLY,
+                    topic
+            );
+
+            notificationService.sendStructuredNotificationToUser(notification);
+        }
+
         return replyResponse;
     }
 
@@ -85,6 +100,7 @@ public class ReplyService {
             int size,
             String sortBy,
             String direction){
+
         if (!topicRepository.existsById(topicId)) {
             throw new AppException(ErrorCode.TOPIC_NOTEXISTED);
         }
@@ -98,8 +114,7 @@ public class ReplyService {
         List<ReplyResponse> repliesResponse = new ArrayList<>();
         //mapping reply to replyresponse list
         for(Reply reply : replyPage.getContent()){
-            repliesResponse.add(replyMapper.toReplyResponse(reply));
-            repliesResponse.getLast().setUserGeneral(userMapper.toUserGeneral(reply.getUser()));
+            repliesResponse.add(toReplyResponse(reply));
         }
 
         return PageResponse.<ReplyResponse>builder()
@@ -130,8 +145,7 @@ public class ReplyService {
         List<ReplyResponse> repliesResponse = new ArrayList<>();
         //mapping reply to replyresponse list
         for(Reply reply : replyPage.getContent()){
-            repliesResponse.add(replyMapper.toReplyResponse(reply));
-            repliesResponse.getLast().setUserGeneral(userMapper.toUserGeneral(reply.getUser()));
+            repliesResponse.add(toReplyResponse(reply));
         }
 
         return PageResponse.<ReplyResponse>builder()
@@ -142,5 +156,13 @@ public class ReplyService {
                 .totalPages(replyPage.getTotalPages())
                 .last(replyPage.isLast())
                 .build();
+    }
+
+    private ReplyResponse toReplyResponse(Reply reply){
+        ReplyResponse replyResponse = replyMapper.toReplyResponse(reply);
+        UserGeneral userGeneral = userMapper.toUserGeneral(reply.getUser());
+        userGeneral.setAvt("http://10.0.2.2:8080/ute/" + reply.getUser().getProfile().getAvatarUrl());
+        replyResponse.setUserGeneral(userGeneral);
+        return replyResponse;
     }
 }

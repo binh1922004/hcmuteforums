@@ -29,5 +29,6 @@ public class User {
     private String mssv;
     private String phone;
     private String address;
-
+    @OneToOne(mappedBy = "user")
+    private Profile profile;
 }

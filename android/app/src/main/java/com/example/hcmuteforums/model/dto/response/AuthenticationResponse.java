@@ -1,10 +1,15 @@
 package com.example.hcmuteforums.model.dto.response;
 
 public class AuthenticationResponse {
+    private String id;
     private String token;
     private boolean isAuthenticated;
     private String username;
     private String email;
+
+    public String getId() {
+        return id;
+    }
 
     public String getUsername() {
         return username;

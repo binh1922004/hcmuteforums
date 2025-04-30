@@ -8,6 +8,8 @@ import com.example.hcmuteforums.data.remote.api.ReplyApi;
 import com.example.hcmuteforums.data.remote.api.TopicApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.model.dto.ApiResponse;
+import com.example.hcmuteforums.model.dto.PageResponse;
+import com.example.hcmuteforums.model.dto.request.ReplyPostRequest;
 import com.example.hcmuteforums.model.dto.request.TopicPostRequest;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
@@ -36,9 +38,14 @@ public class ReplyRepository {
         replyApi = LocalRetrofit.getRetrofit().create(ReplyApi.class);
     }
 
-    public void getAllRepliesByTopicId(String topicId, Callback<ApiResponse<List<ReplyResponse>>> callback) {
-        var call = replyApi.getAllRepliesByTopicId(topicId);
+    public void getAllRepliesByTopicId(String topicId, int page, Callback<ApiResponse<PageResponse<ReplyResponse>>> callback) {
+        var call = replyApi.getAllRepliesByTopicId(topicId, page);
         call.enqueue(callback);
     }
 
+    public void postReply(String content, String parentId, String topicId, Callback<ApiResponse<ReplyResponse>> callback){
+        ReplyPostRequest request = new ReplyPostRequest(content, parentId, topicId);
+        var call = replyApi.postReplyTopic(request);
+        call.enqueue(callback);
+    }
 }

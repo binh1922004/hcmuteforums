@@ -1,5 +1,6 @@
 package com.backend.backend.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -12,6 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Objects;
 
 @Component
+@Slf4j
 public class CustomJwtDecoder implements JwtDecoder {
     @Value("${jwt.signerKey}")
     private String signerKey;

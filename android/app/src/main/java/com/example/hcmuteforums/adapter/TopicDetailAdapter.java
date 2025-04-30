@@ -54,6 +54,11 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         topicDetailResponsesList.addAll(newList);
         notifyItemRangeInserted(oldSize, newList.size());
     }
+
+    public List<TopicDetailResponse> getData() {
+        return topicDetailResponsesList;
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -73,7 +78,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             TopicDetailResponse topicDetailResponse = topicDetailResponsesList.get(position);
             if (topicDetailResponse == null)
                 return;
-            topicHolder.bind(topicDetailResponse);
+            topicHolder.bind(topicDetailResponse, position);
         }
     }
 
@@ -122,7 +127,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvLikeCount = itemView.findViewById(R.id.tvLikeCount);
         }
 
-        public void bind(TopicDetailResponse topic) {
+        public void bind(TopicDetailResponse topic, int position) {
             tvName.setText(topic.getUserGeneral().getFullName());
             tvTime.setText(topic.getCreatedAt().toString());
             tvTitle.setText(topic.getTitle());
@@ -168,7 +173,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvReplyCount.setText(String.valueOf(topic.getReplyCount()));
             btnReply.setOnClickListener(v -> {
                 if (onReplyClickListener != null)
-                    onReplyClickListener.onReply(topic.getId());
+                    onReplyClickListener.onReply(topic.getId(), position);
             });
         }
     }
