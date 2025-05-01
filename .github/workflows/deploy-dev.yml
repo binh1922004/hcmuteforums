@@ -23,6 +23,7 @@ jobs:
     #     username: ${{ secrets.DOCKERHUB_USERNAME }}
     #     password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Deploy using Docker Compose
+      working-directory: ./backend # <-- THÊM DÒNG NÀY: Chỉ định chạy lệnh trong thư mục backend
       run: |
         docker compose down # Dừng và xóa container cũ (dựa trên docker-compose.yml)
         docker compose up -d --build # Build lại image (nếu có thay đổi) và khởi chạy container mới ở chế độ detached
