@@ -17,5 +17,9 @@
         android:id="@+id/itemProfile"
         android:icon="@drawable/person"
         android:title="Profile"/>
+    <item
+        android:id="@+id/itemMenu"
+        android:icon="@drawable/baseline_density_medium_24"
+        android:title="Menu"/>
 
 </menu>

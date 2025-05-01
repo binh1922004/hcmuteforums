@@ -23,16 +23,19 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.EditUserAdapter;
 import com.example.hcmuteforums.decoration.DividerItemDecoration;
 import com.example.hcmuteforums.decoration.RecyclerViewBorderDecoration;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.request.UserUpdateRequest;
+import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.EditNameActivity;
 import com.example.hcmuteforums.ui.activity.user.VerifyOTPActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
+import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -46,6 +49,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditUserBottomSheet extends BottomSheetDialogFragment {
     private ViewGroup containerView;
@@ -100,6 +105,9 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
 
                 // Đặt BottomSheetDialog ở trạng thái mở rộng (EXPANDED)
                 behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                TextView tv_fullname = view.findViewById(R.id.tv_Fullname);
+                tv_fullname.setText(userCurrent.getFullName());
+                getProfile(view);
             }
         }
     }
@@ -119,22 +127,11 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
             userCurrent = (UserResponse) getArguments().getSerializable("user");
         }
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        fullname = userCurrent.getFullName().toString();
-        dob = userCurrent.getDob().toString();
-        gender = userCurrent.getGender().toString();
-        if(userCurrent.getAddress().toString()!=null)
-        {
-            address = userCurrent.getAddress().toString();
-        }else if (userCurrent.getAddress().toString() == null)
-        {
-            address = "Chưa có địa chỉ";
-        } else if (userCurrent.getPhone().toString()!=null) {
-            phone = userCurrent.getPhone().toString();
-        } else if (userCurrent.getPhone().toString() == null) {
-            phone = "Chưa có số điện thoại";
-        }
-        Log.d("Fullname", fullname);
-        tv_fullname.setText(userCurrent.getFullName());
+        fullname = userCurrent.getFullName() != null ? userCurrent.getFullName() : "";
+        dob = userCurrent.getDob() != null ? userCurrent.getDob() : "";
+        gender = userCurrent.getGender() != null ? userCurrent.getGender() : "";
+        address = userCurrent.getAddress() != null ? userCurrent.getAddress() : "Chưa có địa chỉ";
+        phone = userCurrent.getPhone() != null ? userCurrent.getPhone() : "Chưa có số điện thoại";
         setupRecyclerView(view);
     }
 
@@ -150,6 +147,8 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
 
         View mainView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_bottom_sheet_edit_user_dialog, parent, false);
         imgClose = mainView.findViewById(R.id.imgClose);
+
+        getProfile(mainView);
         TextView tv_fullname = mainView.findViewById(R.id.tv_Fullname);
         tv_fullname.setText(userCurrent.getFullName());
         parent.addView(mainView);
@@ -157,6 +156,13 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         imgClose.setOnClickListener(v -> {
             dismiss();
         });
+    }
+    void loadImage(View view){
+        CircleImageView imgAvatar = view.findViewById(R.id.img_User);
+        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" +avatarProfile)
+                .placeholder(R.drawable.avatar_boy)
+                .error(R.drawable.anhhoixua)
+                .into(imgAvatar);
     }
 
     private void setupRecyclerView(View view) {
@@ -197,11 +203,11 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                             userResponse.getGender()
                     );
                 }
-                fullname = userResponse.getFullName().toString();
-                dob = userResponse.getDob().toString();
-                dobEdit = userResponse.getDob().toString();
-                address = userResponse.getAddress().toString();
-                gender = userResponse.getGender().toString();
+                fullname = userResponse.getFullName() != null ? userResponse.getFullName() : "Chưa có tên";
+                dob = userResponse.getDob() != null ? userResponse.getDob() : "Chưa có ngày sinh";
+                dobEdit = dob;
+                address = userResponse.getAddress() != null ? userResponse.getAddress() : "Chưa có địa chỉ";
+                gender = userResponse.getGender() != null ? userResponse.getGender() : "Chưa có giới tính";
 
             }
         });
@@ -594,6 +600,39 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 String errorMessage = event.getContent();
                 if (errorMessage != null) {
                     Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+    ProfileViewModel profileViewModel;
+    String avatarProfile;
+    private void getProfile(View view){
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        profileViewModel.getProfile();
+        profileViewModel.getProfileInfo().observe(getViewLifecycleOwner(), new Observer<ProfileResponse>() {
+            @Override
+            public void onChanged(ProfileResponse profileResponse) {
+                avatarProfile = profileResponse.getAvatarUrl();
+                loadImage(view);
+            }
+        });
+
+        profileViewModel.getProfileInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> booleanEvent) {
+                Boolean errorOccurred = booleanEvent.getContent(); // Lấy lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        profileViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> stringEvent) {
+                String message = stringEvent.getContent(); // Lấy nội dung sự kiện chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                 }
             }
         });

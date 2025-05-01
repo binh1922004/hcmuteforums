@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chaos.view.PinView;
@@ -38,13 +39,9 @@ import com.google.gson.Gson;
  * create an instance of this fragment.
  */
 public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     public static final String ARG_USER = "user";
@@ -95,15 +92,6 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
         }
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ForgotPasswordBottomSheetFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ForgotPasswordBottomSheetFragment newInstance(String param1, String param2) {
         ForgotPasswordBottomSheetFragment fragment = new ForgotPasswordBottomSheetFragment();
         Bundle args = new Bundle();
@@ -154,6 +142,11 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
         View emailView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_forgot_password_bottom_sheet, parent, true);
         edt_mail = emailView.findViewById(R.id.edtEmail);
         btn_switchOtp = emailView.findViewById(R.id.getOtp);
+
+        ImageView imageClose = view.findViewById(R.id.imgClose);
+        imageClose.setOnClickListener(v ->{
+            dismiss();
+        });
 
         btn_switchOtp.setOnClickListener(v -> {
             email = edt_mail.getText().toString();
@@ -219,6 +212,13 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
         View otpView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_otp_password_bottom_sheet, parent, true);
         PinView edtOtp = otpView.findViewById(R.id.password_otpCode);
         Button btn_verifyOtp = otpView.findViewById(R.id.confirmOtp);
+        ImageView imgBack = view.findViewById(R.id.img_backEmail);
+        imgBack.setOnClickListener(v->{
+            switchToEmailLayout();
+        });
+        TextView desOTP = otpView.findViewById(R.id.otp_description_pass);
+        desOTP.setText("Mã OTP đã được gửi đến Mail:\n" + email);
+
 
         btn_verifyOtp.setOnClickListener(v -> {
             if(edtOtp.getText()!=null){
@@ -265,6 +265,10 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
         eventTogglePasswordVisibility(edtNewPassword,R.drawable.baseline_lock_24, R.drawable.baseline_remove_red_eye_24, R.drawable.icons8_closed_eye_50);
         eventTogglePasswordVisibility(edtConfirmPassword,R.drawable.baseline_lock_open_24, R.drawable.baseline_remove_red_eye_24, R.drawable.icons8_closed_eye_50);
 
+        ImageView img_backOTP = view.findViewById(R.id.imgBackOTP);
+        img_backOTP.setOnClickListener(v->{
+            switchToOtpLayout();
+        });
         btn_resetPassword.setOnClickListener(v -> {
             newPassword = edtNewPassword.getText().toString();
             String confirmPassword = edtConfirmPassword.getText().toString();
