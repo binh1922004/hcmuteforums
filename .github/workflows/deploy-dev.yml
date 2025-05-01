@@ -1,0 +1,32 @@
+name: Deploy to Dev VPS
+
+on:
+  push:
+    branches:
+      - dev_deploy # Kích hoạt khi có push mới vào nhánh dev_deploy (sau khi PR được merge)
+
+jobs:
+  deploy:
+    name: Deploy Backend to Dev VPS
+    runs-on: [self-hosted, Linux, X64] # Chỉ định chạy trên runner bạn vừa cài đặt
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4 # Lấy code mới nhất từ nhánh dev_deploy
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # - name: Login to Docker Hub # Nếu bạn dùng private registry
+    #   uses: docker/login-action@v3
+    #   with:
+    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Deploy using Docker Compose
+      run: |
+        docker-compose down # Dừng và xóa container cũ (dựa trên docker-compose.yml)
+        docker-compose up -d --build # Build lại image (nếu có thay đổi) và khởi chạy container mới ở chế độ detached
+
+    - name: Clean up old images
+      run: |
+        docker image prune -a -f --filter "label!=maintainer=actions-runner" # Xóa các image không được dùng nữa, trừ image của runner
