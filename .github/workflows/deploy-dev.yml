@@ -22,11 +22,21 @@ jobs:
     #   with:
     #     username: ${{ secrets.DOCKERHUB_USERNAME }}
     #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    #build docker image hcmuteforums
+    - name: Build Docker Image
+      working-directory: ./backend # Chạy trong thư mục backend
+      run: |
+        echo "Building new image..."
+        # Lệnh này chỉ build image dựa trên docker-compose.yml và Dockerfile
+        # Nó không dừng hay khởi động lại container đang chạy.
+        docker compose build hcmuteforums # Chỉ build service hcmuteforums
+
     - name: Deploy using Docker Compose
       working-directory: ./backend # <-- THÊM DÒNG NÀY: Chỉ định chạy lệnh trong thư mục backend
       run: |
         docker compose down # Dừng và xóa container cũ (dựa trên docker-compose.yml)
-        docker compose up -d --build # Build lại image (nếu có thay đổi) và khởi chạy container mới ở chế độ detached
+        docker compose up -d --no-build # Build lại image (nếu có thay đổi) và khởi chạy container mới ở chế độ detached
 
     - name: Clean up old images
       run: |
