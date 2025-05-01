@@ -40,7 +40,7 @@ public class WebSocketManager {
         disconnect();
 
         // URL của WebSocket server
-        String url = "ws://10.0.2.2:8080/ute/ws";
+        String url = "wss://ball.io.vn/ute/ws";
 
         // Headers cho STOMP
         List<StompHeader> headers = new ArrayList<>();

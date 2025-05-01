@@ -161,7 +161,7 @@ public class ReplyService {
     private ReplyResponse toReplyResponse(Reply reply){
         ReplyResponse replyResponse = replyMapper.toReplyResponse(reply);
         UserGeneral userGeneral = userMapper.toUserGeneral(reply.getUser());
-        userGeneral.setAvt("http://10.0.2.2:8080/ute/" + reply.getUser().getProfile().getAvatarUrl());
+        userGeneral.setAvt("https://ball.io.vn:8080/ute/" + reply.getUser().getProfile().getAvatarUrl());
         replyResponse.setUserGeneral(userGeneral);
         return replyResponse;
     }

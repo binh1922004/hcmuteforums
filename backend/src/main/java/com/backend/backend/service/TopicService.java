@@ -133,7 +133,7 @@ public class TopicService {
         //map all url from topic image to imgUrls
         if (topic.getListImages() != null) {
             topicDetailResponse.setImgUrls(topic.getListImages().stream().map(v -> {
-                return "http://10.0.2.2:8080/ute/" + v.getImageUrl();
+                return "https://ball.io.vn:8080/ute/" + v.getImageUrl();
             }).toList());
         }
         return topicDetailResponse;
