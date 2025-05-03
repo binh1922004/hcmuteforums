@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_marginStart="10dp"
         android:layout_height="wrap_content">
-        <io.github.glailton.expandabletextview.ExpandableTextView
+        <TextView
             android:id="@+id/tvUsername"
             android:textStyle="bold"
             android:textSize="14sp"
@@ -40,16 +40,32 @@
             expandableTextView:animDuration="500"
             expandableTextView:readMoreText="xem thêm"
             expandableTextView:readLessText="thu gọn"
-            expandableTextView:textMode="line"
-            app:expandType="layout"/>
-        <TextView
-            android:id="@+id/tvReply"
-            android:textSize="14sp"
-            android:text="trả lời"
-            android:layout_marginTop="3dp"
-            android:textColor="@color/gray"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
+            expandableTextView:textMode="line"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tvReply"
+                android:textSize="14sp"
+                android:text="Trả lời"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+            <TextView
+                android:visibility="gone"
+                android:layout_marginStart="10dp"
+                android:id="@+id/tvChildReply"
+                android:textSize="14sp"
+                android:text="Xem các câu trả lời"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

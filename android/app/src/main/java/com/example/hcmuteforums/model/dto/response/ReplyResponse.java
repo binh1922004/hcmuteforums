@@ -7,6 +7,10 @@ public class ReplyResponse {
     private String content;
     private String parentReplyId;
     private UserGeneral userGeneral;
+    private boolean hasChild;
+    public boolean isHasChild() {
+        return hasChild;
+    }
 
     public String getId() {
         return id;
