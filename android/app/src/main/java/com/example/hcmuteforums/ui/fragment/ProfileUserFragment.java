@@ -179,7 +179,6 @@ public class ProfileUserFragment extends Fragment {
             @Override
             public void onChanged(ProfileResponse profileResponse) {
                 avatarProfile = profileResponse.getAvatarUrl();
-                Log.d("DUong dan anh", avatarProfile);
                 coverProfile = profileResponse.getCoverUrl();
                 bioProfile = profileResponse.getBio();
                 loadImage(view);

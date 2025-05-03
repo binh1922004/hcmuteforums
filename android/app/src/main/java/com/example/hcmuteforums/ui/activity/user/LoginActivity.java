@@ -3,6 +3,7 @@ package com.example.hcmuteforums.ui.activity.user;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,7 +25,7 @@ import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 public class LoginActivity extends AppCompatActivity {
 
 
-    private TextView tvRegister;
+    private TextView tvRegister, tvForgotPass;
     private EditText edtUsername, edtpassword;
     private Button btnLogin;
 
@@ -35,10 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
-        tvRegister = findViewById(R.id.tvRegister);
-        edtUsername = findViewById(R.id.edtUsername);
-        edtpassword = findViewById(R.id.edtPassword);
-        btnLogin = findViewById(R.id.btnLogin);
+        anhxa();
         //
         authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
 
@@ -47,6 +45,22 @@ public class LoginActivity extends AppCompatActivity {
 
         tvRegister.setOnClickListener(v->{
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
+        eventForgotPass(tvForgotPass);
+    }
+    void anhxa()
+    {
+        tvRegister = findViewById(R.id.tvRegister);
+        edtUsername = findViewById(R.id.edtUsername);
+        edtpassword = findViewById(R.id.edtPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        tvForgotPass = findViewById(R.id.tvForgotPass);
+    }
+    void eventForgotPass(TextView tvForgotPass)
+    {
+        tvForgotPass.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
         });
     }

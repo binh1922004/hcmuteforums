@@ -106,17 +106,7 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
                updateNotificationBadge(false);
                setCurrentFragment(notificationFragment);
            }
-           if (itemId == R.id.itemProfile){
-               if(isLoggedIn()){
-                   setCurrentFragment(profileUserFragment);
-               }
-               else{
-                   setCurrentFragment(profileFragment);
-               }
-           }
-           if (itemId == R.id.itemCategory){
-               setCurrentFragment(categoryFragment);
-           }if(itemId == R.id.itemMenu){
+           if(itemId == R.id.itemMenu){
                if(isLoggedIn()){
                    setCurrentFragment(menuFragment);
                }else{

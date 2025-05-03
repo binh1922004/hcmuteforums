@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,10 +21,12 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.MenuAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.model.modelAdapter.MenuItemModel;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
+import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
 
 import java.util.ArrayList;
@@ -58,6 +61,8 @@ public class MenuFragment extends Fragment {
     UserResponse currentUserResponse;
     UserViewModel userViewModel;
     AuthenticationViewModel authenticationViewModel;
+    ProfileViewModel profileViewModel;
+    String avatarUrl, fullname;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,15 +73,17 @@ public class MenuFragment extends Fragment {
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
-
+        getProfile(view);
         recyclerView = view.findViewById(R.id.recyclerViewMenu);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         getInfo();
+
         // Tạo danh sách menu
         menuList = new ArrayList<>();
         menuList.add(new MenuItemModel(R.drawable.ic_edit, "Chỉnh sửa thông tin"));
@@ -102,6 +109,17 @@ public class MenuFragment extends Fragment {
                         break;
                 }
             }
+
+            @Override
+            public void onHeaderClick() {
+                FragmentTransaction transaction = requireActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction();
+                transaction.replace(R.id.flFragment, new ProfileUserFragment());
+                transaction.addToBackStack(null); // Để người dùng có thể quay lại
+                transaction.commit();
+            }
+
         });
 
         recyclerView.setAdapter(menuAdapter);
@@ -118,6 +136,8 @@ public class MenuFragment extends Fragment {
                 if (userResponse == null)
                     return;
                 currentUserResponse = userResponse;
+                fullname = userResponse.getFullName();
+                menuAdapter.setFullname(fullname);
             }
         });
         userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
@@ -175,5 +195,37 @@ public class MenuFragment extends Fragment {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
         startActivity(intent);
     }
+
+    private void getProfile(View view){
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        profileViewModel.getProfile();
+        profileViewModel.getProfileInfo().observe(getViewLifecycleOwner(), new Observer<ProfileResponse>() {
+            @Override
+            public void onChanged(ProfileResponse profileResponse) {
+                avatarUrl = profileResponse.getAvatarUrl();
+                menuAdapter.setAvatarProfile(avatarUrl);
+            }
+        });
+
+        profileViewModel.getProfileInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> booleanEvent) {
+                Boolean errorOccurred = booleanEvent.getContent(); // Lấy lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        profileViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> stringEvent) {
+                String message = stringEvent.getContent(); // Lấy nội dung sự kiện chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 
 }

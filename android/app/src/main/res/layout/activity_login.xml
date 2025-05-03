@@ -94,6 +94,16 @@
                 android:textColor="@color/blue"
                 android:drawableLeft="@drawable/icongg"
                 android:layout_marginTop="5dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:padding="8dp"
+                android:text="Quên mật khẩu?"
+                android:textSize="14sp"
+                android:layout_gravity="center"
+                android:id="@+id/tvForgotPass"
+                android:textColor="@color/blue" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
     <TextView
