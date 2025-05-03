@@ -46,7 +46,7 @@ public class ProfileController {
                 .result(profileService.getAll())
                 .build();
     }
-    @PostMapping("/upload-avatar")
+    @PostMapping("/ucpload-avatar")
     public ApiResponse<Boolean> uploadAvatar(@RequestParam("file") MultipartFile file) {
         return ApiResponse.<Boolean>builder()
                 .result(avatarImageService.uploadAvatar(file))

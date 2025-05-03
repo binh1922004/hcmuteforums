@@ -9,6 +9,7 @@ import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
+import com.example.hcmuteforums.model.dto.request.PasswordUpdateRequest;
 import com.example.hcmuteforums.model.dto.request.UserCreationRequest;
 import com.example.hcmuteforums.model.dto.request.UserUpdateRequest;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
@@ -30,6 +31,9 @@ public class UserRepository {
 
     private final MutableLiveData<Event<Boolean>> userUpdateError = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> updateResponse = new MutableLiveData<>();
+    private final MutableLiveData<Event<Boolean>> updatePasswordResponse = new MutableLiveData<>();
+    private final MutableLiveData<Event<Boolean>> updatePasswordError = new MutableLiveData<>();
+
 
     private final UserApi userApi;
 
@@ -55,6 +59,10 @@ public class UserRepository {
 
     public void updateUser(UserUpdateRequest userUpdateRequest, Callback<ApiResponse<UserResponse>> callback) {
         var call = userApi.updateUser(userUpdateRequest);
+        call.enqueue(callback);
+    }
+    public void updatePassword(PasswordUpdateRequest passwordUpdateRequest, Callback<ApiResponse<Boolean>> callback){
+        var call = userApi.updatePassword(passwordUpdateRequest);
         call.enqueue(callback);
     }
 
@@ -86,6 +94,14 @@ public class UserRepository {
 
     public MutableLiveData<Event<Boolean>> getUpdateResponse() {
         return updateResponse;
+    }
+
+    public MutableLiveData<Event<Boolean>> getUpdatePasswordResponse() {
+        return updatePasswordResponse;
+    }
+
+    public MutableLiveData<Event<Boolean>> getUpdatePasswordError() {
+        return updatePasswordError;
     }
 }
 

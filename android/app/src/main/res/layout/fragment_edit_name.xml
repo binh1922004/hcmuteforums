@@ -135,7 +135,7 @@
 
     <!-- Nút Xem lại thay đổi -->
     <Button
-        android:id="@+id/btnSave"
+        android:id="@+id/btnSaveName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"

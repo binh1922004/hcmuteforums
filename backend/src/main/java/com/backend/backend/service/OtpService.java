@@ -2,6 +2,7 @@ package com.backend.backend.service;
 
 import com.backend.backend.dto.EmailDTO;
 import com.backend.backend.dto.request.OtpRequest;
+import com.backend.backend.entity.User;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.repository.UserRepository;
@@ -47,6 +48,34 @@ public class OtpService {
                 .recipients(recipients)
                 .body(htmlContent)
                 .subject("Mã OTP đăng ký tài khoản.")
+                .build();
+        return emailService.sendSimpleMessage(emailDTO);
+    }
+    public Boolean sendOtpResetPassword(OtpRequest request){
+        var email = request.getEmail();
+        var username = request.getUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
+        if(!userRepository.existsUserByEmail(email)){
+            throw new AppException(ErrorCode.EMAIL_NOTFOUND);
+        }
+        if (!user.getEmail().equalsIgnoreCase(email)) {
+            throw new AppException(ErrorCode.EMAIL_NOT_MATCH_USERNAME); // Bạn có thể tạo mã lỗi riêng
+        }
+        String otp = otpGenerator.generateOtp(email);
+        String htmlContent = "<div style='text-align: center; font-family: Arial, sans-serif;'>" +
+                "<h2 style='color: #333;'>Mã OTP của bạn</h2>" +
+                "<p style='font-size: 20px; font-weight: bold; color: #007bff;'>" + otp + "</p>" +
+                "<p>Vui lòng không chia sẻ mã này với bất kỳ ai.</p>" +
+                "<br/>" +
+                "<p style='font-size: 14px; color: #888;'>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>" +
+                "</div>";
+        List<String> recipients = new ArrayList<>();
+        recipients.add(email);
+        EmailDTO emailDTO = EmailDTO.builder()
+                .recipients(recipients)
+                .body(htmlContent)
+                .subject("Mã OTP khôi phục, cập nhật mật khẩu.")
                 .build();
         return emailService.sendSimpleMessage(emailDTO);
     }

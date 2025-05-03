@@ -1,6 +1,7 @@
 package com.backend.backend.controller;
 
 import com.backend.backend.dto.ApiResponse;
+import com.backend.backend.dto.request.PasswordUpdateRequest;
 import com.backend.backend.dto.request.UserCreationRequest;
 import com.backend.backend.dto.request.UserUpdateRequest;
 import com.backend.backend.dto.response.UserResponse;
@@ -37,6 +38,12 @@ public class UserController {
     public ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUserInfo(userUpdateRequest))
+                .build();
+    }
+    @PutMapping("/updatePassword")
+    public ApiResponse<Boolean> updatePassword(@RequestBody PasswordUpdateRequest passwordUpdateRequest) {
+        return ApiResponse.<Boolean>builder()
+                .result(userService.updatePassword(passwordUpdateRequest))
                 .build();
     }
 }
