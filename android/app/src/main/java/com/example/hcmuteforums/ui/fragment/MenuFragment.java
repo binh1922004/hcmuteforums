@@ -111,9 +111,12 @@ public class MenuFragment extends Fragment {
     private void getInfo(){
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);   //Map viewmodel
         userViewModel.getInfo();
-        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
+        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<Event<UserResponse>>() {
             @Override
-            public void onChanged(UserResponse userResponse) {
+            public void onChanged(Event<UserResponse> eUserResponse) {
+                UserResponse userResponse = eUserResponse.getContent();
+                if (userResponse == null)
+                    return;
                 currentUserResponse = userResponse;
             }
         });
