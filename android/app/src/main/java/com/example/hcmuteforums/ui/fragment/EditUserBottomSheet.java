@@ -71,6 +71,8 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     String ho = "" , ten="", tendem = "";
     RadioButton rbMale, rbFmale, rbOther;
     RadioGroup rgGender;
+
+    boolean isLoadingData = false;
     void anhxa(View view)
     {
         imgClose = view.findViewById(R.id.imgClose);
@@ -133,10 +135,12 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         address = userCurrent.getAddress() != null ? userCurrent.getAddress() : "Chưa có địa chỉ";
         phone = userCurrent.getPhone() != null ? userCurrent.getPhone() : "Chưa có số điện thoại";
         setupRecyclerView(view);
+        observeUpdateData();
     }
 
 
     private void switchToMainLayout() {
+
         View view = getView();
         if (view == null) return;
 
@@ -159,7 +163,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     }
     void loadImage(View view){
         CircleImageView imgAvatar = view.findViewById(R.id.img_User);
-        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" +avatarProfile)
+        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" + avatarProfile)
                 .placeholder(R.drawable.avatar_boy)
                 .error(R.drawable.anhhoixua)
                 .into(imgAvatar);
@@ -189,39 +193,13 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
 
     private void getProfileInfo(View editNameView)
     {
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        userViewModel.getInfo();
-        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
-            @Override
-            public void onChanged(UserResponse userResponse) {
-                if(userResponse!=null){
-                    userUpdateRequest = new UserUpdateRequest(
-                            userResponse.getFullName(),
-                            userResponse.getPhone(),
-                            userResponse.getDob(),
-                            userResponse.getAddress(),
-                            userResponse.getGender()
-                    );
-                }
-                fullname = userResponse.getFullName() != null ? userResponse.getFullName() : "Chưa có tên";
-                dob = userResponse.getDob() != null ? userResponse.getDob() : "Chưa có ngày sinh";
-                dobEdit = dob;
-                address = userResponse.getAddress() != null ? userResponse.getAddress() : "Chưa có địa chỉ";
-                gender = userResponse.getGender() != null ? userResponse.getGender() : "Chưa có giới tính";
-
-            }
-        });
-        userViewModel.getUserInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-            @Override
-            public void onChanged(Event<Boolean> event) {
-                Boolean errorOccurred = event.getContent();
-                if (errorOccurred != null && errorOccurred) {
-                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-
+        userUpdateRequest = new UserUpdateRequest(
+                userCurrent.getFullName(),
+                userCurrent.getPhone(),
+                userCurrent.getDob(),
+                userCurrent.getAddress(),
+                userCurrent.getGender()
+        );
     }
     private void switchToEditAddressLayout(){
         View view = getView();
@@ -273,6 +251,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         View editNameView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_edit_name, parent, false);
         getProfileInfo(editNameView);
         SetEdtName(editNameView, fullname);
+        Log.d("UserFullNam", fullname);
         //Event
         updateName(editNameView);
         parent.addView(editNameView);
@@ -422,39 +401,8 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 // Quan sát lỗi cập nhật thông tin người dùng
 
             }
-            userViewModel.getUserUpdateError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-                @Override
-                public void onChanged(Event<Boolean> event) {
-                    Boolean errorOccurred = event.getContent();
-                    if (errorOccurred != null && errorOccurred) {
-                        Toast.makeText(getContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
-            // Quan sát thông báo cập nhật thành công
-            userViewModel.getUserUpdate().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-                @Override
-                public void onChanged(Event<Boolean> event) {
-                    Boolean updateSuccess = event.getContent();
-                    if (updateSuccess != null && updateSuccess) {
-                        Toast.makeText(getContext(), "Cập nhật ngày sinh thành công", Toast.LENGTH_SHORT).show();
-                        switchToViewDobLayout();   //Chuyen ve viewDobsheet
-                    }
-                }
-            });
-
-            // Quan sát thông báo lỗi
-            userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
-                @Override
-                public void onChanged(Event<String> event) {
-                    String errorMessage = event.getContent();
-                    if (errorMessage != null) {
-                        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
         });
+
     }
     private void updateAddress(View editAddress, TextInputEditText edt_Address){
         Button btnSave = editAddress.findViewById(R.id.btnSaveAddress);
@@ -463,38 +411,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
             if(newAddress!=null){
                 userUpdateRequest.setAddress(newAddress);
                 userViewModel.updateUser(userUpdateRequest);
-            }
-        });
-        userViewModel.getUserUpdateError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-            @Override
-            public void onChanged(Event<Boolean> event) {
-                Boolean errorOccurred = event.getContent();
-                if (errorOccurred != null && errorOccurred) {
-                    Toast.makeText(getContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        // Quan sát thông báo cập nhật thành công
-        userViewModel.getUserUpdate().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-            @Override
-            public void onChanged(Event<Boolean> event) {
-                Boolean updateSuccess = event.getContent();
-                if (updateSuccess != null && updateSuccess) {
-                    Toast.makeText(getContext(), "Cập nhật địa chỉ thành công", Toast.LENGTH_SHORT).show();
-                    switchToMainLayout();
-                }
-            }
-        });
-
-        // Quan sát thông báo lỗi
-        userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
-            @Override
-            public void onChanged(Event<String> event) {
-                String errorMessage = event.getContent();
-                if (errorMessage != null) {
-                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                }
+                userCurrent.setAddress(newAddress);
             }
         });
     }
@@ -505,6 +422,8 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
         edt_ho = editNameView.findViewById(R.id.edtHo);
         edt_tendem = editNameView.findViewById(R.id.edtTenDem);
         edt_ten = editNameView.findViewById(R.id.edtTen);
+
+        String mFullName;
         btnSave.setOnClickListener(v -> {
             String NewFullName = edt_ho.getText().toString() + " " + edt_tendem.getText().toString() + " "+
                     edt_ten.getText().toString();
@@ -512,43 +431,9 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
             if(NewFullName!=null)
             {
                 userUpdateRequest.setFullName(NewFullName);
-                userViewModel.updateUser(userUpdateRequest);
-                userCurrent.setFullName(NewFullName);   //Lay ra ten duoc cap nhat dem ve cho MainSheet
+                userViewModel.updateUser(userUpdateRequest);  //Lay ra ten duoc cap nhat dem ve cho MainSheet
             }
 
-        });
-        // Quan sát lỗi cập nhật thông tin người dùng
-        userViewModel.getUserUpdateError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-            @Override
-            public void onChanged(Event<Boolean> event) {
-                Boolean errorOccurred = event.getContent();
-                if (errorOccurred != null && errorOccurred) {
-                    Toast.makeText(getContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        // Quan sát thông báo cập nhật thành công
-        userViewModel.getUserUpdate().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-            @Override
-            public void onChanged(Event<Boolean> event) {
-                Boolean updateSuccess = event.getContent();
-                if (updateSuccess != null && updateSuccess) {
-                    Toast.makeText(getContext(), "Cập nhật tên thành công", Toast.LENGTH_SHORT).show();
-                    switchToMainLayout();   //Chuyen ve mainSheet
-                }
-            }
-        });
-
-        // Quan sát thông báo lỗi
-        userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
-            @Override
-            public void onChanged(Event<String> event) {
-                String errorMessage = event.getContent();
-                if (errorMessage != null) {
-                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                }
-            }
         });
     }
     private void updateGender(View viewGender){
@@ -571,39 +456,6 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
 
             }
         });
-        userViewModel.getUserUpdateError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-            @Override
-            public void onChanged(Event<Boolean> event) {
-                Boolean errorOccurred = event.getContent();
-                if (errorOccurred != null && errorOccurred) {
-                    Toast.makeText(getContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        // Quan sát thông báo cập nhật thành công
-        userViewModel.getUserUpdate().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-            @Override
-            public void onChanged(Event<Boolean> event) {
-                Boolean updateSuccess = event.getContent();
-                if (updateSuccess != null && updateSuccess) {
-                    Toast.makeText(getContext(), "Cập nhật giới tính thành công", Toast.LENGTH_SHORT).show();
-                    switchToMainLayout();   //Chuyen ve mainSheet
-                }
-            }
-        });
-
-        // Quan sát thông báo lỗi
-        userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
-            @Override
-            public void onChanged(Event<String> event) {
-                String errorMessage = event.getContent();
-                if (errorMessage != null) {
-                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
     }
     ProfileViewModel profileViewModel;
     String avatarProfile;
@@ -636,7 +488,47 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
                 }
             }
         });
+    }
 
+    private void observeUpdateData(){
+        userViewModel.getUserUpdateError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent();
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Quan sát thông báo cập nhật thành công
+        userViewModel.getUserUpdate().observe(getViewLifecycleOwner(), new Observer<Event<UserResponse>>() {
+            @Override
+            public void onChanged(Event<UserResponse> event) {
+                UserResponse userResponse = event.getContent();
+                if (userResponse != null) {
+                    Toast.makeText(getContext(), "Cập nhật thông tin thành công", Toast.LENGTH_SHORT).show();
+                    fullname = userResponse.getFullName() != null ? userResponse.getFullName() : "Chưa có tên";
+                    dob = userResponse.getDob() != null ? userResponse.getDob() : "Chưa có ngày sinh";
+                    dobEdit = dob;
+                    address = userResponse.getAddress() != null ? userResponse.getAddress() : "Chưa có địa chỉ";
+                    gender = userResponse.getGender() != null ? userResponse.getGender() : "Chưa có giới tính";
+
+                    switchToMainLayout();   //Chuyen ve mainSheet
+                }
+            }
+        });
+
+        // Quan sát thông báo lỗi
+        userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> event) {
+                String errorMessage = event.getContent();
+                if (errorMessage != null) {
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
 }

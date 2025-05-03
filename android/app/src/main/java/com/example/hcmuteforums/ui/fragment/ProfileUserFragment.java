@@ -139,9 +139,12 @@ public class ProfileUserFragment extends Fragment {
     private void getInfo(TextView tv_username, TextView tv_email){
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);   //Map viewmodel
         userViewModel.getInfo();
-        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
+        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<Event<UserResponse>>() {
             @Override
-            public void onChanged(UserResponse userResponse) {
+            public void onChanged(Event<UserResponse> eUserResponse) {
+                UserResponse userResponse = eUserResponse.getContent();
+                if (userResponse == null)
+                    return;
                 currentUserResponse = userResponse;
                 tv_username.setText(userResponse.getFullName());
                 tv_email.setText(userResponse.getEmail());
