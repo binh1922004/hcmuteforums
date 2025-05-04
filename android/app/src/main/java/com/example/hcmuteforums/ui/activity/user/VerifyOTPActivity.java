@@ -28,7 +28,6 @@ public class VerifyOTPActivity extends AppCompatActivity {
     private PinView pinView;
     private TextView tvOtpdescription;
     private Button btnVerifyOtp;
-
     private VerifyOTPViewModel verifyOTPViewModel;
     UserCreationRequest userRequest;
 

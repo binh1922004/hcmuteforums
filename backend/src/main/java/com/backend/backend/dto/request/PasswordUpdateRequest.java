@@ -12,4 +12,5 @@ public class PasswordUpdateRequest {
     private String email;
     private String password;
     private String otp;
+    private String username;
 }

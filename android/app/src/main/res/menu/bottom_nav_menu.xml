@@ -2,10 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/itemCategory"
-        android:title="Category"
-        android:icon="@drawable/category"/>
-    <item
         android:id="@+id/itemHome"
         android:title="Home"
         android:icon="@drawable/home"/>
@@ -13,10 +9,6 @@
         android:id="@+id/itemNotification"
         android:title="Notification"
         android:icon="@drawable/notification_selector"/>
-    <item
-        android:id="@+id/itemProfile"
-        android:icon="@drawable/person"
-        android:title="Profile"/>
     <item
         android:id="@+id/itemMenu"
         android:icon="@drawable/baseline_density_medium_24"

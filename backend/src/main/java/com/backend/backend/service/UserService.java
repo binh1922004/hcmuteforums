@@ -42,11 +42,9 @@ public class UserService {
         return profileService.createProfile(userRepository.save(user)) != null;
     }
     public boolean updatePassword(PasswordUpdateRequest passwordUpdateRequest) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = passwordUpdateRequest.getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(()->
                 new AppException(ErrorCode.USER_NOTEXISTED));
-
         passwordUpdateRequest.setPassword(passwordEncoder.encode(passwordUpdateRequest.getPassword()));
         userMapper.updatePassword(user, passwordUpdateRequest);
         return userMapper.toUserResponse(userRepository.save(user))!=null;

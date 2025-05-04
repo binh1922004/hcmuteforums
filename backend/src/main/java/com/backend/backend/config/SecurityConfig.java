@@ -17,7 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINT = {"/api/users", "/api/auth/login", "/api/otp/get", "/api/otp/validate",
-    "/api/categories/**", "/api/subcategory/**", "/api/auth/introspect", "/ws"};
+    "/api/categories/**", "/api/subcategory/**", "/api/auth/introspect", "/ws", "/api/otp/getOTPResetPassword", "/api/otp/validatedOTP"
+    ,"/api/users/updatePassword"};
     private final String[] PUBLIC_ENDPOINT_GET = {"/api/topics/**", "/upload/**", "/api/reply/**"};
 
     @Bean

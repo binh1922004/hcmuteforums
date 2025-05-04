@@ -5,7 +5,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -31,7 +30,6 @@ import com.example.hcmuteforums.viewmodel.OtpValidateViewModel;
 import com.example.hcmuteforums.viewmodel.VerifyOTPViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.gson.Gson;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,7 +68,7 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
     VerifyOTPViewModel verifyOTPViewModel;
     OtpValidateViewModel otpValidateViewModel;
 
-    String email, newPassword, otp;
+    String email, newPassword, otp, username;
 
     @Override
     public void onStart() {
@@ -114,7 +112,7 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_forgot_password_bottom_sheet, container, false);
+        View view = inflater.inflate(R.layout.fragment_change_password_bottom_sheet, container, false);
 
         return view;
     }
@@ -139,7 +137,7 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
 
         parent.removeAllViews();
 
-        View emailView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_forgot_password_bottom_sheet, parent, true);
+        View emailView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_change_password_bottom_sheet, parent, true);
         edt_mail = emailView.findViewById(R.id.edtEmail);
         btn_switchOtp = emailView.findViewById(R.id.getOtp);
 
@@ -150,7 +148,7 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
 
         btn_switchOtp.setOnClickListener(v -> {
             email = edt_mail.getText().toString();
-            String username = user.getUsername();
+            username = user.getUsername();
             forgotPassWordViewModel.sendOtpResetPassword(email, username);
         });
 
@@ -227,6 +225,7 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
                 Log.d("Otp", otp);
                 otpValidateViewModel.validateOtp(email, otp);
                 edtOtp.requestFocus();
+
             }
         });
         otpValidateViewModel.getOtpValidatedResponse().observe(getViewLifecycleOwner(), event -> {
@@ -274,7 +273,7 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
             String confirmPassword = edtConfirmPassword.getText().toString();
 
             if (newPassword.equals(confirmPassword)) {
-                PasswordUpdateRequest request = new PasswordUpdateRequest(email, newPassword, otp);
+                PasswordUpdateRequest request = new PasswordUpdateRequest(email, newPassword, otp, username);
                 Log.d("ForgotPassword", "Đang gọi updatePassword");
                 verifyOTPViewModel.updatePassword(request);
             } else {
