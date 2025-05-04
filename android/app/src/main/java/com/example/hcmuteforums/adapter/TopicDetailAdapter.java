@@ -14,10 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.hcmuteforums.R;
-import com.example.hcmuteforums.listeners.OnReplyClickListener;
+import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
-import com.example.hcmuteforums.ui.fragment.ReplyBottomSheetFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private List<TopicDetailResponse> topicDetailResponsesList;
     //listener interface
     private TopicLikeListener topicLikeListener;
-    private OnReplyClickListener onReplyClickListener;
+    private OnReplyShowListener onReplyShowListener;
 
     private static final int ITEM_TYPE_NORMAL = 0;
     private static final int ITEM_TYPE_LOADING = 1;
@@ -38,9 +37,9 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private boolean isLoadingAdded = false;
 
 
-    public TopicDetailAdapter(Context context, OnReplyClickListener onReplyClickListener, TopicLikeListener topicLikeListener) {
+    public TopicDetailAdapter(Context context, OnReplyShowListener onReplyShowListener, TopicLikeListener topicLikeListener) {
         this.context = context;
-        this.onReplyClickListener = onReplyClickListener;
+        this.onReplyShowListener = onReplyShowListener;
         this.topicLikeListener = topicLikeListener;
         topicDetailResponsesList = new ArrayList<>();
     }
@@ -172,8 +171,8 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             //biding for reply
             tvReplyCount.setText(String.valueOf(topic.getReplyCount()));
             btnReply.setOnClickListener(v -> {
-                if (onReplyClickListener != null)
-                    onReplyClickListener.onReply(topic.getId(), position);
+                if (onReplyShowListener != null)
+                    onReplyShowListener.onReply(topic.getId(), position);
             });
         }
     }

@@ -22,6 +22,7 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.ReplyAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
+import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.viewmodel.ReplyViewModel;
@@ -37,7 +38,8 @@ import java.util.List;
  * Use the {@link ReplyBottomSheetFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
+public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implements
+        OnReplyClickListener {
     //element from layout
     private RecyclerView rcvReplies;
     private EditText edtComment;
@@ -99,10 +101,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
     //mapping for data
     private void replyAdapterConfig() {
         rcvReplies.setLayoutManager(new LinearLayoutManager(getContext()));
-        replyAdapter = new ReplyAdapter(getContext(), replyList, reply -> {
-            replyingToUser = reply.getUserGeneral().getUsername();
-            edtComment.setHint("Reply @" + replyingToUser);
-        });
+        replyAdapter = new ReplyAdapter(getContext(), replyList, this);
         rcvReplies.setAdapter(replyAdapter);
 
 
@@ -215,5 +214,11 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment {
         ReplyResponse response = new ReplyResponse();
 //        response.
         return response;
+    }
+
+    @Override
+    public void onReplyClick(ReplyResponse reply) {
+        replyingToUser = reply.getUserGeneral().getUsername();
+        edtComment.setHint("Reply @" + replyingToUser);
     }
 }

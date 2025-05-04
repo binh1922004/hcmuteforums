@@ -17,29 +17,26 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
-import com.example.hcmuteforums.adapter.CategoryAdapter;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
-import com.example.hcmuteforums.listeners.OnReplyClickListener;
+import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
-import com.example.hcmuteforums.model.entity.Category;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements TopicLikeListener, OnReplyClickListener {
+public class HomeFragment extends Fragment implements TopicLikeListener, OnReplyShowListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

@@ -55,23 +55,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 />
-            <TextView
-                android:visibility="gone"
-                android:layout_marginStart="10dp"
-                android:id="@+id/tvChildReply"
-                android:textSize="14sp"
-                android:text="Xem các câu trả lời"
-                android:layout_marginTop="3dp"
-                android:textColor="@color/gray"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
         </LinearLayout>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvChildReplies"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false" android:visibility="gone" />
 </LinearLayout>
 </LinearLayout>

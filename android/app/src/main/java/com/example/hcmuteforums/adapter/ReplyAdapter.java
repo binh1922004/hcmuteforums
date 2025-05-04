@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 
 import java.util.List;
@@ -22,9 +23,6 @@ import io.github.glailton.expandabletextview.ExpandableTextView;
 
 public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHolder> {
 
-    public interface OnReplyClickListener {
-        void onReplyClick(ReplyResponse reply);
-    }
 
     private List<ReplyResponse> replyList;
     private OnReplyClickListener listener;
