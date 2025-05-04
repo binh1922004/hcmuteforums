@@ -1,6 +1,7 @@
 package com.example.hcmuteforums.adapter;
 
 import android.content.Context;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,34 +10,34 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
+import com.ms.square.android.expandabletextview.ExpandableTextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.github.glailton.expandabletextview.ExpandableTextView;
 
 public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHolder> {
 
 
     private List<ReplyResponse> replyList;
+    //listener
     private OnReplyClickListener listener;
     private Context context;
+    //adapter
     public ReplyAdapter(Context context, List<ReplyResponse> replyList, OnReplyClickListener listener) {
         this.replyList = replyList;
         this.listener = listener;
         this.context = context;
     }
 
-    public void setData(List<ReplyResponse> replyList){
-        this.replyList = replyList;
-        notifyDataSetChanged();
-    }
     public void addData(List<ReplyResponse> newList){
         int oldSize = replyList.size();
         replyList.addAll(newList);
@@ -45,6 +46,30 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     public void addNewReply(ReplyResponse newReply){
         replyList.add(0, newReply);
         notifyItemInserted(0);
+    }
+    public void addNewReplyChild(List<ReplyResponse> childList, boolean isLast){
+        //child list empty so not do any thing
+        if (childList.isEmpty())
+            return;
+        String parentId = childList.get(0).getParentReplyId();
+        int pos = -1;
+        for (int i = 0; i < replyList.size(); i++){
+            var reply = replyList.get(i);
+            if (reply.getId().equals(parentId)){
+                pos = i;
+                break;
+            }
+        }
+        //not found reply with id
+        if (pos == -1){
+            return;
+        }
+        if (replyList.get(pos).getListChild() == null){
+            replyList.get(pos).setListChild(new ArrayList<>());
+        }
+        replyList.get(pos).getListChild().addAll(childList);
+        replyList.get(pos).setLast(isLast);
+        notifyItemChanged(pos);
     }
     @NonNull
     @Override
@@ -57,7 +82,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     @Override
     public void onBindViewHolder(@NonNull ReplyViewHolder holder, int position) {
         ReplyResponse reply = replyList.get(position);
-        holder.bind(reply);
+        holder.bind(reply, position);
     }
 
     @Override
@@ -68,26 +93,123 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     }
 
     public class ReplyViewHolder extends RecyclerView.ViewHolder {
-        TextView tvUsername;
-        ExpandableTextView tvContent;
+        TextView tvUsername, tvReply, tvShowChildReply;
+        TextView tvContent, tvToggle, tvShowMoreChildReply, tvHideChildReply;
         CircleImageView imgAvatar;
+        RecyclerView rcvChildReplies;
+        ReplyChildAdapter replyChildAdapter;
         public ReplyViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvContent = itemView.findViewById(R.id.tvContent);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
+            tvReply = itemView.findViewById(R.id.tvReply);
+            tvShowChildReply = itemView.findViewById(R.id.tvShowChildReply);
+            rcvChildReplies = itemView.findViewById(R.id.rcvChildReplies);
+            tvToggle = itemView.findViewById(R.id.tvToggle);
+            tvShowMoreChildReply = itemView.findViewById(R.id.tvShowMoreChildReply);
+            tvHideChildReply = itemView.findViewById(R.id.tvHideChildReply);
+            //config for reply child adapter
+            rcvChildReplies.setLayoutManager(new LinearLayoutManager(itemView.getContext(), RecyclerView.VERTICAL, false));
+            replyChildAdapter = new ReplyChildAdapter(context, listener);
+            rcvChildReplies.setAdapter(replyChildAdapter);
+            rcvChildReplies.setNestedScrollingEnabled(false);
         }
-        public void bind(ReplyResponse reply){
+        public void bind(ReplyResponse reply, int pos){
+            tvShowMoreChildReply.setVisibility(View.GONE);
+            tvShowChildReply.setVisibility(View.GONE);
+            tvHideChildReply.setVisibility(View.GONE);
+
             tvUsername.setText(reply.getUserGeneral().getFullName());
-            tvContent.setText(reply.getContent());
+            //TODO: Expand text view
+            String content = reply.getContent();
+            tvContent.setText(content);
+            //setup for content and max lines
+            tvContent.setMaxLines(reply.isExpanded() ? Integer.MAX_VALUE : 3);
+            tvToggle.setText(reply.isExpanded() ? "Thu gọn" : "Xem thêm");
+            tvToggle.setVisibility(content.length() > 100 ? View.VISIBLE : View.GONE);
+            //content and toggle use both event
+            // Toggle xử lý khi nhấn
+            View.OnClickListener toggleListener = v -> {
+                reply.setExpanded(!reply.isExpanded());
+                notifyItemChanged(pos); // Dùng notify để đảm bảo UI được update
+            };
+            tvToggle.setOnClickListener(toggleListener);
+            tvContent.setOnClickListener(toggleListener);
+
+
+            //TODO: Up avatar
             Glide.with(context)
                     .load(reply.getUserGeneral().getAvt())
                     .centerCrop()
                     .into(imgAvatar);
-            tvContent.setOnClickListener(v -> {
+
+            //TODO: set click event to reply
+            tvReply.setOnClickListener(v -> {
                 if (listener != null)
                     listener.onReplyClick(reply);
             });
+
+            //TODO: show more reply
+            if (reply.isShowChild() ){
+                if (reply.isLast()){
+                    tvShowMoreChildReply.setVisibility(View.GONE);
+                    tvHideChildReply.setVisibility(View.VISIBLE);
+
+                    tvHideChildReply.setOnClickListener(v -> {
+                        rcvChildReplies.setVisibility(View.GONE);
+                        tvHideChildReply.setVisibility(View.GONE);
+                        reply.getListChild().clear();
+                        replyChildAdapter.clearData();
+                        reply.setShowChild(false);
+                        listener.onHideChildReply(reply);
+                        notifyItemChanged(pos);
+                    });
+                }
+                else{
+                    tvShowMoreChildReply.setVisibility(View.VISIBLE);
+                    tvHideChildReply.setVisibility(View.GONE);
+
+                    tvShowMoreChildReply.setOnClickListener(v -> {
+                        listener.onShowChildReply(reply);
+                    });
+                }
+
+            }
+            else{
+                tvShowMoreChildReply.setVisibility(View.GONE);
+                tvHideChildReply.setVisibility(View.GONE);
+            }
+
+            //TODO: show reply child
+            if (reply.isHasChild()) {
+                if (!reply.isShowChild()) {
+                    reply.setShowChild(true);
+                    tvShowChildReply.setVisibility(View.VISIBLE);
+                }
+                else{
+                    tvShowChildReply.setVisibility(View.GONE);
+                }
+                //recyclerview set up and add data
+                List<ReplyResponse> children = reply.getListChild();
+                replyChildAdapter.setData(children != null ? children : new ArrayList<>());
+
+                rcvChildReplies.setVisibility(
+                        reply.isHasChild() && reply.isShowChild() && children != null && !children.isEmpty()
+                                ? View.VISIBLE
+                                : View.GONE
+                );
+
+                //show child
+                tvShowChildReply.setOnClickListener(v -> {
+                    tvShowChildReply.setVisibility(View.GONE);
+                    listener.onShowChildReply(reply);
+                });
+            }
+            else{
+                tvShowChildReply.setVisibility(View.GONE);
+                rcvChildReplies.setVisibility(View.GONE);
+            }
 
         }
     }

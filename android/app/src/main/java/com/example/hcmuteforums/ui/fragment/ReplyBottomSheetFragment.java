@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -63,6 +65,10 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
 
     //listiner interface
     OnReplyAddedListener onReplyAddedListener;
+
+    //hash map for storage page size of each reply child
+    HashMap<String, Integer> currentPageReplyChildMap;
+    HashMap<String, Boolean> isLastPageReplyChildMap;
     public static ReplyBottomSheetFragment newInstance(String topicId) {
         ReplyBottomSheetFragment fragment = new ReplyBottomSheetFragment();
         Bundle args = new Bundle();
@@ -87,6 +93,8 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         replyViewModel = new ReplyViewModel();
         topicId = getArguments().getString("topicId");
 
+        currentPageReplyChildMap = new HashMap<>();
+        isLastPageReplyChildMap = new HashMap<>();
         replyAdapterConfig();
 
         loadMoreReplies();
@@ -128,6 +136,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     }
 
     private void observeData(){
+        //reply response success
         replyViewModel.getReplyLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<ReplyResponse>>() {
             @Override
             public void onChanged(PageResponse<ReplyResponse> replyResponses) {
@@ -141,7 +150,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
                 }
             }
         });
-
+        //reply message error
         replyViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
             public void onChanged(Event<String> stringEvent) {
@@ -151,6 +160,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
                 }
             }
         });
+        //reply post success
         replyViewModel.getReplyPostSuccess().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
             @Override
             public void onChanged(Event<ReplyResponse> replyResponseEvent) {
@@ -165,6 +175,30 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
                 }
             }
         });
+
+
+        //reply child
+        replyViewModel.getReplyChildLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<ReplyResponse>>() {
+            @Override
+            public void onChanged(PageResponse<ReplyResponse> replyResponsePageResponse) {
+                var replyChildList = replyResponsePageResponse.getContent();
+                replyAdapter.addNewReplyChild(replyChildList, replyResponsePageResponse.isLast());
+                if (!replyChildList.isEmpty()){
+                    String parentReplyId = replyChildList.get(0).getParentReplyId();
+                    isLastPageReplyChildMap.put(parentReplyId, replyResponsePageResponse.isLast());
+                }
+            }
+        });
+        replyViewModel.getMessageChildError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> stringEvent) {
+                String mess = stringEvent.getContent();
+                if (mess != null){
+                    Toast.makeText(getContext(), mess, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
 
@@ -220,5 +254,24 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     public void onReplyClick(ReplyResponse reply) {
         replyingToUser = reply.getUserGeneral().getUsername();
         edtComment.setHint("Reply @" + replyingToUser);
+    }
+
+    @Override
+    public void onShowChildReply(ReplyResponse reply) {
+        boolean isLast = isLastPageReplyChildMap.getOrDefault(reply.getId(), false);
+        if (isLast)
+            return;
+        int currPageChild = currentPageReplyChildMap.getOrDefault(reply.getId(), -1);
+        currPageChild++;
+        currentPageReplyChildMap.put(reply.getId(), currPageChild);
+        replyViewModel.getAllRepliesByParentReplyId(reply.getId(), currPageChild);
+        Log.d("ReplyBotoom", currPageChild+"");
+    }
+
+    @Override
+    public void onHideChildReply(ReplyResponse reply) {
+        String replyId = reply.getId();
+        currentPageReplyChildMap.remove(replyId);
+        isLastPageReplyChildMap.remove(replyId);
     }
 }

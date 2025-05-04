@@ -22,6 +22,7 @@ import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import retrofit2.Call;
 import retrofit2.Callback;
 
 public class ReplyRepository {
@@ -46,6 +47,11 @@ public class ReplyRepository {
     public void postReply(String content, String parentId, String topicId, Callback<ApiResponse<ReplyResponse>> callback){
         ReplyPostRequest request = new ReplyPostRequest(content, parentId, topicId);
         var call = replyApi.postReplyTopic(request);
+        call.enqueue(callback);
+    }
+
+    public void getAllRepliesByParentReplyId(String parentReplyId, int page, Callback<ApiResponse<PageResponse<ReplyResponse>>> callback){
+        var call = replyApi.getAllRepliesByParentReplyId(parentReplyId, page);
         call.enqueue(callback);
     }
 }

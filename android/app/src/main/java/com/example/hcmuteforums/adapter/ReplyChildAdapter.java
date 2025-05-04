@@ -1,14 +1,13 @@
 package com.example.hcmuteforums.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -16,27 +15,51 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.github.glailton.expandabletextview.ExpandableTextView;
 
-public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHolder> {
+public class ReplyChildAdapter extends RecyclerView.Adapter<ReplyChildAdapter.ReplyViewHolder> {
 
 
     private List<ReplyResponse> replyList;
     private OnReplyClickListener listener;
     private Context context;
-    public ReplyAdapter(Context context, List<ReplyResponse> replyList, OnReplyClickListener listener) {
-        this.replyList = replyList;
+    public ReplyChildAdapter(Context context, OnReplyClickListener listener) {
         this.listener = listener;
         this.context = context;
+        replyList = new ArrayList<>();
+    }
+    public void setData(List<ReplyResponse> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return replyList != null ? replyList.size() : 0;
+            }
+
+            @Override
+            public int getNewListSize() {
+                return newList != null ? newList.size() : 0;
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                return replyList.get(oldItemPosition).getId()
+                        .equals(newList.get(newItemPosition).getId());
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                return replyList.get(oldItemPosition).getContent().equals(newList.get(newItemPosition).getContent());
+            }
+        });
+
+        this.replyList = new ArrayList<>(newList);
+        diffResult.dispatchUpdatesTo(this); // Chỉ cập nhật phần thay đổi
     }
 
-    public void setData(List<ReplyResponse> replyList){
-        this.replyList = replyList;
-        notifyDataSetChanged();
-    }
     public void addData(List<ReplyResponse> newList){
         int oldSize = replyList.size();
         replyList.addAll(newList);
@@ -46,11 +69,18 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         replyList.add(0, newReply);
         notifyItemInserted(0);
     }
+
+
+    public void clearData() {
+        replyList.clear();
+        notifyItemChanged(0);
+    }
+
     @NonNull
     @Override
     public ReplyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_reply, parent, false);
+                .inflate(R.layout.item_reply_child, parent, false);
         return new ReplyViewHolder(view);
     }
 
@@ -91,5 +121,6 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
 
         }
     }
+
 }
 
