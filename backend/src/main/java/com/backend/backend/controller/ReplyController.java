@@ -57,9 +57,9 @@ public class ReplyController {
     public ApiResponse<PageResponse<ReplyResponse>> getAllRepliesByParentReplyId(
             @PathVariable("parentReplyId") String parentReplyId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "2") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "DESC") String direction){
+            @RequestParam(defaultValue = "ASC") String direction){
         return ApiResponse.<PageResponse<ReplyResponse>>builder()
                 .result(replyService.getAllRepliesByParentReplyId(parentReplyId, page, size, sortBy, direction))
                 .build();
