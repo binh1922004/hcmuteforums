@@ -132,9 +132,11 @@ public class TopicService {
         userGeneral.setAvt(Constant.url + topic.getUser().getProfile().getAvatarUrl());
         topicDetailResponse.setUserGeneral(userGeneral);
         //map all url from topic image to imgUrls
-        topicDetailResponse.setImgUrls(topic.getListImages().stream().map(v -> {
-            return Constant.url + v.getImageUrl();
-        }).toList());
+        if (topic.getListImages() != null){
+            topicDetailResponse.setImgUrls(topic.getListImages().stream().map(v -> {
+                return Constant.url + v.getImageUrl();
+            }).toList());
+        }
         return topicDetailResponse;
     }
 }
