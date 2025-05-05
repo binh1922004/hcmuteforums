@@ -22,7 +22,10 @@ public enum ErrorCode {
     USER_NOTFOUND(1013, "User not found", HttpStatus.NOT_FOUND),
     EMAIL_NOTFOUND(1014, "Email not found", HttpStatus.NOT_FOUND),
     INVALID_OTP(1016, "OTP không hợp lệ hoặc đã hết hạn", HttpStatus.NOT_FOUND),
-    EMAIL_NOT_MATCH_USERNAME(1015, "Email does not match Username", HttpStatus.NOT_FOUND),;
+    EMAIL_NOT_MATCH_USERNAME(1015, "Email does not match Username", HttpStatus.NOT_FOUND),
+    INVALID_OPERATION(1017, "Không thể theo dõi chính mình", HttpStatus.NOT_FOUND),
+    DUPLICATE_RESOURCE(1019, "Đã theo dõi người này", HttpStatus.NOT_FOUND),
+    RESOURCE_NOT_FOUND(1020, "Không tồn tại ", HttpStatus.NOT_FOUND),;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;
