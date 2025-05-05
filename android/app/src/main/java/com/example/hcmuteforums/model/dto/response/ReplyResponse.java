@@ -8,10 +8,15 @@ public class ReplyResponse {
     private String id;
     private String content;
     private String parentReplyId;
+    private String targetUserName;
     private UserGeneral userGeneral;
     private boolean hasChild;
     private boolean isShowChild;
     private boolean isLast;
+
+    public String getTargetUserName() {
+        return targetUserName;
+    }
 
     public boolean isLast() {
         return isLast;

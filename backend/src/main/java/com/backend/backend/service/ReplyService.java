@@ -11,6 +11,7 @@ import com.backend.backend.mapper.UserMapper;
 import com.backend.backend.repository.ReplyRepository;
 import com.backend.backend.repository.TopicRepository;
 import com.backend.backend.repository.UserRepository;
+import com.backend.backend.utils.Constant;
 import com.backend.backend.utils.NotificationContent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,7 @@ public class ReplyService {
         Reply reply = Reply.builder()
                 .content(replyPostRequest.getContent())
                 .parentReplyId(replyPostRequest.getParentReplyId())
+                .targetUserName(replyPostRequest.getTargetUserName())
                 .user(sendUser)
                 .topic(topic)
                 .createdAt(new Date())
@@ -161,7 +163,7 @@ public class ReplyService {
     private ReplyResponse toReplyResponse(Reply reply){
         ReplyResponse replyResponse = replyMapper.toReplyResponse(reply);
         UserGeneral userGeneral = userMapper.toUserGeneral(reply.getUser());
-        userGeneral.setAvt("https://ball.io.vn:8080/ute/" + reply.getUser().getProfile().getAvatarUrl());
+        userGeneral.setAvt(Constant.url + reply.getUser().getProfile().getAvatarUrl());
         replyResponse.setUserGeneral(userGeneral);
         if (reply.getChildReplies() != null && !reply.getChildReplies().isEmpty()) {
             replyResponse.setHasChild(true);

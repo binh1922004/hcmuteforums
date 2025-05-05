@@ -44,8 +44,8 @@ public class ReplyRepository {
         call.enqueue(callback);
     }
 
-    public void postReply(String content, String parentId, String topicId, Callback<ApiResponse<ReplyResponse>> callback){
-        ReplyPostRequest request = new ReplyPostRequest(content, parentId, topicId);
+    public void postReply(String content, String parentId, String targetUserName, String topicId, Callback<ApiResponse<ReplyResponse>> callback){
+        ReplyPostRequest request = new ReplyPostRequest(content, parentId, targetUserName, topicId);
         var call = replyApi.postReplyTopic(request);
         call.enqueue(callback);
     }

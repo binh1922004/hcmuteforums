@@ -20,7 +20,7 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:root}
   jpa:
-    hibernate:  
+    hibernate:
       ddl-auto: update
     show-sql: true
   data:

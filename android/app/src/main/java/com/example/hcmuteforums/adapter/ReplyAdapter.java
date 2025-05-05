@@ -1,12 +1,9 @@
 package com.example.hcmuteforums.adapter;
 
 import android.content.Context;
-import android.text.Layout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,7 +14,6 @@ import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
-import com.ms.square.android.expandabletextview.ExpandableTextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,30 +43,41 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         replyList.add(0, newReply);
         notifyItemInserted(0);
     }
-    public void addNewReplyChild(List<ReplyResponse> childList, boolean isLast){
+    public void addNewReplyChildList(List<ReplyResponse> childList, boolean isLast){
         //child list empty so not do any thing
         if (childList.isEmpty())
             return;
         String parentId = childList.get(0).getParentReplyId();
-        int pos = -1;
-        for (int i = 0; i < replyList.size(); i++){
-            var reply = replyList.get(i);
+        for (int pos = 0; pos < replyList.size(); pos++){
+            var reply = replyList.get(pos);
             if (reply.getId().equals(parentId)){
-                pos = i;
+                if (replyList.get(pos).getListChild() == null){
+                    replyList.get(pos).setListChild(new ArrayList<>());
+                }
+                replyList.get(pos).getListChild().addAll(childList);
+                replyList.get(pos).setLast(isLast);
+                notifyItemChanged(pos);
                 break;
             }
         }
-        //not found reply with id
-        if (pos == -1){
-            return;
-        }
-        if (replyList.get(pos).getListChild() == null){
-            replyList.get(pos).setListChild(new ArrayList<>());
-        }
-        replyList.get(pos).getListChild().addAll(childList);
-        replyList.get(pos).setLast(isLast);
-        notifyItemChanged(pos);
     }
+
+    public void addNewReplyChild(ReplyResponse childReply){
+        String parentId = childReply.getParentReplyId();
+        for (int pos = 0; pos < replyList.size(); pos++){
+            var reply = replyList.get(pos);
+            if (reply.getId().equals(parentId)){
+                if (replyList.get(pos).getListChild() == null){
+                    replyList.get(pos).setListChild(new ArrayList<>());
+                }
+                replyList.get(pos).getListChild().add(0, childReply);
+                notifyItemChanged(pos);
+                break;
+            }
+        }
+    }
+
+
     @NonNull
     @Override
     public ReplyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

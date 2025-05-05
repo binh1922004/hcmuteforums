@@ -1,15 +1,14 @@
 package com.backend.backend.dto.request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReplyPostRequest {
-    String content;
-    String parentReplyId;
-    String targetUserName;
-    String topicId;
+public class FollowRequest {
+    private String followedUsername;
 }

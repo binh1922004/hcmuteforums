@@ -25,7 +25,7 @@ public class Reply {
     private String content;
 
     private String parentReplyId;
-
+    private String targetUserName;
     @Column(name = "create_at")
     private Date createdAt;
 

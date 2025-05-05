@@ -17,6 +17,7 @@ import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.github.glailton.expandabletextview.ExpandableTextView;
@@ -87,7 +88,7 @@ public class ReplyChildAdapter extends RecyclerView.Adapter<ReplyChildAdapter.Re
     @Override
     public void onBindViewHolder(@NonNull ReplyViewHolder holder, int position) {
         ReplyResponse reply = replyList.get(position);
-        holder.bind(reply);
+        holder.bind(reply, position);
     }
 
     @Override
@@ -98,23 +99,49 @@ public class ReplyChildAdapter extends RecyclerView.Adapter<ReplyChildAdapter.Re
     }
 
     public class ReplyViewHolder extends RecyclerView.ViewHolder {
-        TextView tvUsername;
-        ExpandableTextView tvContent;
+        TextView tvUsername, tvReply;
+        TextView tvContent, tvToggle, tvTargetUserName;
         CircleImageView imgAvatar;
         public ReplyViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvContent = itemView.findViewById(R.id.tvContent);
+            tvToggle = itemView.findViewById(R.id.tvToggle);
+            tvTargetUserName = itemView.findViewById(R.id.tvTargetUserName);
+            tvReply = itemView.findViewById(R.id.tvReply);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
         }
-        public void bind(ReplyResponse reply){
+        public void bind(ReplyResponse reply, int pos){
+            //TODO: set reply target user
             tvUsername.setText(reply.getUserGeneral().getFullName());
-            tvContent.setText(reply.getContent());
+            if (reply.getTargetUserName() != null && !Objects.equals(reply.getTargetUserName(), "")){
+                tvTargetUserName.setVisibility(View.VISIBLE);
+                tvTargetUserName.setText("@" + reply.getTargetUserName() + " ");
+            }
+            else{
+                tvTargetUserName.setVisibility(View.GONE);
+            }
+            //TODO: Expand text view
+            String content = reply.getContent();
+            tvContent.setText(content);
+            //setup for content and max lines
+            tvContent.setMaxLines(reply.isExpanded() ? Integer.MAX_VALUE : 3);
+            tvToggle.setText(reply.isExpanded() ? "Thu gọn" : "Xem thêm");
+            tvToggle.setVisibility(content.length() > 100 ? View.VISIBLE : View.GONE);
+            //content and toggle use both event
+            // Toggle xử lý khi nhấn
+            View.OnClickListener toggleListener = v -> {
+                reply.setExpanded(!reply.isExpanded());
+                notifyItemChanged(pos); // Dùng notify để đảm bảo UI được update
+            };
+            tvToggle.setOnClickListener(toggleListener);
+            tvContent.setOnClickListener(toggleListener);
+            //TODO: up load avatar
             Glide.with(context)
                     .load(reply.getUserGeneral().getAvt())
                     .centerCrop()
                     .into(imgAvatar);
-            tvContent.setOnClickListener(v -> {
+            tvReply.setOnClickListener(v -> {
                 if (listener != null)
                     listener.onReplyClick(reply);
             });
