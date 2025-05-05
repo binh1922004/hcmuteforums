@@ -16,17 +16,17 @@ spring:
     host: smtp.gmail.com
     port: 587
   datasource:
-    url: "jdbc:mysql://localhost:3307/hcmuteforums"
-    username: root
-    password: root
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/hcmuteforums}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
   jpa:
-    hibernate:  
+    hibernate:
       ddl-auto: update
     show-sql: true
   data:
     redis:
-      host: localhost
-      port: 6380
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6380}
 jwt:
   signerKey: "b4ISo6+PT1fY8eppQ564SXabONN945cjuPYa0mTOmPrThHVxEnH7+xxE5RFJCqtk"
 upload:
