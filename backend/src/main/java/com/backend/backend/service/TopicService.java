@@ -13,6 +13,7 @@ import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.TopicMapper;
 import com.backend.backend.mapper.UserMapper;
 import com.backend.backend.repository.*;
+import com.backend.backend.utils.Constant;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -128,11 +129,11 @@ public class TopicService {
         }
         //get user
         UserGeneral userGeneral = userMapper.toUserGeneral(topic.getUser());
-        userGeneral.setAvt(profileRepository.findAvatarUrlByUserName(username));
+        userGeneral.setAvt(Constant.url + topic.getUser().getProfile().getAvatarUrl());
         topicDetailResponse.setUserGeneral(userGeneral);
         //map all url from topic image to imgUrls
         topicDetailResponse.setImgUrls(topic.getListImages().stream().map(v -> {
-            return "http://10.0.2.2:8080/ute/" + v.getImageUrl();
+            return Constant.url + v.getImageUrl();
         }).toList());
         return topicDetailResponse;
     }
