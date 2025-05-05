@@ -9,12 +9,14 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -44,6 +47,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     private RecyclerView rcvReplies;
     private EditText edtComment;
     private ImageButton btnSend;
+    private ImageView btnCancel;
     private LinearLayout layoutText;
 
     //adapter config
@@ -53,7 +57,6 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     ReplyViewModel replyViewModel;
 
     //attribute
-    private String replyingToUser = null; // Username người đang được reply
     private String topicId;
     private boolean isLastPage = false;
     private boolean isLoading = false;
@@ -63,6 +66,14 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
 
     //listiner interface
     OnReplyAddedListener onReplyAddedListener;
+
+    //hash map for storage page size of each reply child
+    HashMap<String, Integer> currentPageReplyChildMap;
+    HashMap<String, Boolean> isLastPageReplyChildMap;
+
+    //reply information
+    private String parentReplyId = null;
+    private String replyingToUser = null;
     public static ReplyBottomSheetFragment newInstance(String topicId) {
         ReplyBottomSheetFragment fragment = new ReplyBottomSheetFragment();
         Bundle args = new Bundle();
@@ -83,10 +94,13 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         rcvReplies = view.findViewById(R.id.recyclerReplies);
         edtComment = view.findViewById(R.id.edtComment);
         btnSend = view.findViewById(R.id.btnSend);
+        btnCancel = view.findViewById(R.id.btnCancel);
         layoutText = view.findViewById(R.id.layoutText);
         replyViewModel = new ReplyViewModel();
         topicId = getArguments().getString("topicId");
 
+        currentPageReplyChildMap = new HashMap<>();
+        isLastPageReplyChildMap = new HashMap<>();
         replyAdapterConfig();
 
         loadMoreReplies();
@@ -95,7 +109,16 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
 
         observeData();
 
+        cancelReply();
         return view;
+    }
+
+    private void cancelReply() {
+        btnCancel.setOnClickListener(v -> {
+            btnCancel.setVisibility(View.GONE);
+            edtComment.setText("");
+            edtComment.setHint("Viết bình luận...");
+        });
     }
 
     //mapping for data
@@ -128,6 +151,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     }
 
     private void observeData(){
+        //reply response success
         replyViewModel.getReplyLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<ReplyResponse>>() {
             @Override
             public void onChanged(PageResponse<ReplyResponse> replyResponses) {
@@ -141,7 +165,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
                 }
             }
         });
-
+        //reply message error
         replyViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
             public void onChanged(Event<String> stringEvent) {
@@ -151,20 +175,50 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
                 }
             }
         });
+        //reply post success
         replyViewModel.getReplyPostSuccess().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
             @Override
             public void onChanged(Event<ReplyResponse> replyResponseEvent) {
                 ReplyResponse replyResponse = replyResponseEvent.getContent();
                 if (replyResponse != null){
                     layoutText.setVisibility(View.GONE);
-                    replyAdapter.addNewReply(replyResponse);
-                    rcvReplies.smoothScrollToPosition(0);
+                    if (replyResponse.getParentReplyId() == null || replyResponse.getParentReplyId() == ""){
+                        replyAdapter.addNewReply(replyResponse);
+                        rcvReplies.smoothScrollToPosition(0);
+                    }
+                    else{
+                        replyAdapter.addNewReplyChild(replyResponse);
+                    }
                     if (onReplyAddedListener != null){
                         onReplyAddedListener.onReplyAdded(replyResponse);
                     }
                 }
             }
         });
+
+
+        //reply child
+        replyViewModel.getReplyChildLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<ReplyResponse>>() {
+            @Override
+            public void onChanged(PageResponse<ReplyResponse> replyResponsePageResponse) {
+                var replyChildList = replyResponsePageResponse.getContent();
+                replyAdapter.addNewReplyChildList(replyChildList, replyResponsePageResponse.isLast());
+                if (!replyChildList.isEmpty()){
+                    String parentReplyId = replyChildList.get(0).getParentReplyId();
+                    isLastPageReplyChildMap.put(parentReplyId, replyResponsePageResponse.isLast());
+                }
+            }
+        });
+        replyViewModel.getMessageChildError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> stringEvent) {
+                String mess = stringEvent.getContent();
+                if (mess != null){
+                    Toast.makeText(getContext(), mess, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
 
@@ -202,7 +256,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         btnSend.setOnClickListener(v -> {
             String comment = edtComment.getText().toString().trim();
             if (!comment.isEmpty()) {
-                replyViewModel.postReply(comment, "", topicId);
+                replyViewModel.postReply(comment, parentReplyId, replyingToUser, topicId);
                 edtComment.setText("");
                 edtComment.setHint("Viết bình luận...");
                 replyingToUser = null;
@@ -219,6 +273,32 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     @Override
     public void onReplyClick(ReplyResponse reply) {
         replyingToUser = reply.getUserGeneral().getUsername();
+        if (reply.getParentReplyId() == null || reply.getParentReplyId() == ""){
+            parentReplyId = reply.getId();
+        }
+        else
+            parentReplyId = reply.getParentReplyId();
+
         edtComment.setHint("Reply @" + replyingToUser);
+        btnCancel.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onShowChildReply(ReplyResponse reply) {
+        boolean isLast = isLastPageReplyChildMap.getOrDefault(reply.getId(), false);
+        if (isLast)
+            return;
+        int currPageChild = currentPageReplyChildMap.getOrDefault(reply.getId(), -1);
+        currPageChild++;
+        currentPageReplyChildMap.put(reply.getId(), currPageChild);
+        replyViewModel.getAllRepliesByParentReplyId(reply.getId(), currPageChild);
+        Log.d("ReplyBotoom", currPageChild+"");
+    }
+
+    @Override
+    public void onHideChildReply(ReplyResponse reply) {
+        String replyId = reply.getId();
+        currentPageReplyChildMap.remove(replyId);
+        isLastPageReplyChildMap.remove(replyId);
     }
 }

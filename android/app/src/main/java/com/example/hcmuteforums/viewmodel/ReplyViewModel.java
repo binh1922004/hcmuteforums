@@ -25,8 +25,11 @@ public class ReplyViewModel extends ViewModel {
     private ReplyRepository replyRepository;
 
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
+    private MutableLiveData<Event<String>> messageChildError = new MutableLiveData<>();
     private MutableLiveData<PageResponse<ReplyResponse>> replyLiveData = new MutableLiveData<>();
+    private MutableLiveData<PageResponse<ReplyResponse>> replyChildLiveData = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> replyError = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> replyChildError = new MutableLiveData<>();
     private MutableLiveData<Event<ReplyResponse>> replyPostSuccess = new MutableLiveData<>();
 
     public ReplyViewModel() {
@@ -47,6 +50,18 @@ public class ReplyViewModel extends ViewModel {
 
     public MutableLiveData<Event<Boolean>> getReplyError() {
         return replyError;
+    }
+
+    public MutableLiveData<Event<String>> getMessageChildError() {
+        return messageChildError;
+    }
+
+    public MutableLiveData<PageResponse<ReplyResponse>> getReplyChildLiveData() {
+        return replyChildLiveData;
+    }
+
+    public MutableLiveData<Event<Boolean>> getReplyChildError() {
+        return replyChildError;
     }
 
     public void getAllRepliesByTopicId(String topicId, int page) {
@@ -79,8 +94,8 @@ public class ReplyViewModel extends ViewModel {
             }
         });
     }
-    public void postReply(String content, String parentId, String topicId){
-        replyRepository.postReply(content, parentId, topicId, new Callback<ApiResponse<ReplyResponse>>() {
+    public void postReply(String content, String parentId, String targetUserName, String topicId){
+        replyRepository.postReply(content, parentId, targetUserName, topicId, new Callback<ApiResponse<ReplyResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<ReplyResponse>> call, Response<ApiResponse<ReplyResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -106,6 +121,36 @@ public class ReplyViewModel extends ViewModel {
             public void onFailure(Call<ApiResponse<ReplyResponse>> call, Throwable throwable) {
                 Log.d("Error Topic", throwable.getMessage());
                 replyError.setValue(new Event<>(true));
+            }
+        });
+    }
+    public void getAllRepliesByParentReplyId(String parentId, int page){
+        replyRepository.getAllRepliesByParentReplyId(parentId, page, new Callback<ApiResponse<PageResponse<ReplyResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<PageResponse<ReplyResponse>>> call, Response<ApiResponse<PageResponse<ReplyResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<PageResponse<ReplyResponse>> apiRes = response.body();
+                    if (apiRes.getResult() != null) {
+                        replyChildLiveData.setValue(apiRes.getResult());  // ✅ Không dùng Event
+                    } else {
+                        replyChildError.setValue(new Event<>(true));       // ✅ Dùng Event
+                    }
+                } else {
+                    if (response.errorBody() != null) {
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        messageChildError.setValue(new Event<>(apiError.getMessage()));  // ✅ Dùng Event
+                    } else {
+                        replyChildError.setValue(new Event<>(true));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<PageResponse<ReplyResponse>>> call, Throwable throwable) {
+                Log.d("ErrorChildReply", throwable.getMessage());
+                replyChildError.setValue(new Event<>(true));
             }
         });
     }

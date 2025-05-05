@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class ReplyPostRequest {
     String content;
     String parentReplyId;
+    String targetUserName;
     String topicId;
 }
