@@ -1,0 +1,56 @@
+package com.backend.backend.controller;
+
+import com.backend.backend.dto.ApiResponse;
+import com.backend.backend.dto.request.FollowRequest;
+import com.backend.backend.dto.response.FollowResponse;
+import com.backend.backend.mapper.FollowMapper;
+import com.backend.backend.service.FollowService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/follow")
+@RequiredArgsConstructor
+
+public class FollowController {
+    FollowService followService;
+    @Autowired
+    public FollowController(FollowService followService) {
+        this.followService = followService;
+    }
+    @PostMapping
+    public ApiResponse<FollowResponse> followUser(@RequestBody FollowRequest followRequest) {
+        return ApiResponse.<FollowResponse>builder()
+                .result(followService.followUser(followRequest))
+                .build();
+    }
+    @DeleteMapping("/delete")
+    public ApiResponse<FollowResponse> unfollowUser(@RequestBody FollowRequest followRequest) {
+        return ApiResponse.<FollowResponse>builder()
+                .result(followService.unfollowUser(followRequest))
+                .build();
+    }
+    @GetMapping("/followers")
+    public ApiResponse<Page<FollowResponse>> getFollowers(
+            @RequestParam String username,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.<Page<FollowResponse>>builder()
+                .result(followService.getFollowers(username,page,size))
+                .build();
+    }
+
+    @GetMapping("/following")
+    public ApiResponse<Page<FollowResponse>> getFollowing(
+            @RequestParam String username,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.<Page<FollowResponse>>builder()
+                .result(followService.getFollowing(username, page, size))
+                .build();
+    }
+}
