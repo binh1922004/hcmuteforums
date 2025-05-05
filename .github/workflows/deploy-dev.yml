@@ -1,14 +1,19 @@
 name: Deploy to Dev VPS
 
 on:
-  push:
+  pull_request:
     branches:
-      - dev_deploy # Kích hoạt khi có push mới vào nhánh dev_deploy (sau khi PR được merge)
+      - dev_deploy
+    types:
+      - closed  # Chỉ khi PR được đóng (đã merge hoặc bị hủy)
+    paths:
+      - 'backend/**'  # Chỉ chạy khi có thay đổi trong thư mục backend
 
 jobs:
   deploy:
+    if: github.event.pull_request.merged == true # Chỉ chạy khi PR thực sự được merge
     name: Deploy Backend to Dev VPS
-    runs-on: [self-hosted, Linux, X64] # Chỉ định chạy trên runner bạn vừa cài đặt
+    runs-on: [self-hosted, Linux, X64]
 
     steps:
     - name: Checkout code
