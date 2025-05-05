@@ -13,17 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.github.glailton.expandabletextview.ExpandableTextView;
 
 public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHolder> {
 
-    public interface OnReplyClickListener {
-        void onReplyClick(ReplyResponse reply);
-    }
 
     private List<ReplyResponse> replyList;
     private OnReplyClickListener listener;
@@ -69,7 +68,8 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     }
 
     public class ReplyViewHolder extends RecyclerView.ViewHolder {
-        TextView tvUsername, tvContent;
+        TextView tvUsername;
+        ExpandableTextView tvContent;
         CircleImageView imgAvatar;
         public ReplyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -84,10 +84,11 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                     .load(reply.getUserGeneral().getAvt())
                     .centerCrop()
                     .into(imgAvatar);
-            itemView.setOnClickListener(v -> {
+            tvContent.setOnClickListener(v -> {
                 if (listener != null)
                     listener.onReplyClick(reply);
             });
+
         }
     }
 }

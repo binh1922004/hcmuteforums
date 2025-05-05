@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.fragment)
     implementation(libs.rxandroid)
+    implementation(libs.ms.square.expandabletextview)
     implementation(libs.rxandroid)
     implementation(libs.expandabletextview)
     implementation(libs.legacy.support.v4)

@@ -71,7 +71,7 @@
             <!-- Nội dung -->
             <io.github.glailton.expandabletextview.ExpandableTextView
                 android:id="@+id/tvContent"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
                 expandableTextView:collapsedLines="3"
