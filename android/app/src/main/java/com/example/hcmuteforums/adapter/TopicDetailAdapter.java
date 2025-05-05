@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
@@ -139,6 +140,12 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             } else {
                 viewPagerImages.setVisibility(View.GONE);
             }
+
+            //TODO: Up avatar
+            Glide.with(context)
+                    .load(topic.getUserGeneral().getAvt())
+                    .centerCrop()
+                    .into(imgAvatar);
 
             //biding for like
             tvLikeCount.setText(String.valueOf(topic.getLikeCount()));
