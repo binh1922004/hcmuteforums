@@ -41,8 +41,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Xem thêm"
-            android:textSize="14sp"
-            android:textColor="@color/blue"
+            android:textSize="12sp"
+            android:textColor="@color/gray"
             android:visibility="gone" />
         <!-- sample xml -->
         <LinearLayout

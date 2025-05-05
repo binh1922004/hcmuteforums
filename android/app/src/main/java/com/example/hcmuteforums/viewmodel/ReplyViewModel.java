@@ -94,8 +94,8 @@ public class ReplyViewModel extends ViewModel {
             }
         });
     }
-    public void postReply(String content, String parentId, String topicId){
-        replyRepository.postReply(content, parentId, topicId, new Callback<ApiResponse<ReplyResponse>>() {
+    public void postReply(String content, String parentId, String targetUserName, String topicId){
+        replyRepository.postReply(content, parentId, targetUserName, topicId, new Callback<ApiResponse<ReplyResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<ReplyResponse>> call, Response<ApiResponse<ReplyResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
