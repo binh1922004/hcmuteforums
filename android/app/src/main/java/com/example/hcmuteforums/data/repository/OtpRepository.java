@@ -10,6 +10,7 @@ import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.request.OtpRequest;
+import com.example.hcmuteforums.model.dto.request.OtpValidationRequest;
 import com.google.gson.Gson;
 
 import retrofit2.Call;
@@ -33,6 +34,16 @@ public class OtpRepository {
     public void sendOtp(String email, String username, Callback<ApiResponse<Boolean>> callback) {
         OtpRequest otpRequest = new OtpRequest(email, username);
         var call = otpApi.sendOtp(otpRequest);
+        call.enqueue(callback);
+    }
+    public void sendOtpResetPasword(String email, String username, Callback<ApiResponse<Boolean>> callback){
+        OtpRequest otpRequest = new OtpRequest(email, username);
+        var call = otpApi.sendOtpResetPasword(otpRequest);
+        call.enqueue(callback);
+    }
+    public void validateOtp(String email, String otp, Callback<ApiResponse<Boolean>> callback){
+        OtpValidationRequest otpValidationRequest = new OtpValidationRequest(email, otp);
+        var call = otpApi.validateOTP(otpValidationRequest);
         call.enqueue(callback);
     }
 }

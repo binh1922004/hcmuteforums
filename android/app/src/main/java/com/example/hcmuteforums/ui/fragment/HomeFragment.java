@@ -20,25 +20,23 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
-import com.example.hcmuteforums.listeners.OnReplyClickListener;
+import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
-import com.example.hcmuteforums.model.entity.Category;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements TopicLikeListener, OnReplyClickListener {
+public class HomeFragment extends Fragment implements TopicLikeListener, OnReplyShowListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -57,12 +55,9 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     RecyclerView rcvTopic;
     //adapter
     TopicDetailAdapter topicDetailAdapter;
-
-    //attribute
-        private boolean isLastPage = false;
-        private boolean isLoading = false;
-        private boolean isFirstLoad = true;
-        private int currentPage = 0;
+    private boolean isLastPage = false;
+    private boolean isLoading = false;
+    private int currentPage = 0;
     private final int pageSize = 6;
 
 
@@ -109,7 +104,6 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
         recyclerViewConfig();
         //show topic
         showMoreTopic();
-        //quan sat data
         observeData();
         //go to post topic
         postTopic();
@@ -119,7 +113,7 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     private void mappingData(View view) {
 
         //init data
-        topicViewModel = TopicViewModel.getInstance();
+        topicViewModel = new TopicViewModel();
         topicDetailViewModel = new TopicDetailViewModel();
         cvPostTopic = view.findViewById(R.id.cvPostTopic);
         rcvTopic = view.findViewById(R.id.rcvTopic);
@@ -154,6 +148,12 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
 
     }
 
+    private void showMoreTopic() {
+        //get data from viewmodel
+        topicViewModel.fetchAllTopics(currentPage);
+        currentPage++;
+    }
+
     private void postTopic() {
         cvPostTopic.setOnClickListener(v -> {
             Intent myIntent = new Intent(getContext(), TopicPostActivity.class);
@@ -168,9 +168,6 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
             public void onChanged(PageResponse<TopicDetailResponse> topicDetailResponses) {
                 topicDetailAdapter.addData(topicDetailResponses.getContent());
                 isLastPage = topicDetailResponses.isLast();
-                //cached data
-                var listCurrent = topicDetailAdapter.getData();
-                topicViewModel.setCachedListTopic(listCurrent);
             }
         });
 
@@ -231,20 +228,17 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (!isFirstLoad){
-            resetData();
-        } else {
-            isFirstLoad = false;
-        }
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+//        resetData();
     }
 
-    private void showMoreTopic() {
-        //get data from viewmodel
-        topicViewModel.fetchAllTopics(currentPage);
-        currentPage++;
+    @Override
+    public void onResume() {
+        super.onResume();
+        resetData();
     }
+
     private void resetData() {
         currentPage = 0;
         isLastPage = false;
@@ -252,3 +246,5 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
         showMoreTopic();            // Gọi lại API trang đầu tiên
     }
 }
+
+

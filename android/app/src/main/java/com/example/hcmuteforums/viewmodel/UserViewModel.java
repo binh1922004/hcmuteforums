@@ -26,11 +26,11 @@
         private final MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
         private final MutableLiveData<Event<Boolean>> registerError = new MutableLiveData<>();
 
-        private final MutableLiveData<UserResponse> userInfo = new MutableLiveData<>();
+        private final MutableLiveData<Event<UserResponse>> userInfo = new MutableLiveData<>();
         private final MutableLiveData<Event<Boolean>> userInfoError = new MutableLiveData<>();
 
         private final MutableLiveData<Event<Boolean>> userUpdateError = new MutableLiveData<>();
-        private final MutableLiveData<Event<Boolean>> updateResponse = new MutableLiveData<>();
+        private final MutableLiveData<Event<UserResponse>> updateResponse = new MutableLiveData<>();
         public UserViewModel(){
             userRepository = UserRepository.getInstance();
         }
@@ -42,7 +42,7 @@
                     if (response.isSuccessful() && response.body() != null) {
                         ApiResponse<UserResponse> apiRes = response.body();
                         if (apiRes.getResult() != null) {
-                            userInfo.setValue(apiRes.getResult());
+                            userInfo.setValue(new Event<>(apiRes.getResult()));
                         } else {
                             userInfoError.setValue(new Event<>(true));
                         }
@@ -71,11 +71,13 @@
                     if (response.isSuccessful() && response.body() != null) {
                         ApiResponse<UserResponse> apiRes = response.body();
                         if (apiRes.getResult() != null) {
-                            updateResponse.setValue(new Event<>(true));
-                        } else {
+                            updateResponse.setValue(new Event<>(apiRes.getResult()));
+                        }
+                        else {
                             userUpdateError.setValue(new Event<>(true));
                         }
-                    } else {
+                    }
+                    else {
                         if (response.errorBody() != null) {
                             Gson gson = new Gson();
                             ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(), ApiErrorResponse.class);
@@ -84,8 +86,6 @@
                             } else {
                                 messageError.setValue(new Event<>("Đã xảy ra lỗi không xác định."));
                             }
-                        } else {
-                            updateResponse.setValue(new Event<>(true));
                         }
                     }
                 }
@@ -110,7 +110,7 @@
             return registerError;
         }
 
-        public MutableLiveData<UserResponse> getUserInfo() {
+        public MutableLiveData<Event<UserResponse>> getUserInfo() {
             return userInfo;
         }
 
@@ -122,7 +122,7 @@
             return userUpdateError;
         }
 
-        public MutableLiveData<Event<Boolean>> getUserUpdate() {
+        public MutableLiveData<Event<UserResponse>> getUserUpdate() {
             return updateResponse;
         }
     }

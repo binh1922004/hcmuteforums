@@ -139,9 +139,12 @@ public class ProfileUserFragment extends Fragment {
     private void getInfo(TextView tv_username, TextView tv_email){
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);   //Map viewmodel
         userViewModel.getInfo();
-        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<UserResponse>() {
+        userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<Event<UserResponse>>() {
             @Override
-            public void onChanged(UserResponse userResponse) {
+            public void onChanged(Event<UserResponse> eUserResponse) {
+                UserResponse userResponse = eUserResponse.getContent();
+                if (userResponse == null)
+                    return;
                 currentUserResponse = userResponse;
                 tv_username.setText(userResponse.getFullName());
                 tv_email.setText(userResponse.getEmail());
@@ -176,7 +179,6 @@ public class ProfileUserFragment extends Fragment {
             @Override
             public void onChanged(ProfileResponse profileResponse) {
                 avatarProfile = profileResponse.getAvatarUrl();
-                Log.d("DUong dan anh", avatarProfile);
                 coverProfile = profileResponse.getCoverUrl();
                 bioProfile = profileResponse.getBio();
                 loadImage(view);
@@ -260,9 +262,21 @@ public class ProfileUserFragment extends Fragment {
 
     private void OpenEditProfile(Button btn_edit){
         btn_edit.setOnClickListener(view -> {
-            showBottomDialog();
+            //showBottomDialog();
+            showBottomDiaglogForgotPassword();
         });
     }
+    private void showBottomDiaglogForgotPassword(){
+        if(currentUserResponse!=null){
+            ForgotPasswordBottomSheetFragment bottomSheetFragment =
+                    ForgotPasswordBottomSheetFragment.newInstance(currentUserResponse);;
+            bottomSheetFragment.show(getParentFragmentManager(), bottomSheetFragment.getTag());
+        }else{
+            Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 
     private void showBottomDialog()
     {

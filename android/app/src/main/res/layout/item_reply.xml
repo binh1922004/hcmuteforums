@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_marginStart="10dp"
         android:layout_height="wrap_content">
-        <io.github.glailton.expandabletextview.ExpandableTextView
+        <TextView
             android:id="@+id/tvUsername"
             android:textStyle="bold"
             android:textSize="14sp"
@@ -29,27 +29,73 @@
             expandableTextView:readLessText="thu gọn"
             expandableTextView:textMode="line"
             app:expandType="layout"/>
-        <io.github.glailton.expandabletextview.ExpandableTextView
+        <TextView
             android:id="@+id/tvContent"
             android:textSize="16sp"
             android:text="content"
             android:textColor="#555555"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            expandableTextView:collapsedLines="3"
-            expandableTextView:animDuration="500"
-            expandableTextView:readMoreText="xem thêm"
-            expandableTextView:readLessText="thu gọn"
-            expandableTextView:textMode="line"
-            app:expandType="layout"/>
+            android:layout_height="wrap_content" />
         <TextView
-            android:id="@+id/tvReply"
+            android:id="@+id/tvToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xem thêm"
             android:textSize="14sp"
-            android:text="trả lời"
+            android:textColor="@color/blue"
+            android:visibility="gone" />
+        <!-- sample xml -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tvReply"
+                android:textSize="14sp"
+                android:text="Trả lời"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+            <TextView
+                android:visibility="gone"
+                android:layout_marginStart="10dp"
+                android:id="@+id/tvShowChildReply"
+                android:textSize="14sp"
+                android:text="Xem các câu trả lời"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvChildReplies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false" android:visibility="gone" />
+        <TextView
+            android:visibility="gone"
+            android:layout_marginStart="10dp"
+            android:id="@+id/tvHideChildReply"
+            android:textSize="14sp"
+            android:text="Ẩn các câu trả lời"
             android:layout_marginTop="3dp"
             android:textColor="@color/gray"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             />
-    </LinearLayout>
+        <TextView
+            android:visibility="gone"
+            android:layout_marginStart="10dp"
+            android:id="@+id/tvShowMoreChildReply"
+            android:textSize="14sp"
+            android:text="Xem thêm các câu trả lời"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/gray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+</LinearLayout>
 </LinearLayout>

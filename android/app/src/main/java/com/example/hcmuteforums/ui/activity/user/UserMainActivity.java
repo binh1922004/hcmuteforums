@@ -21,6 +21,7 @@ import com.example.hcmuteforums.listeners.OnNotificationListener;
 import com.example.hcmuteforums.model.dto.NotificationDTO;
 import com.example.hcmuteforums.ui.fragment.CategoryFragment;
 import com.example.hcmuteforums.ui.fragment.HomeFragment;
+import com.example.hcmuteforums.ui.fragment.MenuFragment;
 import com.example.hcmuteforums.ui.fragment.NotificationFragment;
 import com.example.hcmuteforums.ui.fragment.ProfileFragment;
 import com.example.hcmuteforums.ui.fragment.ProfileUserFragment;
@@ -35,6 +36,7 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
     HomeFragment homeFragment = new HomeFragment();
     CategoryFragment categoryFragment = new CategoryFragment();
     ProfileUserFragment profileUserFragment = new ProfileUserFragment();
+    MenuFragment menuFragment = new MenuFragment();
     int currentNoti = 0;
 
     //Websocket
@@ -104,17 +106,14 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
                updateNotificationBadge(false);
                setCurrentFragment(notificationFragment);
            }
-           if (itemId == R.id.itemProfile){
+           if(itemId == R.id.itemMenu){
                if(isLoggedIn()){
-                   setCurrentFragment(profileUserFragment);
-               }
-               else{
+                   setCurrentFragment(menuFragment);
+               }else{
                    setCurrentFragment(profileFragment);
                }
-           }
-           if (itemId == R.id.itemCategory){
-               setCurrentFragment(categoryFragment);
-           }
+
+            }
            return true;
         });
     }

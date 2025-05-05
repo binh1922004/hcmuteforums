@@ -20,4 +20,8 @@ public interface ReplyApi {
 
     @POST("api/reply")
     Call<ApiResponse<ReplyResponse>> postReplyTopic(@Body ReplyPostRequest replyPostRequest);
+
+    @GET("api/reply/parent/{parentReplyId}")
+    Call<ApiResponse<PageResponse<ReplyResponse>>> getAllRepliesByParentReplyId(@Path("parentReplyId") String parentReplyId, @Query("page") int page);
+
 }

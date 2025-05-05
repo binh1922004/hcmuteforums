@@ -163,6 +163,9 @@ public class ReplyService {
         UserGeneral userGeneral = userMapper.toUserGeneral(reply.getUser());
         userGeneral.setAvt("https://ball.io.vn:8080/ute/" + reply.getUser().getProfile().getAvatarUrl());
         replyResponse.setUserGeneral(userGeneral);
+        if (reply.getChildReplies() != null && !reply.getChildReplies().isEmpty()) {
+            replyResponse.setHasChild(true);
+        }
         return replyResponse;
     }
 }

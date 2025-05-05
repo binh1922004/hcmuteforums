@@ -1,5 +1,6 @@
 package com.backend.backend.service;
 
+import com.backend.backend.dto.request.PasswordUpdateRequest;
 import com.backend.backend.dto.request.UserCreationRequest;
 import com.backend.backend.dto.request.UserUpdateRequest;
 import com.backend.backend.dto.response.UserResponse;
@@ -40,6 +41,14 @@ public class UserService {
 
         return profileService.createProfile(userRepository.save(user)) != null;
     }
+    public boolean updatePassword(PasswordUpdateRequest passwordUpdateRequest) {
+        String username = passwordUpdateRequest.getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(()->
+                new AppException(ErrorCode.USER_NOTEXISTED));
+        passwordUpdateRequest.setPassword(passwordEncoder.encode(passwordUpdateRequest.getPassword()));
+        userMapper.updatePassword(user, passwordUpdateRequest);
+        return userMapper.toUserResponse(userRepository.save(user))!=null;
+    }
 
     public UserResponse getUserInfo(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -59,4 +68,5 @@ public class UserService {
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
+
 }
