@@ -53,6 +53,7 @@ public class ReplyService {
         Reply reply = Reply.builder()
                 .content(replyPostRequest.getContent())
                 .parentReplyId(replyPostRequest.getParentReplyId())
+                .targetUserName(replyPostRequest.getTargetUserName())
                 .user(sendUser)
                 .topic(topic)
                 .createdAt(new Date())
