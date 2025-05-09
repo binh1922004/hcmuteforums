@@ -64,8 +64,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     public void clearData() {
-        notificationList.clear();
-        notifyItemChanged(0);
+        int size = this.notificationList.size();
+        if (size > 0) {
+            this.notificationList.clear();
+            notifyItemRangeRemoved(0, size);
+        }
     }
 
     public class NotificationViewHolder extends RecyclerView.ViewHolder {
