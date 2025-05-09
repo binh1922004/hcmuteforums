@@ -55,6 +55,14 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyItemRangeInserted(oldSize, newList.size());
     }
 
+    public void clearData(){
+        int size = this.topicDetailResponsesList.size();
+        if (size > 0) {
+            this.topicDetailResponsesList.clear();
+            notifyItemRangeRemoved(0, size);
+        }
+    }
+
     public List<TopicDetailResponse> getData() {
         return topicDetailResponsesList;
     }
@@ -109,7 +117,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
     public class TopicDetailViewHolder extends RecyclerView.ViewHolder{
-        TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount;
+        TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount, tvToggle;
         ImageView btnLike, btnReply;
         CircleImageView imgAvatar;
         ViewPager2 viewPagerImages;
@@ -125,13 +133,30 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewPagerImages = itemView.findViewById(R.id.viewPagerImages);
             tvReplyCount = itemView.findViewById(R.id.tvReplyCount);
             tvLikeCount = itemView.findViewById(R.id.tvLikeCount);
+            tvToggle = itemView.findViewById(R.id.tvToggle);
         }
 
         public void bind(TopicDetailResponse topic, int position) {
             tvName.setText(topic.getUserGeneral().getFullName());
             tvTime.setText(topic.getCreatedAt().toString());
             tvTitle.setText(topic.getTitle());
+            //TODO: Expand text view
+            String content = topic.getContent();
+            tvContent.setText(content);
+            //setup for content and max lines
+            tvContent.setMaxLines(topic.isExpanded() ? Integer.MAX_VALUE : 3);
+            tvToggle.setText(topic.isExpanded() ? "Thu gọn" : "Xem thêm");
+            tvToggle.setVisibility(content.length() > 100 ? View.VISIBLE : View.GONE);
+            //content and toggle use both event
+            // Toggle xử lý khi nhấn
+            View.OnClickListener toggleListener = v -> {
+                topic.setExpanded(!topic.isExpanded());
+                notifyItemChanged(position); // Dùng notify để đảm bảo UI được update
+            };
+            tvToggle.setOnClickListener(toggleListener);
+            tvContent.setOnClickListener(toggleListener);
             tvContent.setText(topic.getContent());
+
             List<String> imageUrls = topic.getImgUrls();
             if (imageUrls != null && !imageUrls.isEmpty()) {
                 viewPagerImages.setVisibility(View.VISIBLE);
@@ -154,6 +179,10 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             if (like){
                 btnLike.setSelected(true);
                 btnLike.setImageResource(R.drawable.love_click);
+            }
+            else{
+                btnLike.setSelected(false);
+                btnLike.setImageResource(R.drawable.love_unclick);
             }
 
             btnLike.setOnClickListener(v -> {

@@ -16,6 +16,15 @@ public class TopicDetailResponse {
     private boolean liked;
     private boolean owner;
     private List<String> imgUrls;
+    private boolean isExpanded;
+
+    public boolean isExpanded() {
+        return isExpanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        isExpanded = expanded;
+    }
 
     public UserGeneral getUserGeneral() {
         return userGeneral;
