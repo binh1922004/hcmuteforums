@@ -171,6 +171,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 int currentLike = topic.getLikeCount();
 
                 currentLike += (v.isSelected() ? 1 : -1);
+                topic.setLikeCount(currentLike);
                 tvLikeCount.setText(String.valueOf(currentLike));
             });
 

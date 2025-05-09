@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
@@ -45,7 +44,7 @@ public class NotificationFragment extends Fragment {
 
     //fields
     RecyclerView rcvNotification;
-    MaterialButton btnMoreNoti;
+    MaterialButton btnMoreNotification;
     //viewmodel
     NotificationViewModel notificationViewModel;
     //adapter
@@ -90,12 +89,11 @@ public class NotificationFragment extends Fragment {
         //mapping data
         rcvNotification = view.findViewById(R.id.rcvNotification);
         notificationViewModel = new NotificationViewModel();
-        btnMoreNoti = view.findViewById(R.id.btnMoreNoti);
+        btnMoreNotification = view.findViewById(R.id.btnMoreNoti);
         //adapter config
         adapterConfig();
         //show more data
         showMoreDataEvent();
-        showMoreData();
         //observe data
         observeData();
         return view;
@@ -132,8 +130,16 @@ public class NotificationFragment extends Fragment {
         currentPage++;
     }
     private void showMoreDataEvent(){
-        btnMoreNoti.setOnClickListener(v -> {
+        btnMoreNotification.setOnClickListener(v -> {
             showMoreData();
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        currentPage = 0;
+        notificationAdapter.clearData();
+        showMoreData();
     }
 }

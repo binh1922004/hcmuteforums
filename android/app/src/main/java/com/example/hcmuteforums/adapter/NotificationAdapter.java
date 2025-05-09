@@ -63,6 +63,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return notificationList.size();
     }
 
+    public void clearData() {
+        notificationList.clear();
+        notifyItemChanged(0);
+    }
+
     public class NotificationViewHolder extends RecyclerView.ViewHolder {
         TextView tvContent, tvTime;
         CircleImageView imgAvatar;
