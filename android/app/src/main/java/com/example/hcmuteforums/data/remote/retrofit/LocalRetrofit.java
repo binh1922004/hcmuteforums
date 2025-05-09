@@ -23,7 +23,7 @@ public class LocalRetrofit {
                     .build();
         }
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/ute/")
+                .baseUrl("https://ball.io.vn/ute/")
                 .addConverterFactory(GsonConverterFactory.create(new Gson()))
                 .client(client)
                 .build();

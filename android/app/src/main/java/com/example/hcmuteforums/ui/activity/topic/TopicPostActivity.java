@@ -103,7 +103,10 @@ public class TopicPostActivity extends AppCompatActivity implements ImageActionL
                 TopicDetailResponse topicDetailResponse = topic.getContent();
                 if (topicDetailResponse != null){
                     Toast.makeText(TopicPostActivity.this, "Post thanhg cong", Toast.LENGTH_SHORT).show();
-                    topicPostViewModel.uploadImage(topicDetailResponse.getId(), imageAdapter.getImageList(), TopicPostActivity.this);
+                    if (imageAdapter.getImageList() != null && !imageAdapter.getImageList().isEmpty())
+                        topicPostViewModel.uploadImage(topicDetailResponse.getId(), imageAdapter.getImageList(), TopicPostActivity.this);
+                    else
+                        finish();
                 }
             }
         });

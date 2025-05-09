@@ -76,6 +76,29 @@ public class ReplyService {
 
             notificationService.sendStructuredNotificationToUser(notification);
         }
+        System.out.println("send username: " + sendUsername);
+        System.out.println("received username: " + receivedUsername);
+
+        if (savedReply.getParentReplyId() != null && !savedReply.getParentReplyId().equals("")) {
+            var parentReply = replyRepository.findById(savedReply.getParentReplyId()).orElse(null);
+            if (parentReply != null) {
+                User parentUser = parentReply.getUser();
+                //parent reply not equal reply
+                if (!sendUser.getId().equals(parentUser.getId()) && !parentUser.getId().equals(receivedUser.getId())) {
+                    Notification notification = notificationService.createNotification(
+                            savedReply.getId(),
+                            sendUser,
+                            parentUser,
+                            NotificationContent.TAG,
+                            topic
+                    );
+
+                    notificationService.sendStructuredNotificationToUser(notification);
+                }
+                System.out.println("parent username: " + parentUser.getUsername());
+
+            }
+        }
 
         return replyResponse;
     }

@@ -242,7 +242,7 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     private void resetData() {
         currentPage = 0;
         isLastPage = false;
-        topicDetailAdapter.setData(new ArrayList<>()); // Xóa hết dữ liệu hiện có
+        topicDetailAdapter.clearData(); // Xóa hết dữ liệu hiện có
         showMoreTopic();            // Gọi lại API trang đầu tiên
     }
 }
