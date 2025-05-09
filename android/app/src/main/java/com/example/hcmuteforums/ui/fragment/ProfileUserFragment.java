@@ -25,6 +25,7 @@ import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -39,6 +40,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +51,7 @@ import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
+import com.example.hcmuteforums.viewmodel.FollowViewModel;
 import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -99,6 +102,7 @@ public class ProfileUserFragment extends Fragment {
     UserViewModel userViewModel;
     ProfileViewModel profileViewModel;
     AuthenticationViewModel authenticationViewModel;
+    FollowViewModel followViewModel;
 
     UserResponse currentUserResponse;   //Xac nhan co ton du lieu nguoi dung hay chua
     String avatarProfile, coverProfile, bioProfile;
@@ -106,7 +110,8 @@ public class ProfileUserFragment extends Fragment {
     ImageView coverPhoto;
     CircleImageView imgAvatar;
     ImageButton uploadAvatar, uploadCover, btn_logout;
-    TextView tv_username, tv_email;
+    TextView tv_username, tv_email, tv_countFollower, tv_countFollowing;
+    LinearLayout followingLayout, followerLayout;
     Button btn_edit;
 
     private ActivityResultLauncher<String> permissionLauncher;
@@ -231,7 +236,9 @@ public class ProfileUserFragment extends Fragment {
         EventUploadAvatar(uploadAvatar);
         EventUploadCover(uploadCover);
         //Goi Form EditProfile
-        OpenEditProfile(btn_edit);
+        //OpenEditProfile(btn_edit);
+        // Xử lý sự kiện nhấn vào Following và Follower
+        setupFollowClickEvents();
 
         return view;
     }
@@ -253,10 +260,13 @@ public class ProfileUserFragment extends Fragment {
         tv_email = view.findViewById(R.id.tvUsername);
         uploadAvatar = view.findViewById(R.id.uploadAvatar);
         uploadCover = view.findViewById(R.id.coverCameraButton);
-        btn_edit = view.findViewById(R.id.btnEdit);
         coverPhoto = view.findViewById(R.id.coverPhoto);
         imgAvatar = view.findViewById(R.id.imgAvatar);
         btn_logout = view.findViewById(R.id.btnSetting);  //logout
+        tv_countFollower = view.findViewById(R.id.tvFollowerCount);
+        tv_countFollowing = view.findViewById(R.id.tvFollowingCount);
+        followingLayout = view.findViewById(R.id.following);
+        followerLayout = view.findViewById(R.id.follower);
     }
 
 
@@ -426,6 +436,86 @@ public class ProfileUserFragment extends Fragment {
                 .into(cover);
 
     }
+    private void fetchFollowCounts(String username) {
+        followViewModel = new ViewModelProvider(this).get(FollowViewModel.class);
 
+        // Lấy danh sách Followers
+        followViewModel.getFollower(username, 0);
+        followViewModel.getGetListFollower().observe(getViewLifecycleOwner(), pageResponse -> {
+            if (pageResponse != null) {
+                long followerCount = pageResponse.getTotalElements();
+                tv_countFollower.setText(String.valueOf(followerCount));
+            }
+        });
+
+        followViewModel.getGetFollowerError().observe(getViewLifecycleOwner(), event -> {
+            Boolean error = event.getContent();
+            if (error != null && error) {
+                tv_countFollower.setText("0");
+                Toast.makeText(getContext(), "Lỗi khi lấy số lượng người theo dõi", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Lấy danh sách Following
+        followViewModel.getFollowing(username, 0);
+        followViewModel.getGetListFollowing().observe(getViewLifecycleOwner(), pageResponse -> {
+            if (pageResponse != null) {
+                long followingCount = pageResponse.getTotalElements();
+                tv_countFollowing.setText(String.valueOf(followingCount));
+            }
+        });
+
+        followViewModel.getGetFollowingError().observe(getViewLifecycleOwner(), event -> {
+            Boolean error = event.getContent();
+            if (error != null && error) {
+                tv_countFollowing.setText("0");
+                Toast.makeText(getContext(), "Lỗi khi lấy số lượng đang theo dõi", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        followViewModel.getMessageError().observe(getViewLifecycleOwner(), event -> {
+            String message = event.getContent();
+            if (message != null) {
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void setupFollowClickEvents() {
+        // Khi nhấn vào "Đang theo dõi"
+        followingLayout.setOnClickListener(v -> {
+            if (currentUserResponse == null) {
+                Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            FollowFragment followingFragment = new FollowFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", currentUserResponse.getUsername());
+            bundle.putInt("defaultTab", 1); // 1: Tab "Đang theo dõi"
+            followingFragment.setArguments(bundle);
+
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.flFragment, followingFragment); // Thay R.id.fragment_container bằng ID của container trong Activity
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
+
+        // Khi nhấn vào "Người theo dõi"
+        followerLayout.setOnClickListener(v -> {
+            if (currentUserResponse == null) {
+                Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            FollowFragment followingFragment = new FollowFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", currentUserResponse.getUsername());
+            bundle.putInt("defaultTab", 0); // 0: Tab "Người theo dõi"
+            followingFragment.setArguments(bundle);
+
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.flFragment, followingFragment); // Thay R.id.fragment_container bằng ID của container trong Activity
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
+    }
 
 }
