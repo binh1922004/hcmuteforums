@@ -76,7 +76,7 @@ public class TopicService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
-            return null;
+            throw new AppException(ErrorCode.USER_NOTEXISTED);
         }
 
         Topic topic = topicMapper.toTopic(topicPostRequest);
@@ -125,6 +125,9 @@ public class TopicService {
         if (username != null){
             if (likeRepository.existsLikeByTopic_IdAndUser_Username(topicId, username)) {
                 topicDetailResponse.setLiked(true);
+            }
+            else{
+                topicDetailResponse.setLiked(false);
             }
         }
         //get user

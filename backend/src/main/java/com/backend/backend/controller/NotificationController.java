@@ -33,7 +33,7 @@ public class NotificationController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "2") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction){
+            @RequestParam(defaultValue = "DESC") String direction){
         return ApiResponse.<PageResponse<NotificationDTO>>builder()
                 .result(notificationService.getNotifications(page, size, sortBy, direction))
                 .build();
