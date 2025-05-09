@@ -13,6 +13,11 @@ public class NotificationDTO {
     private String replyId;      // ID của reply liên quan
     private boolean isRead;      // Trạng thái đã đọc hay chưa
     private Date createdAt;      // Thời điểm tạo thông báo
+    private String sendUserAvatar;
+
+    public String getSendUserAvatar() {
+        return sendUserAvatar;
+    }
 
     public String getId() {
         return id;

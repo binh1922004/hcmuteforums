@@ -21,4 +21,5 @@ public class NotificationDTO {
     String actionId;      // ID của reply liên quan
     boolean isRead;      // Trạng thái đã đọc hay chưa
     Date createdAt;      // Thời điểm tạo thông báo
+    String sendUserAvatar;
 }

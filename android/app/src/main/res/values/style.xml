@@ -1,0 +1,5 @@
+<resources>
+    <style name="ButtonShape" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerSize">20dp</item>
+    </style>
+</resources>

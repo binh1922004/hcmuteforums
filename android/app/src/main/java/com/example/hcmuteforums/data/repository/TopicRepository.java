@@ -74,4 +74,8 @@ public class TopicRepository {
         call.enqueue(callback);
     }
 
+    public void getTopicDetail(String id, Callback<ApiResponse<TopicDetailResponse>> callback){
+        var call = topicApi.getTopicDetail(id);
+        call.enqueue(callback);
+    }
 }

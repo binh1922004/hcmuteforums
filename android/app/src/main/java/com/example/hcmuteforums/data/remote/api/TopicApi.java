@@ -20,9 +20,15 @@ import retrofit2.http.Query;
 public interface TopicApi {
     @GET("api/topics")
     Call<ApiResponse<PageResponse<TopicDetailResponse>>> getAllTopic(@Query("page") int page);
+    @GET("api/topics/detail/{id}")
+    Call<ApiResponse<TopicDetailResponse>> getTopicDetail(@Path("id") String id);
 
     @POST("api/topics/post")
     Call<ApiResponse<TopicDetailResponse>> postTopic(@Body TopicPostRequest topicPostRequest);
+    @POST("api/topics/delete/{id}")
+    Call<ApiResponse<Boolean>> deleteTopic(@Path("id") String id);
+    @POST("api/topics/update/{id}")
+    Call<ApiResponse<TopicDetailResponse>> updateTopic(@Path("id") String id);
 
     @Multipart
     @POST("api/topic-images/{topicId}/upload")

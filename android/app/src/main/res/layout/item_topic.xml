@@ -69,7 +69,7 @@
                 android:textStyle="bold" />
 
             <!-- Nội dung -->
-            <io.github.glailton.expandabletextview.ExpandableTextView
+            <TextView
                 android:id="@+id/tvContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,6 +81,14 @@
                 expandableTextView:textMode="line"
                 app:expandType="layout"
                 android:text="Content" />
+            <TextView
+                android:id="@+id/tvToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xem thêm"
+                android:textSize="12sp"
+                android:textColor="@color/gray"
+                android:visibility="gone" />
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPagerImages"
                 android:layout_width="match_parent"
