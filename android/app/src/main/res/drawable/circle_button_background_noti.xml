@@ -1,6 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
-    <solid android:color="#E0E0E0" /> <!-- màu nền xám nhạt -->
+    <solid android:color="#FFFFFF" /> <!-- màu nền xám nhạt -->
     <size
         android:width="60dp"
         android:height="60dp" />

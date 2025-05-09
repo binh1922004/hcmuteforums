@@ -3,12 +3,24 @@ package com.example.hcmuteforums.ui.fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.adapter.NotificationAdapter;
+import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.model.dto.NotificationDTO;
+import com.example.hcmuteforums.model.dto.PageResponse;
+import com.example.hcmuteforums.viewmodel.NotificationViewModel;
+import com.google.android.material.button.MaterialButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,11 +33,23 @@ public class NotificationFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private final String TAG = "NotificationTag";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
+
+    //param:
+    private int currentPage = 0;
+
+    //fields
+    RecyclerView rcvNotification;
+    MaterialButton btnMoreNoti;
+    //viewmodel
+    NotificationViewModel notificationViewModel;
+    //adapter
+    NotificationAdapter notificationAdapter;
     public NotificationFragment() {
         // Required empty public constructor
     }
@@ -61,6 +85,55 @@ public class NotificationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notification, container, false);
+        View view =  inflater.inflate(R.layout.fragment_notification, container, false);
+
+        //mapping data
+        rcvNotification = view.findViewById(R.id.rcvNotification);
+        notificationViewModel = new NotificationViewModel();
+        btnMoreNoti = view.findViewById(R.id.btnMoreNoti);
+        //adapter config
+        adapterConfig();
+        //show more data
+        showMoreDataEvent();
+        showMoreData();
+        //observe data
+        observeData();
+        return view;
+    }
+
+    private void observeData() {
+        notificationViewModel.getNotificationLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<NotificationDTO>>() {
+            @Override
+            public void onChanged(PageResponse<NotificationDTO> notificationDTOPageResponse) {
+                Log.d(TAG, "Data Noti");
+                notificationAdapter.addData(notificationDTOPageResponse.getContent());
+            }
+        });
+        notificationViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> stringEvent) {
+                String mess = stringEvent.getContent();
+                if (mess != null){
+                    Toast.makeText(getContext(), mess, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void adapterConfig(){
+        notificationAdapter = new NotificationAdapter(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        rcvNotification.setLayoutManager(linearLayoutManager);
+        rcvNotification.setAdapter(notificationAdapter);
+    }
+
+    private void showMoreData(){
+        notificationViewModel.getAllNotifications(currentPage);
+        currentPage++;
+    }
+    private void showMoreDataEvent(){
+        btnMoreNoti.setOnClickListener(v -> {
+            showMoreData();
+        });
     }
 }

@@ -1,57 +1,31 @@
 package com.example.hcmuteforums.data.repository;
 
-import android.content.Context;
-import android.net.Uri;
-
-import com.example.hcmuteforums.data.remote.api.LikeApi;
+import com.example.hcmuteforums.data.remote.api.NotificationApi;
 import com.example.hcmuteforums.data.remote.api.ReplyApi;
-import com.example.hcmuteforums.data.remote.api.TopicApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.model.dto.ApiResponse;
+import com.example.hcmuteforums.model.dto.NotificationDTO;
 import com.example.hcmuteforums.model.dto.PageResponse;
-import com.example.hcmuteforums.model.dto.request.ReplyPostRequest;
-import com.example.hcmuteforums.model.dto.request.TopicPostRequest;
-import com.example.hcmuteforums.model.dto.response.ReplyResponse;
-import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
-import com.example.hcmuteforums.utils.FileUtils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
 import retrofit2.Callback;
 
-public class ReplyRepository {
-    private static ReplyRepository instance;
-    private ReplyApi replyApi;
+public class NotificationRepository {
+    private static NotificationRepository instance;
+    private NotificationApi notiApi;
 
-    public static ReplyRepository getInstance() {
+    public static NotificationRepository getInstance() {
         if (instance == null)
-            instance = new ReplyRepository();
+            instance = new NotificationRepository();
         return instance;
     }
 
-    public ReplyRepository() {
-        replyApi = LocalRetrofit.getRetrofit().create(ReplyApi.class);
+    public NotificationRepository() {
+        notiApi = LocalRetrofit.getRetrofit().create(NotificationApi.class);
     }
 
-    public void getAllRepliesByTopicId(String topicId, int page, Callback<ApiResponse<PageResponse<ReplyResponse>>> callback) {
-        var call = replyApi.getAllRepliesByTopicId(topicId, page);
+    public void getAllNotifications(int page, Callback<ApiResponse<PageResponse<NotificationDTO>>> callback){
+        var call = notiApi.getAllNotifications(page);
         call.enqueue(callback);
     }
 
-    public void postReply(String content, String parentId, String targetUserName, String topicId, Callback<ApiResponse<ReplyResponse>> callback){
-        ReplyPostRequest request = new ReplyPostRequest(content, parentId, targetUserName, topicId);
-        var call = replyApi.postReplyTopic(request);
-        call.enqueue(callback);
-    }
-
-    public void getAllRepliesByParentReplyId(String parentReplyId, int page, Callback<ApiResponse<PageResponse<ReplyResponse>>> callback){
-        var call = replyApi.getAllRepliesByParentReplyId(parentReplyId, page);
-        call.enqueue(callback);
-    }
 }

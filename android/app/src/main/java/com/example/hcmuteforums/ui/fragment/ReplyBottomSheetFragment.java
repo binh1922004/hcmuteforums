@@ -118,6 +118,8 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
             btnCancel.setVisibility(View.GONE);
             edtComment.setText("");
             edtComment.setHint("Viết bình luận...");
+            replyingToUser = null;
+            parentReplyId = null;
         });
     }
 
