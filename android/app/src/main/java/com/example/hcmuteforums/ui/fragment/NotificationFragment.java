@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -16,8 +17,10 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.NotificationAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnNotificationClickListener;
 import com.example.hcmuteforums.model.dto.NotificationDTO;
 import com.example.hcmuteforums.model.dto.PageResponse;
+import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.viewmodel.NotificationViewModel;
 import com.google.android.material.button.MaterialButton;
 
@@ -26,7 +29,7 @@ import com.google.android.material.button.MaterialButton;
  * Use the {@link NotificationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NotificationFragment extends Fragment {
+public class NotificationFragment extends Fragment implements OnNotificationClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -119,7 +122,7 @@ public class NotificationFragment extends Fragment {
     }
 
     private void adapterConfig(){
-        notificationAdapter = new NotificationAdapter(getContext());
+        notificationAdapter = new NotificationAdapter(getContext(), this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         rcvNotification.setLayoutManager(linearLayoutManager);
         rcvNotification.setAdapter(notificationAdapter);
@@ -141,5 +144,17 @@ public class NotificationFragment extends Fragment {
         currentPage = 0;
         notificationAdapter.clearData();
         showMoreData();
+    }
+
+    @Override
+    public void onClickLike(String topicId) {
+        Intent topicIntent = new Intent(getContext(), TopicDetailActivity.class);
+        topicIntent.putExtra("topicId", topicId);
+        startActivity(topicIntent);
+    }
+
+    @Override
+    public void onClickReply(String topicId) {
+
     }
 }

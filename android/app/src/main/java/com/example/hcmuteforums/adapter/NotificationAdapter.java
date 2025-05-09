@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnNotificationClickListener;
 import com.example.hcmuteforums.model.dto.NotificationDTO;
 
 import java.util.ArrayList;
@@ -28,9 +29,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
 
     private List<NotificationDTO > notificationList;
+    private OnNotificationClickListener onNotificationClickListener;
     private Context context;
-    public NotificationAdapter(Context context) {
+    public NotificationAdapter(Context context, OnNotificationClickListener onNotificationClickListener) {
         this.context = context;
+        this.onNotificationClickListener = onNotificationClickListener;
         notificationList = new ArrayList<>();
     }
 
@@ -82,11 +85,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
             imgAction = itemView.findViewById(R.id.imgAction);
         }
-        public void bind(NotificationDTO noti, int pos){
+        public void bind(NotificationDTO notification, int pos){
             //TODO: set up for content of notification
-            tvContent.setText(noti.getContent());
-            String sender = noti.getSenderName();
-            String message = sender + noti.getContent();
+            tvContent.setText(notification.getContent());
+            String sender = notification.getSenderName();
+            String message = sender + notification.getContent();
             SpannableString spannable = new SpannableString(message);
 
             // In đậm tên người gửi
@@ -95,13 +98,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             //TODO: Up avatar
             Glide.with(context)
-                    .load(noti.getSendUserAvatar())
+                    .load(notification.getSendUserAvatar())
                     .centerCrop()
                     .into(imgAvatar);
 
-            if (!Objects.equals(noti.getType(), "LIKE")){
+            if (!Objects.equals(notification.getType(), "LIKE")){
                 imgAction.setImageResource(R.drawable.ic_comment);
             }
+
+            itemView.setOnClickListener(v -> {
+                if (Objects.equals(notification.getType(), "LIKE"))
+                    onNotificationClickListener.onClickLike(notification.getTopicId());
+            });
         }
     }
 
