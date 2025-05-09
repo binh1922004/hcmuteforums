@@ -7,6 +7,7 @@ import com.backend.backend.entity.Notification;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.repository.UserRepository;
+import com.backend.backend.utils.Constant;
 import com.backend.backend.utils.NotificationContent;
 import com.backend.backend.entity.Topic;
 import com.backend.backend.entity.User;
@@ -47,6 +48,8 @@ public class NotificationService {
 
     public NotificationDTO convertToNotificationDTO(Notification notification) {
         return NotificationDTO.builder()
+                .sendUserAvatar(Constant.url + notification.getSendUser().getProfile().getAvatarUrl())
+                .id(notification.getId())
                 .receivedUser(notification.getRecieveUser().getFullName()) //receivedUser is user who receive notificaion
                 .type(notification.getContent().name())
                 .content(notification.getContent().getContent())
@@ -81,7 +84,7 @@ public class NotificationService {
                 : Sort.by(sortBy).ascending();
 
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Notification> notifications = notificationRepository.findAllBySendUser(user, pageable);
+        Page<Notification> notifications = notificationRepository.findALlByRecieveUser(user, pageable);
         List<NotificationDTO> notificationDTOList = new ArrayList<>();
         for (Notification notification : notifications.getContent()) {
             notificationDTOList.add(convertToNotificationDTO(notification));
