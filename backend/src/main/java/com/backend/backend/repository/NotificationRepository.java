@@ -16,4 +16,5 @@ import java.util.Optional;
 public interface NotificationRepository extends JpaRepository<Notification, String> {
     Page<Notification> findAllBySendUser(User sendUser, Pageable pageable);
     Page<Notification> findALlByRecieveUser(User recieveUser, Pageable pageable);
+    Optional<Notification> findNotificationByActionId(String id);
 }

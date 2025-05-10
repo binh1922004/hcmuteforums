@@ -55,6 +55,7 @@ public class NotificationService {
                 .content(notification.getContent().getContent())
                 .topicId(notification.getTopic().getId())
                 .senderName(notification.getSendUser().getFullName())
+                .actionId(notification.getActionId())
                 .isRead(false)
                 .createdAt(new Date())
                 .build();
@@ -71,6 +72,12 @@ public class NotificationService {
                 .build();
     }
 
+    public Boolean deleteNotification(String actionId) {
+        Notification notification = notificationRepository.findNotificationByActionId(actionId).orElseThrow(()
+                -> new AppException(ErrorCode.NOTIFICATION_NOT_FOUND));
+        notificationRepository.delete(notification);
+        return true;
+    }
     public PageResponse<NotificationDTO> getNotifications(
             int page,
             int size,
