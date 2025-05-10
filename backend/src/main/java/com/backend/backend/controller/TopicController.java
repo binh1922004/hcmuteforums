@@ -68,7 +68,7 @@ public class TopicController {
     @GetMapping
     public ApiResponse<PageResponse<TopicDetailResponse>> getAllTopics(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "1") int size,
+            @RequestParam(defaultValue = "6") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String direction
     ){

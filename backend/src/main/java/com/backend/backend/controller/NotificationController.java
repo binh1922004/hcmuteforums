@@ -31,7 +31,7 @@ public class NotificationController {
     @GetMapping()
     public ApiResponse<PageResponse<NotificationDTO>> getAllNotifications(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "2") int size,
+            @RequestParam(defaultValue = "6") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String direction){
         return ApiResponse.<PageResponse<NotificationDTO>>builder()
