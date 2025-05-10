@@ -30,6 +30,8 @@ public class FollowViewModel extends ViewModel {
     private MutableLiveData<PageResponse<FollowerResponse>> getListFollower = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> getFollowerError = new MutableLiveData<>();
     private MutableLiveData<PageResponse<FollowingResponse>> getListFollowing = new MutableLiveData<>();
+    private MutableLiveData<PageResponse<FollowingResponse>> getListFollowingCurrentUser = new MutableLiveData<>(); // Dành cho currentUser
+
     private MutableLiveData<Event<Boolean>> getFollowingError = new MutableLiveData<>();
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
 
@@ -51,6 +53,10 @@ public class FollowViewModel extends ViewModel {
 
     public MutableLiveData<PageResponse<FollowerResponse>> getGetListFollower() {
         return getListFollower;
+    }
+
+    public MutableLiveData<PageResponse<FollowingResponse>> getGetListFollowingCurrentUser() {
+        return getListFollowingCurrentUser;
     }
 
     public MutableLiveData<Event<Boolean>> getGetFollowerError() {
@@ -142,11 +148,11 @@ public class FollowViewModel extends ViewModel {
 
                 } else {
                     if (response.errorBody() != null) {
-//                        Gson gson = new Gson();
-//                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
-//                                ApiErrorResponse.class);
-//                        Log.d("Message", apiError.getMessage());
-                        messageError.setValue(new Event<>("loi"));
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        Log.d("Message", apiError.getMessage());
+                        messageError.setValue(new Event<>(apiError.getMessage()));
                     }
                     getFollowerError.setValue(new Event<>(true));
                 }
@@ -166,16 +172,21 @@ public class FollowViewModel extends ViewModel {
                 if(response.isSuccessful() && response.body()!=null){
                     ApiResponse<PageResponse<FollowingResponse>> apiResponse = response.body();
                     if(apiResponse.getResult()!=null){
-                        getListFollowing.setValue(apiResponse.getResult());
+                        if (username.equals("default_user")) { // Giả định "default_user" là currentUserUsername
+                            getListFollowingCurrentUser.setValue(apiResponse.getResult());
+                        } else {
+                            getListFollowing.setValue(apiResponse.getResult());
+                        }
+
                     }else{
                         getFollowingError.setValue(new Event<>(true));
                     }
                 }else {
                     if (response.errorBody() != null) {
-//                        Gson gson = new Gson();
-//                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
-//                                ApiErrorResponse.class);
-                        messageError.setValue(new Event<>("Loi"));
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        messageError.setValue(new Event<>(apiError.getMessage()));
                     }
                     getFollowingError.setValue(new Event<>(true));
                 }

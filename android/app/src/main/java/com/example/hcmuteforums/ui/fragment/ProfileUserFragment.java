@@ -482,39 +482,45 @@ public class ProfileUserFragment extends Fragment {
     }
     private void setupFollowClickEvents() {
         // Khi nhấn vào "Đang theo dõi"
-        followingLayout.setOnClickListener(v -> {
-            if (currentUserResponse == null) {
-                Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            FollowFragment followingFragment = new FollowFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("username", currentUserResponse.getUsername());
-            bundle.putInt("defaultTab", 1); // 1: Tab "Đang theo dõi"
-            followingFragment.setArguments(bundle);
+        followingLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentUserResponse == null) {
+                    Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                FollowFragment followingFragment = new FollowFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("username", currentUserResponse.getUsername());
+                bundle.putInt("defaultTab", 1); // 1: Tab "Đang theo dõi"
+                followingFragment.setArguments(bundle);
 
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.flFragment, followingFragment); // Thay R.id.fragment_container bằng ID của container trong Activity
-            transaction.addToBackStack(null);
-            transaction.commit();
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.flFragment, followingFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         });
 
         // Khi nhấn vào "Người theo dõi"
-        followerLayout.setOnClickListener(v -> {
-            if (currentUserResponse == null) {
-                Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            FollowFragment followingFragment = new FollowFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("username", currentUserResponse.getUsername());
-            bundle.putInt("defaultTab", 0); // 0: Tab "Người theo dõi"
-            followingFragment.setArguments(bundle);
+        followerLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentUserResponse == null) {
+                    Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                FollowFragment followingFragment = new FollowFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("username", currentUserResponse.getUsername());
+                bundle.putInt("defaultTab", 0); // 0: Tab "Người theo dõi"
+                followingFragment.setArguments(bundle);
 
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.flFragment, followingFragment); // Thay R.id.fragment_container bằng ID của container trong Activity
-            transaction.addToBackStack(null);
-            transaction.commit();
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.flFragment, followingFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         });
     }
 
