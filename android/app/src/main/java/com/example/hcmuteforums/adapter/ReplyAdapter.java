@@ -17,7 +17,9 @@ import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -25,6 +27,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
 
 
     private List<ReplyResponse> replyList;
+    private Set<String> replyIds; // Lưu trữ id của các reply
     //listener
     private OnReplyClickListener listener;
     private Context context;
@@ -33,6 +36,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         this.replyList = replyList;
         this.listener = listener;
         this.context = context;
+        replyIds = new HashSet<>();
     }
     // Lớp DiffUtil.Callback chung
     private static class ReplyDiffCallback extends DiffUtil.Callback {
@@ -76,7 +80,12 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         if (newList == null || newList.isEmpty()) return;
         List<ReplyResponse> oldList = new ArrayList<>(replyList);
         List<ReplyResponse> updatedList = new ArrayList<>(oldList);
-        updatedList.addAll(newList);
+        // Chỉ thêm reply chưa tồn tại
+        for (ReplyResponse newReply : newList) {
+            if (!replyIds.contains(newReply.getId())) {
+                updatedList.add(newReply);
+            }
+        }
         applyDiffUtil(oldList, updatedList);
     }
 
@@ -86,6 +95,9 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         List<ReplyResponse> updatedList = new ArrayList<>(oldList);
         updatedList.add(0, newReply);
         applyDiffUtil(oldList, updatedList);
+
+        //add item to set
+        replyIds.add(newReply.getId());
     }
     public void addNewReplyChildList(List<ReplyResponse> childList, boolean isLast){
         //child list empty so not do any thing

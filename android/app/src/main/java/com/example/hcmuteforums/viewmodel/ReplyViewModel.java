@@ -32,6 +32,10 @@ public class ReplyViewModel extends ViewModel {
     private MutableLiveData<Event<Boolean>> replyChildError = new MutableLiveData<>();
     private MutableLiveData<Event<ReplyResponse>> replyPostSuccess = new MutableLiveData<>();
 
+    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    private MutableLiveData<Event<ReplyResponse>> detailReplyLiveData = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> detailReplyError= new MutableLiveData<>();
+
     public ReplyViewModel() {
         replyRepository = ReplyRepository.getInstance();
     }
@@ -60,11 +64,24 @@ public class ReplyViewModel extends ViewModel {
         return replyChildLiveData;
     }
 
+    public MutableLiveData<Boolean> getIsLoading() {
+        return isLoading;
+    }
+
+    public MutableLiveData<Event<ReplyResponse>> getDetailReplyLiveData() {
+        return detailReplyLiveData;
+    }
+
+    public MutableLiveData<Event<Boolean>> getDetailReplyError() {
+        return detailReplyError;
+    }
+
     public MutableLiveData<Event<Boolean>> getReplyChildError() {
         return replyChildError;
     }
 
     public void getAllRepliesByTopicId(String topicId, int page) {
+        isLoading.setValue(true);
         replyRepository.getAllRepliesByTopicId(topicId, page, new Callback<ApiResponse<PageResponse<ReplyResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<PageResponse<ReplyResponse>>> call, Response<ApiResponse<PageResponse<ReplyResponse>>> response) {
@@ -85,12 +102,44 @@ public class ReplyViewModel extends ViewModel {
                         replyError.setValue(new Event<>(true));
                     }
                 }
+                isLoading.setValue(false);
             }
 
             @Override
             public void onFailure(Call<ApiResponse<PageResponse<ReplyResponse>>> call, Throwable throwable) {
                 Log.d("Error Topic", throwable.getMessage());
                 replyError.setValue(new Event<>(true));
+                isLoading.setValue(false);
+            }
+        });
+    }
+    public void getDetailReply(String replyId) {
+        replyRepository.getDetailReply(replyId, new Callback<ApiResponse<ReplyResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ReplyResponse>> call, Response<ApiResponse<ReplyResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<ReplyResponse> apiRes = response.body();
+                    if (apiRes.getResult() != null) {
+                        detailReplyLiveData.setValue(new Event<>(apiRes.getResult()));
+                    } else {
+                        detailReplyError.setValue(new Event<>(true));       // ✅ Dùng Event
+                    }
+                } else {
+                    if (response.errorBody() != null) {
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        messageError.setValue(new Event<>(apiError.getMessage()));  // ✅ Dùng Event
+                    } else {
+                        detailReplyError.setValue(new Event<>(true));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ReplyResponse>> call, Throwable throwable) {
+                Log.d("Error Reply", throwable.getMessage());
+                detailReplyError.setValue(new Event<>(true));
             }
         });
     }

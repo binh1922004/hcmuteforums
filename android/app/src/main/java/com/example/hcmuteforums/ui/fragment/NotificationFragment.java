@@ -154,7 +154,10 @@ public class NotificationFragment extends Fragment implements OnNotificationClic
     }
 
     @Override
-    public void onClickReply(String topicId) {
-
+    public void onClickReply(String topicId, String replyId) {
+        Intent topicIntent = new Intent(getContext(), TopicDetailActivity.class);
+        topicIntent.putExtra("topicId", topicId);
+        topicIntent.putExtra("replyId", replyId);
+        startActivity(topicIntent);
     }
 }

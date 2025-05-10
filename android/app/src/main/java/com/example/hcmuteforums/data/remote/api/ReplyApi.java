@@ -23,5 +23,7 @@ public interface ReplyApi {
 
     @GET("api/reply/parent/{parentReplyId}")
     Call<ApiResponse<PageResponse<ReplyResponse>>> getAllRepliesByParentReplyId(@Path("parentReplyId") String parentReplyId, @Query("page") int page);
+    @GET("api/reply/detail/{replyId}")
+    Call<ApiResponse<ReplyResponse>> getDetailReply(@Path("replyId") String replyId);
 
 }

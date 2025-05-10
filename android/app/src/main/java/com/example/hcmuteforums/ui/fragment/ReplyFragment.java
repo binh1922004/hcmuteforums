@@ -56,7 +56,6 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener {
     private int currentPage = 0;
 
     //listener interface
-    private OnReplyAddedListener onReplyAddedListener;
 
     //hash map for storage page size of each reply child
     HashMap<String, Integer> currentPageReplyChildMap;
@@ -65,6 +64,10 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener {
     //reply information
     private String parentReplyId = null;
     private String replyingToUser = null;
+    //fields
+    private String replyIdFromNotification = null;
+    //support
+    LoadingDialogFragment loadingDialog;
 
     public static ReplyFragment newInstance(String topicId) {
         ReplyFragment fragment = new ReplyFragment();
@@ -74,9 +77,15 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener {
         return fragment;
     }
 
-    public void setOnReplyAddedListener(OnReplyAddedListener onReplyAddedListener){
-        this.onReplyAddedListener = onReplyAddedListener;
+    public static ReplyFragment newInstance(String topicId, String replyId) {
+        ReplyFragment fragment = new ReplyFragment();
+        Bundle args = new Bundle();
+        args.putString("topicId", topicId);
+        args.putString("replyId", replyId);
+        fragment.setArguments(args);
+        return fragment;
     }
+
 
     @Nullable
     @Override
@@ -92,9 +101,11 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener {
         layoutText = view.findViewById(R.id.layoutText);
         replyViewModel = new ReplyViewModel();
         topicId = getArguments().getString("topicId");
-
+        replyIdFromNotification = getArguments().getString("replyId");
         currentPageReplyChildMap = new HashMap<>();
         isLastPageReplyChildMap = new HashMap<>();
+        //support
+        loadingDialog = new LoadingDialogFragment();
         replyAdapterConfig();
 
         loadMoreReplies();
@@ -147,7 +158,28 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener {
     }
 
     private void observeData(){
-        //reply response success
+        //reply detail response
+        replyViewModel.getDetailReplyLiveData().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
+            @Override
+            public void onChanged(Event<ReplyResponse> replyResponseEvent) {
+                var replyResponse = replyResponseEvent.getContent();
+                if (replyResponse != null){
+                    replyAdapter.addNewReply(replyResponse);
+                }
+            }
+        });
+        replyViewModel.getIsLoading().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isLoading) {
+                if (isLoading){
+                    loadingDialog.show(getParentFragmentManager(), "LoadingDiaglog");
+                }
+                else{
+                    loadingDialog.dismiss();
+                }
+            }
+        });
+        //list reply response success
         replyViewModel.getReplyLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<ReplyResponse>>() {
             @Override
             public void onChanged(PageResponse<ReplyResponse> replyResponses) {
@@ -185,9 +217,6 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener {
                     else{
                         replyAdapter.addNewReplyChild(replyResponse);
                     }
-                    if (onReplyAddedListener != null){
-                        onReplyAddedListener.onReplyAdded(replyResponse);
-                    }
                 }
             }
         });
@@ -218,6 +247,10 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener {
     }
 
     private void loadMoreReplies() {
+        if (replyIdFromNotification != null){
+            replyViewModel.getDetailReply(replyIdFromNotification);
+        }
+
         replyViewModel.getAllRepliesByTopicId(topicId, currentPage);
         currentPage++;
     }

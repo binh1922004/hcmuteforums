@@ -105,10 +105,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             if (!Objects.equals(notification.getType(), "LIKE")){
                 imgAction.setImageResource(R.drawable.ic_comment);
             }
+            else {
+                imgAction.setImageResource(R.drawable.love_click);
+            }
 
             itemView.setOnClickListener(v -> {
-                if (Objects.equals(notification.getType(), "LIKE"))
+                if (Objects.equals(notification.getType(), "LIKE")) {
                     onNotificationClickListener.onClickLike(notification.getTopicId());
+                }
+                else{
+                    onNotificationClickListener.onClickReply(notification.getTopicId(), notification.getActionId());
+                }
             });
         }
     }
