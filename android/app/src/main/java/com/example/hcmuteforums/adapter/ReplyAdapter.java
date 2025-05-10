@@ -1,9 +1,12 @@
 package com.example.hcmuteforums.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnMenuActionListener;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 
@@ -29,13 +33,16 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     private List<ReplyResponse> replyList;
     private Set<String> replyIds; // Lưu trữ id của các reply
     //listener
-    private OnReplyClickListener listener;
+    private OnReplyClickListener onReplyClickListener;
+    private OnMenuActionListener onMenuActionListener;
     private Context context;
     //adapter
-    public ReplyAdapter(Context context, List<ReplyResponse> replyList, OnReplyClickListener listener) {
+    public ReplyAdapter(Context context, List<ReplyResponse> replyList, OnReplyClickListener onReplyClickListener,
+                        OnMenuActionListener onMenuActionListener) {
         this.replyList = replyList;
-        this.listener = listener;
+        this.onReplyClickListener = onReplyClickListener;
         this.context = context;
+        this.onMenuActionListener = onMenuActionListener;
         replyIds = new HashSet<>();
     }
     // Lớp DiffUtil.Callback chung
@@ -134,6 +141,23 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     }
 
 
+    public void deleteReply(int position){
+        if (position >= 0 && position < replyList.size()) {
+            replyList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, replyList.size());
+        }
+    }
+
+    // Method to update reply at specific position
+    public void updateReply(int position, String newContent) {
+        if (position >= 0 && position < replyList.size()) {
+            ReplyResponse reply = replyList.get(position);
+            reply.setContent(newContent); // Assuming Reply has a setter for content
+            notifyItemChanged(position);
+        }
+    }
+
     @NonNull
     @Override
     public ReplyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -159,6 +183,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         TextView tvUsername, tvReply, tvShowChildReply;
         TextView tvContent, tvToggle, tvShowMoreChildReply, tvHideChildReply;
         CircleImageView imgAvatar;
+        ImageView imgMoreActions;
         RecyclerView rcvChildReplies;
         ReplyChildAdapter replyChildAdapter;
         public ReplyViewHolder(@NonNull View itemView) {
@@ -172,9 +197,10 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
             tvToggle = itemView.findViewById(R.id.tvToggle);
             tvShowMoreChildReply = itemView.findViewById(R.id.tvShowMoreChildReply);
             tvHideChildReply = itemView.findViewById(R.id.tvHideChildReply);
+            imgMoreActions = itemView.findViewById(R.id.imgMoreActions);
             //config for reply child adapter
             rcvChildReplies.setLayoutManager(new LinearLayoutManager(itemView.getContext(), RecyclerView.VERTICAL, false));
-            replyChildAdapter = new ReplyChildAdapter(context, listener);
+            replyChildAdapter = new ReplyChildAdapter(context, onReplyClickListener);
             rcvChildReplies.setAdapter(replyChildAdapter);
             rcvChildReplies.setNestedScrollingEnabled(false);
         }
@@ -209,8 +235,8 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
 
             //TODO: set click event to reply
             tvReply.setOnClickListener(v -> {
-                if (listener != null)
-                    listener.onReplyClick(reply);
+                if (onReplyClickListener != null)
+                    onReplyClickListener.onReplyClick(reply);
             });
 
             //TODO: show more reply
@@ -225,7 +251,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                         reply.getListChild().clear();
                         replyChildAdapter.clearData();
                         reply.setShowChild(false);
-                        listener.onHideChildReply(reply);
+                        onReplyClickListener.onHideChildReply(reply);
                         notifyItemChanged(pos);
                     });
                 }
@@ -234,7 +260,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                     tvHideChildReply.setVisibility(View.GONE);
 
                     tvShowMoreChildReply.setOnClickListener(v -> {
-                        listener.onShowChildReply(reply);
+                        onReplyClickListener.onShowChildReply(reply);
                     });
                 }
 
@@ -266,14 +292,46 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                 //show child
                 tvShowChildReply.setOnClickListener(v -> {
                     tvShowChildReply.setVisibility(View.GONE);
-                    listener.onShowChildReply(reply);
+                    onReplyClickListener.onShowChildReply(reply);
                 });
             }
             else{
                 tvShowChildReply.setVisibility(View.GONE);
                 rcvChildReplies.setVisibility(View.GONE);
             }
+            //TODO: menu actions
+            imgMoreActions.setOnClickListener(v ->{
+                // Tạo PopupMenu
+                PopupMenu popupMenu = new PopupMenu(context, v);
 
+                //if is your reply have 3 selections
+                if (reply.isOwner()) {
+                    popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_user, popupMenu.getMenu());
+                }
+                else{
+                    popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_guest, popupMenu.getMenu());
+                }
+                // Xử lý sự kiện khi chọn mục trong menu
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(android.view.MenuItem item) {
+                        int itemId = item.getItemId();
+                        if (itemId == R.id.actionCopy){
+
+                        }
+                        else if (itemId == R.id.actionEdit){
+                            onMenuActionListener.onUpdate(reply.getId(), reply.getContent(), pos);
+                        }
+                        else if (itemId == R.id.actionDelete){
+                            onMenuActionListener.onDelete(reply.getId(), pos);
+                        }
+                        return true;
+                    }
+                });
+
+                // Hiển thị menu
+                popupMenu.show();
+            });
         }
     }
 }

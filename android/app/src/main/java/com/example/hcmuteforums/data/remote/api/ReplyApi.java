@@ -8,6 +8,7 @@ import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -25,5 +26,11 @@ public interface ReplyApi {
     Call<ApiResponse<PageResponse<ReplyResponse>>> getAllRepliesByParentReplyId(@Path("parentReplyId") String parentReplyId, @Query("page") int page);
     @GET("api/reply/detail/{replyId}")
     Call<ApiResponse<ReplyResponse>> getDetailReply(@Path("replyId") String replyId);
+
+
+    @PUT("api/reply/update")
+    Call<ApiResponse<ReplyResponse>> updateReply(@Query("replyId") String replyId, @Query("content") String content);
+    @DELETE("api/reply/delete")
+    Call<ApiResponse<String>> deleteReply(@Query("replyId") String replyId);
 
 }
