@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,15 +34,58 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         this.listener = listener;
         this.context = context;
     }
+    // Lớp DiffUtil.Callback chung
+    private static class ReplyDiffCallback extends DiffUtil.Callback {
+        private final List<ReplyResponse> oldList;
+        private final List<ReplyResponse> newList;
 
-    public void addData(List<ReplyResponse> newList){
-        int oldSize = replyList.size();
-        replyList.addAll(newList);
-        notifyItemInserted(oldSize);
+        public ReplyDiffCallback(List<ReplyResponse> oldList, List<ReplyResponse> newList) {
+            this.oldList = oldList != null ? oldList : new ArrayList<>();
+            this.newList = newList != null ? newList : new ArrayList<>();
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId().equals(newList.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            ReplyResponse oldReply = oldList.get(oldItemPosition);
+            ReplyResponse newReply = newList.get(newItemPosition);
+            return oldReply.getContent().equals(newReply.getContent());
+        }
     }
-    public void addNewReply(ReplyResponse newReply){
-        replyList.add(0, newReply);
-        notifyItemInserted(0);
+
+    private void applyDiffUtil(List<ReplyResponse> oldList, List<ReplyResponse> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ReplyDiffCallback(oldList, newList));
+        replyList = new ArrayList<>(newList);
+        diffResult.dispatchUpdatesTo(this);
+    }
+    public void addData(List<ReplyResponse> newList) {
+        if (newList == null || newList.isEmpty()) return;
+        List<ReplyResponse> oldList = new ArrayList<>(replyList);
+        List<ReplyResponse> updatedList = new ArrayList<>(oldList);
+        updatedList.addAll(newList);
+        applyDiffUtil(oldList, updatedList);
+    }
+
+    public void addNewReply(ReplyResponse newReply) {
+        if (newReply == null) return;
+        List<ReplyResponse> oldList = new ArrayList<>(replyList);
+        List<ReplyResponse> updatedList = new ArrayList<>(oldList);
+        updatedList.add(0, newReply);
+        applyDiffUtil(oldList, updatedList);
     }
     public void addNewReplyChildList(List<ReplyResponse> childList, boolean isLast){
         //child list empty so not do any thing
