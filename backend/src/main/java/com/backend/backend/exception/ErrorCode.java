@@ -25,7 +25,8 @@ public enum ErrorCode {
     EMAIL_NOT_MATCH_USERNAME(1015, "Email does not match Username", HttpStatus.NOT_FOUND),
     INVALID_OPERATION(1017, "Không thể theo dõi chính mình", HttpStatus.NOT_FOUND),
     DUPLICATE_RESOURCE(1019, "Đã theo dõi người này", HttpStatus.NOT_FOUND),
-    RESOURCE_NOT_FOUND(1020, "Không tồn tại ", HttpStatus.NOT_FOUND),;
+    RESOURCE_NOT_FOUND(1020, "Không tồn tại ", HttpStatus.NOT_FOUND),
+    NOTIFICATION_NOT_FOUND(1021, "Không tồn tại thông báo", HttpStatus.NOT_FOUND),;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;
