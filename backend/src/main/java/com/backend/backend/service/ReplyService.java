@@ -103,15 +103,16 @@ public class ReplyService {
         return replyResponse;
     }
 
-    public void updateReply(String replyId, String content){
+    public ReplyResponse updateReply(String replyId, String content){
         Reply reply = replyRepository.findRepliesById(replyId);
         reply.setContent(content);
-        replyRepository.save(reply);
+        return toReplyResponse(replyRepository.save(reply));
     }
     @Transactional
-    public void deleteReply(String replyId){
+    public Boolean deleteReply(String replyId){
         replyRepository.deleteRepliesByParentReplyId(replyId);
         replyRepository.deleteById(replyId);
+        return true;
     }
 
     public boolean isOwner(String replyId){
@@ -181,6 +182,12 @@ public class ReplyService {
                 .totalPages(replyPage.getTotalPages())
                 .last(replyPage.isLast())
                 .build();
+    }
+
+    public ReplyResponse getDetailReply(String replyId){
+        Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new AppException(ErrorCode.REPLY_NOTEXISTED));
+
+        return toReplyResponse(reply);
     }
 
     private ReplyResponse toReplyResponse(Reply reply){
