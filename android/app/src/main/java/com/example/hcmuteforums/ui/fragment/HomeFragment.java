@@ -102,8 +102,7 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
 
         //recyclerView
         recyclerViewConfig();
-        //show topic
-        showMoreTopic();
+
         observeData();
         //go to post topic
         postTopic();

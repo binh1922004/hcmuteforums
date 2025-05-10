@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.ReplyAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnMenuActionListener;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
@@ -42,7 +44,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implements
-        OnReplyClickListener {
+        OnReplyClickListener, OnMenuActionListener {
     //element from layout
     private RecyclerView rcvReplies;
     private EditText edtComment;
@@ -70,7 +72,8 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     //hash map for storage page size of each reply child
     HashMap<String, Integer> currentPageReplyChildMap;
     HashMap<String, Boolean> isLastPageReplyChildMap;
-
+    HashMap<String, Integer> positionDelete;
+    HashMap<String, Integer> positionUpdate;
     //reply information
     private String parentReplyId = null;
     private String replyingToUser = null;
@@ -101,6 +104,8 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
 
         currentPageReplyChildMap = new HashMap<>();
         isLastPageReplyChildMap = new HashMap<>();
+        positionDelete = new HashMap<>();
+        positionUpdate = new HashMap<>();
         replyAdapterConfig();
 
         loadMoreReplies();
@@ -113,7 +118,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         return view;
     }
 
-    private void cancelReply() {
+    private void    cancelReply() {
         btnCancel.setOnClickListener(v -> {
             btnCancel.setVisibility(View.GONE);
             edtComment.setText("");
@@ -126,7 +131,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     //mapping for data
     private void replyAdapterConfig() {
         rcvReplies.setLayoutManager(new LinearLayoutManager(getContext()));
-        replyAdapter = new ReplyAdapter(getContext(), replyList, this);
+        replyAdapter = new ReplyAdapter(getContext(), replyList, this, this);
         rcvReplies.setAdapter(replyAdapter);
 
 
@@ -178,7 +183,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
             }
         });
         //reply post success
-        replyViewModel.getReplyPostSuccess().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
+        replyViewModel.getReplyPostLiveData().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
             @Override
             public void onChanged(Event<ReplyResponse> replyResponseEvent) {
                 ReplyResponse replyResponse = replyResponseEvent.getContent();
@@ -221,6 +226,31 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
             }
         });
 
+        //TODO: Delete reply
+        replyViewModel.getReplyDeleteLiveData().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> result) {
+                String replyId = result.getContent();
+                if (replyId != null && positionDelete.containsKey(replyId)){
+                    Integer pos = positionDelete.get(replyId);
+                    replyAdapter.deleteReply(pos);
+                    positionDelete.remove(replyId);
+                }
+            }
+        });
+
+        //TODO: Update reply
+        replyViewModel.getReplyUpdateLiveData().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
+            @Override
+            public void onChanged(Event<ReplyResponse> replyResponseEvent) {
+                ReplyResponse reply = replyResponseEvent.getContent();
+                if (reply != null && positionUpdate.containsKey(reply.getId())){
+                    int pos = positionUpdate.get(reply.getId());
+                    replyAdapter.updateReply(pos, reply.getContent());
+                    positionUpdate.remove(reply.getId());
+                }
+            }
+        });
     }
 
 
@@ -302,5 +332,38 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         String replyId = reply.getId();
         currentPageReplyChildMap.remove(replyId);
         isLastPageReplyChildMap.remove(replyId);
+    }
+
+    @Override
+    public void onUpdate(String replyId, String content, int pos) {
+        // Create and show AlertDialog for editing
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Chỉnh sửa câu trả lời");
+
+        // Create EditText for input
+        final EditText input = new EditText(getContext());
+        input.setText(content);
+        builder.setView(input);
+
+        // Set up buttons
+        builder.setPositiveButton("Lưu", (dialog, which) -> {
+            String newContent = input.getText().toString().trim();
+            if (!newContent.isEmpty()) {
+                // Store position and call API
+                positionUpdate.put(replyId, pos);
+                replyViewModel.updateReply(replyId, newContent);
+            } else {
+                Toast.makeText(getContext(), "Nội dung không được để trống", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    @Override
+    public void onDelete(String replyId, int pos) {
+        positionDelete.put(replyId, pos);
+        replyViewModel.deleteReply(replyId);
     }
 }

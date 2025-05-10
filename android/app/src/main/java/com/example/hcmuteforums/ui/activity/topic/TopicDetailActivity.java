@@ -50,6 +50,7 @@ public class TopicDetailActivity extends AppCompatActivity {
         //TODO: Get data from before activity
         Intent receivedIntent = getIntent();
         String topicId = receivedIntent.getStringExtra("topicId");
+        String replyId = receivedIntent.getStringExtra("replyId");
         //mapping data
         mappingData();
 
@@ -57,7 +58,13 @@ public class TopicDetailActivity extends AppCompatActivity {
         setTopicData(topicId);
 
         // Thêm CommentFragment vào Activity
-        ReplyFragment replyFragment = ReplyFragment.newInstance(topicId);
+        ReplyFragment replyFragment;
+        if (replyId == null){
+            replyFragment = ReplyFragment.newInstance(topicId);
+        }
+        else{
+            replyFragment = ReplyFragment.newInstance(topicId, replyId);
+        }
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, replyFragment)
                 .commit();

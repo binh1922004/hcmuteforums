@@ -16,6 +16,7 @@ public class ReplyResponse {
     String content;
     String parentReplyId;
     String targetUserName;
+    boolean isOwner;
     UserGeneral userGeneral;
     @Builder.Default
     boolean hasChild = false;

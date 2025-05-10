@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -38,6 +39,8 @@ public class LikeService {
         if (likeRepository.existsLikeByTopic_IdAndUser_Username(topicId, username)){
             Like like = likeRepository.findLikeByTopic_IdAndUser_Username(topicId, username);
             likeRepository.delete(like);
+            if (!Objects.equals(username, topic.getUser().getUsername()))
+                return notificationService.deleteNotification(like.getId());
         }
         else{
             User sendUser = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
