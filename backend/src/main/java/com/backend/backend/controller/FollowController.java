@@ -3,6 +3,9 @@ package com.backend.backend.controller;
 import com.backend.backend.dto.ApiResponse;
 import com.backend.backend.dto.request.FollowRequest;
 import com.backend.backend.dto.response.FollowResponse;
+import com.backend.backend.dto.response.FollowerResponse;
+import com.backend.backend.dto.response.FollowingResponse;
+import com.backend.backend.dto.response.PageResponse;
 import com.backend.backend.mapper.FollowMapper;
 import com.backend.backend.service.FollowService;
 import lombok.RequiredArgsConstructor;
@@ -26,31 +29,36 @@ public class FollowController {
                 .result(followService.followUser(followRequest))
                 .build();
     }
-    @DeleteMapping("/delete")
+    @DeleteMapping("/unfollow")
     public ApiResponse<FollowResponse> unfollowUser(@RequestBody FollowRequest followRequest) {
         return ApiResponse.<FollowResponse>builder()
                 .result(followService.unfollowUser(followRequest))
                 .build();
     }
     @GetMapping("/followers")
-    public ApiResponse<Page<FollowResponse>> getFollowers(
+    public ApiResponse<PageResponse<FollowerResponse>> getFollowers(
             @RequestParam String username,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction
     ) {
-        return ApiResponse.<Page<FollowResponse>>builder()
-                .result(followService.getFollowers(username,page,size))
+        return ApiResponse.<PageResponse<FollowerResponse>>builder()
+                .result(followService.getFollowers(username, page, size, sortBy, direction))
                 .build();
     }
 
     @GetMapping("/following")
-    public ApiResponse<Page<FollowResponse>> getFollowing(
+    public ApiResponse<PageResponse<FollowingResponse>> getFollowing(
             @RequestParam String username,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction
+
     ) {
-        return ApiResponse.<Page<FollowResponse>>builder()
-                .result(followService.getFollowing(username, page, size))
+        return ApiResponse.<PageResponse<FollowingResponse>>builder()
+                .result(followService.getFollowing(username, page, size, sortBy, direction))
                 .build();
     }
 }

@@ -197,7 +197,6 @@ public class ForgotPasswordBottomSheetFragment extends BottomSheetDialogFragment
             }
         });
 
-
     }
 
     private void switchToOtpLayout() {
