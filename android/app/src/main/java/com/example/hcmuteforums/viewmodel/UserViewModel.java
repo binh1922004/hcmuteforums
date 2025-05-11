@@ -27,6 +27,8 @@
         private final MutableLiveData<Event<Boolean>> registerError = new MutableLiveData<>();
 
         private final MutableLiveData<Event<UserResponse>> userInfo = new MutableLiveData<>();
+        private final MutableLiveData<Event<UserResponse>> personInfo = new MutableLiveData<>();
+        private final MutableLiveData<Event<Boolean>> personInfoError = new MutableLiveData<>();
         private final MutableLiveData<Event<Boolean>> userInfoError = new MutableLiveData<>();
 
         private final MutableLiveData<Event<Boolean>> userUpdateError = new MutableLiveData<>();
@@ -61,6 +63,35 @@
                 public void onFailure(Call<ApiResponse<UserResponse>> call, Throwable throwable) {
                     Log.d("Error UserInfo", throwable.getMessage());
                     userInfoError.setValue(new Event<>(true));
+                }
+            });
+        }
+        public void getInfoPerson(String username){
+            userRepository.getInfoPerson(username, new Callback<ApiResponse<UserResponse>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<UserResponse>> call, Response<ApiResponse<UserResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                       ApiResponse<UserResponse> apiResponse = response.body();
+                       if(apiResponse.getResult()!=null){
+                           personInfo.setValue(new Event<>(apiResponse.getResult()));
+                       }else{
+                           personInfoError.setValue(new Event<>(true));
+                       }
+                    }else {
+                        if (response.errorBody() != null) {
+                            Gson gson = new Gson();
+                            ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(), ApiErrorResponse.class);
+                            messageError.setValue(new Event<>(apiError.getMessage()));
+                        } else {
+                            personInfoError.setValue(new Event<>(true));
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<UserResponse>> call, Throwable throwable) {
+                    Log.d("Error PersonInfo", throwable.getMessage());
+                    personInfoError.setValue(new Event<>(true));
                 }
             });
         }
@@ -124,5 +155,13 @@
 
         public MutableLiveData<Event<UserResponse>> getUserUpdate() {
             return updateResponse;
+        }
+
+        public MutableLiveData<Event<UserResponse>> getPersonInfo() {
+            return personInfo;
+        }
+
+        public MutableLiveData<Event<Boolean>> getPersonInfoError() {
+            return personInfoError;
         }
     }

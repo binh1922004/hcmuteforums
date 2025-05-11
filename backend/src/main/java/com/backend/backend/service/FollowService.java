@@ -63,14 +63,15 @@ public class FollowService {
 
         return followMapper.toFollowResponse(followRepository.save(follow));
     }
-    public FollowResponse unfollowUser(FollowRequest request) {
+
+    public FollowResponse unfollowUser(String targetUsername) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
         User follower = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
 
-        User followed = userRepository.findByUsername(request.getFollowedUsername())
+        User followed = userRepository.findByUsername(targetUsername)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
 
         Follow follow = followRepository.findByFollowerAndFollowed(follower, followed)
@@ -144,6 +145,18 @@ public class FollowService {
                 .totalPages(followingUserPage.getTotalPages())
                 .last(followingUserPage.isLast())
                 .build();
+    }
+    public boolean checkFollowStatus(String currentUsername, String targetUsername) {
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+        User targetUser = userRepository.findByUsername(targetUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+
+        if (currentUser.getUsername().equals(targetUser.getUsername())) {
+            return false; // Không follow chính mình
+        }
+
+        return followRepository.existsByFollowerAndFollowed(currentUser, targetUser);
     }
 
 }
