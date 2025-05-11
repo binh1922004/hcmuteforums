@@ -257,16 +257,26 @@ public class HomeFragment extends Fragment implements
         if (preferences.getBoolean("isLoggedIn", false)){
             String currentUserName = preferences.getString("username", null);
             if (!Objects.equals(currentUserName, username)){
-                Intent myintent = new Intent(getContext(), AnyProfileUserFragment.class);
-                myintent.putExtra("username", username);
-                myintent.putExtra("currentUsername", currentUserName);
-                startActivity(myintent);
+                AnyProfileUserFragment anyProfileUserFragment = new AnyProfileUserFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("username", username);
+                bundle.putString("currentUsername", currentUserName);
+                anyProfileUserFragment.setArguments(bundle);
+                getParentFragmentManager().beginTransaction()
+                                .replace(R.id.flFragment, anyProfileUserFragment)
+                                        .addToBackStack(null)
+                                                .commit();
             }
         }
         else{
-            Intent myintent = new Intent(getContext(), AnyProfileUserFragment.class);
-            myintent.putExtra("username", username);
-            startActivity(myintent);
+            AnyProfileUserFragment anyProfileUserFragment = new AnyProfileUserFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", username);
+            anyProfileUserFragment.setArguments(bundle);
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, anyProfileUserFragment)
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 }
