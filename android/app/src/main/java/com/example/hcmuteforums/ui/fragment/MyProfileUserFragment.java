@@ -6,37 +6,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -49,14 +34,11 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
-import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 import com.example.hcmuteforums.viewmodel.FollowViewModel;
 import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
 import com.github.dhaval2404.imagepicker.ImagePicker;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,16 +47,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ProfileUserFragment#newInstance} factory method to
+ * Use the {@link MyProfileUserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfileUserFragment extends Fragment {
+public class MyProfileUserFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -85,7 +64,7 @@ public class ProfileUserFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public ProfileUserFragment() {
+    public MyProfileUserFragment() {
         // Required empty public constructor
     }
 
@@ -109,8 +88,8 @@ public class ProfileUserFragment extends Fragment {
 
     ImageView coverPhoto;
     CircleImageView imgAvatar;
-    ImageButton uploadAvatar, uploadCover, btn_logout;
-    TextView tv_username, tv_email, tv_countFollower, tv_countFollowing;
+    ImageButton uploadAvatar, uploadCover, btn_back;
+    TextView tv_username, tv_email, tv_countFollower, tv_countFollowing, tv_fullname;
     LinearLayout followingLayout, followerLayout;
     Button btn_edit;
 
@@ -121,8 +100,8 @@ public class ProfileUserFragment extends Fragment {
 
 
 
-    public static ProfileUserFragment newInstance(String param1, String param2) {
-        ProfileUserFragment fragment = new ProfileUserFragment();
+    public static MyProfileUserFragment newInstance(String param1, String param2) {
+        MyProfileUserFragment fragment = new MyProfileUserFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -141,7 +120,7 @@ public class ProfileUserFragment extends Fragment {
     }
 
 
-    private void getInfo(TextView tv_username, TextView tv_email){
+    private void getInfo(TextView tv_username, TextView tv_email, TextView tv_fullname){
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);   //Map viewmodel
         userViewModel.getInfo();
         userViewModel.getUserInfo().observe(getViewLifecycleOwner(), new Observer<Event<UserResponse>>() {
@@ -151,8 +130,13 @@ public class ProfileUserFragment extends Fragment {
                 if (userResponse == null)
                     return;
                 currentUserResponse = userResponse;
-                tv_username.setText(userResponse.getFullName());
+                tv_username.setText(userResponse.getUsername());
                 tv_email.setText(userResponse.getEmail());
+                tv_fullname.setText(userResponse.getFullName());
+                // Lấy số người theo dõi và đang theo dõi khi có username
+                if (userResponse.getUsername() != null) {
+                    fetchFollowCounts(userResponse.getUsername());
+                }
             }
         });
         userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
@@ -221,12 +205,8 @@ public class ProfileUserFragment extends Fragment {
         SharedPreferences preferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
         String token = preferences.getString("jwtLocal", "Không có");
         Log.d("JWT ERROR", token);
-        //Nut logout
-        btn_logout.setOnClickListener(v-> {
-           logoutEvent();
-        });
         //Lay thong tin
-        getInfo(tv_username, tv_email);
+        getInfo(tv_username, tv_email, tv_fullname);
 
         //Load Image
         getProfile(view);
@@ -238,23 +218,12 @@ public class ProfileUserFragment extends Fragment {
         //Goi Form EditProfile
         //OpenEditProfile(btn_edit);
         // Xử lý sự kiện nhấn vào Following và Follower
+        EventBackMenu();
         setupFollowClickEvents();
 
         return view;
     }
-    private void logoutEvent()
-    {
-        //xoa du lieu trong viewmodel
-        authenticationViewModel = new ViewModelProvider(this).get(AuthenticationViewModel.class);
-        authenticationViewModel.logout();
-        //Xoá thông tin đăng nhập ở sharepreferences
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("User", Context.MODE_PRIVATE);
-        sharedPreferences.edit().clear().apply();
-        //Chuyen ve trang chu
-        Intent intent = new Intent(requireActivity(), UserMainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
-        startActivity(intent);
-    }
+
     void anhxa(View view) {
         tv_username = view.findViewById(R.id.tvName);
         tv_email = view.findViewById(R.id.tvUsername);
@@ -262,11 +231,12 @@ public class ProfileUserFragment extends Fragment {
         uploadCover = view.findViewById(R.id.coverCameraButton);
         coverPhoto = view.findViewById(R.id.coverPhoto);
         imgAvatar = view.findViewById(R.id.imgAvatar);
-        btn_logout = view.findViewById(R.id.btnSetting);  //logout
         tv_countFollower = view.findViewById(R.id.tvFollowerCount);
         tv_countFollowing = view.findViewById(R.id.tvFollowingCount);
         followingLayout = view.findViewById(R.id.following);
         followerLayout = view.findViewById(R.id.follower);
+        tv_fullname = view.findViewById(R.id.tvHeaderName);
+        btn_back = view.findViewById(R.id.btnBack);
     }
 
 
@@ -523,5 +493,17 @@ public class ProfileUserFragment extends Fragment {
             }
         });
     }
+    private void EventBackMenu(){
+        btn_back.setOnClickListener(v -> {
+            // Tạo instance của MenuFragment
+            MenuFragment menuFragment = new MenuFragment();
+            // Thay thế fragment hiện tại bằng MenuFragment
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, menuFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+    }
+
 
 }

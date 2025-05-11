@@ -52,7 +52,7 @@
         android:id="@+id/moreButton"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@android:drawable/ic_menu_more"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
         android:contentDescription="More options"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"

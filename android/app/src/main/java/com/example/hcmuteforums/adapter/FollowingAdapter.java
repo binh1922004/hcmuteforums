@@ -24,7 +24,7 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.View
     private OnMoreClickListener moreClickListener;
 
     public interface OnMoreClickListener {
-        void onMoreClick(String followId, int position);
+        void onMoreClick(String followId,String targetUsername ,int position);
     }
 
     public FollowingAdapter(Context context, OnMoreClickListener moreClickListener) {
@@ -58,11 +58,12 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.View
 
         // Lấy followId
         String followId = following.getFollowId();
+        String targetUsername = following.getUserGeneral().getUsername();
 
         // Xử lý sự kiện nhấn nút "More"
         holder.moreButton.setOnClickListener(v -> {
             if (moreClickListener != null) {
-                moreClickListener.onMoreClick(followId, position);
+                moreClickListener.onMoreClick(followId,targetUsername ,position);
             }
         });
     }

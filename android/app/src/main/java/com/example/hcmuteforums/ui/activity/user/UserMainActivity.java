@@ -3,12 +3,8 @@ package com.example.hcmuteforums.ui.activity.user;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,7 +20,7 @@ import com.example.hcmuteforums.ui.fragment.HomeFragment;
 import com.example.hcmuteforums.ui.fragment.MenuFragment;
 import com.example.hcmuteforums.ui.fragment.NotificationFragment;
 import com.example.hcmuteforums.ui.fragment.ProfileFragment;
-import com.example.hcmuteforums.ui.fragment.ProfileUserFragment;
+import com.example.hcmuteforums.ui.fragment.MyProfileUserFragment;
 import com.example.hcmuteforums.utils.WebSocketManager;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -35,7 +31,7 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
     NotificationFragment notificationFragment = new NotificationFragment();
     HomeFragment homeFragment = new HomeFragment();
     CategoryFragment categoryFragment = new CategoryFragment();
-    ProfileUserFragment profileUserFragment = new ProfileUserFragment();
+    MyProfileUserFragment myProfileUserFragment = new MyProfileUserFragment();
     MenuFragment menuFragment = new MenuFragment();
     int currentNoti = 0;
 

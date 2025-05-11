@@ -33,6 +33,12 @@ public class UserController {
                 .result(userService.getUserInfo())
                 .build();
     }
+    @GetMapping("/personInfo")
+    public ApiResponse<UserResponse> personInfo(@RequestParam String username) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUserInfoWithUserName(username))
+                .build();
+    }
 
     @PutMapping("/update")
     public ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {

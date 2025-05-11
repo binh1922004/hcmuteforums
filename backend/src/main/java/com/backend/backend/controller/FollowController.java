@@ -2,10 +2,7 @@ package com.backend.backend.controller;
 
 import com.backend.backend.dto.ApiResponse;
 import com.backend.backend.dto.request.FollowRequest;
-import com.backend.backend.dto.response.FollowResponse;
-import com.backend.backend.dto.response.FollowerResponse;
-import com.backend.backend.dto.response.FollowingResponse;
-import com.backend.backend.dto.response.PageResponse;
+import com.backend.backend.dto.response.*;
 import com.backend.backend.mapper.FollowMapper;
 import com.backend.backend.service.FollowService;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +27,9 @@ public class FollowController {
                 .build();
     }
     @DeleteMapping("/unfollow")
-    public ApiResponse<FollowResponse> unfollowUser(@RequestBody FollowRequest followRequest) {
+    public ApiResponse<FollowResponse> unfollowUser(@RequestParam String targetUsername) {
         return ApiResponse.<FollowResponse>builder()
-                .result(followService.unfollowUser(followRequest))
+                .result(followService.unfollowUser(targetUsername))
                 .build();
     }
     @GetMapping("/followers")
@@ -59,6 +56,15 @@ public class FollowController {
     ) {
         return ApiResponse.<PageResponse<FollowingResponse>>builder()
                 .result(followService.getFollowing(username, page, size, sortBy, direction))
+                .build();
+    }
+    @GetMapping("/check")
+    public ApiResponse<FollowStatusResponse> checkFollowStatus(
+            @RequestParam("currentUsername") String currentUsername,
+            @RequestParam("targetUsername") String targetUsername) {
+        boolean isFollowing = followService.checkFollowStatus(currentUsername, targetUsername);
+        return ApiResponse.<FollowStatusResponse>builder()
+                .result(new FollowStatusResponse(isFollowing))
                 .build();
     }
 }

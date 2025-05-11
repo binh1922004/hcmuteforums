@@ -43,6 +43,12 @@ public class ProfileService {
 
         return profileMapper.toProfileResponse(profile);
     }
+    public ProfileResponse getProfilePerson(String username) {
+        Profile profile = profileRepository.findProfileByUser_Username(username).orElseThrow(()->
+                new AppException(ErrorCode.USER_NOTEXISTED));
+
+        return profileMapper.toProfileResponse(profile);
+    }
     public Profile getAll(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
