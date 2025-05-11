@@ -109,8 +109,6 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
         isLastPageReplyChildMap = new HashMap<>();
         positionDelete = new HashMap<>();
         positionUpdate = new HashMap<>();
-        //support
-        loadingDialog = new LoadingDialogFragment();
         replyAdapterConfig();
 
         loadMoreReplies();
@@ -123,7 +121,15 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
 
         return view;
     }
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Ẩn dialog nếu đang hiển thị
+        if (loadingDialog != null && loadingDialog.isAdded()) {
+            loadingDialog.dismiss();
+            loadingDialog = null;
+        }
+    }
     private void cancelReply() {
         btnCancel.setOnClickListener(v -> {
             btnCancel.setVisibility(View.GONE);
@@ -176,11 +182,17 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
         replyViewModel.getIsLoading().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isLoading) {
-                if (isLoading){
-                    loadingDialog.show(getParentFragmentManager(), "LoadingDiaglog");
-                }
-                else{
-                    loadingDialog.dismiss();
+                if (isLoading) {
+                    // Chỉ hiển thị dialog nếu chưa được thêm
+                    if (loadingDialog == null || !loadingDialog.isAdded()) {
+                        loadingDialog = new LoadingDialogFragment();
+                        loadingDialog.show(getParentFragmentManager(), "LoadingDialog");
+                    }
+                } else {
+                    // Ẩn dialog nếu đang hiển thị
+                    if (loadingDialog != null && loadingDialog.isAdded()) {
+                        loadingDialog.dismiss();
+                    }
                 }
             }
         });

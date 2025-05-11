@@ -1,9 +1,20 @@
 package com.example.hcmuteforums.ui.activity.user;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +30,7 @@ import com.example.hcmuteforums.data.remote.interceptor.LocalAuthInterceptor;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.listeners.OnNotificationListener;
 import com.example.hcmuteforums.model.dto.NotificationDTO;
+import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.ui.fragment.CategoryFragment;
 import com.example.hcmuteforums.ui.fragment.HomeFragment;
 import com.example.hcmuteforums.ui.fragment.MenuFragment;
@@ -41,6 +53,13 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
 
     //Websocket
     WebSocketManager webSocketManager;
+
+    //banner
+    private LinearLayout notificationBanner;
+    private TextView notificationMessage;
+    private ImageView notificationClose;
+    private Handler bannerHandler;
+    private static final long BANNER_DURATION = 5000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,11 +82,56 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
         //set up for websocket
         webSocketManager = WebSocketManager.getInstance();
         connectWebSocket();
+        //banner for notification
+        bannerConfig();
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void bannerConfig() {
+        // Khởi tạo banner
+        notificationBanner = findViewById(R.id.banner_notification);
+        notificationMessage = findViewById(R.id.notification_message);
+        notificationClose = findViewById(R.id.notification_close);
+        bannerHandler = new Handler(Looper.getMainLooper());
+
+        // Sự kiện đóng banner
+        notificationClose.setOnClickListener(v -> hideNotificationBanner());
+
+    }
+
+    private void showNotificationBanner(NotificationDTO notification) {
+        // Cập nhật nội dung banner
+        notificationMessage.setText(notification.getContent());
+        String sender = notification.getSenderName();
+        String message = sender + notification.getContent();
+        SpannableString spannable = new SpannableString(message);
+
+        // In đậm tên người gửi
+        spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, sender.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        notificationMessage.setText(spannable);
+        notificationBanner.setVisibility(View.VISIBLE);
+
+        // Sự kiện nhấn vào banner (chuyển đến NotificationFragment hoặc activity chi tiết)
+        notificationBanner.setOnClickListener(v -> {
+            Intent topicIntent = new Intent(this, TopicDetailActivity.class);
+            topicIntent.putExtra("topicId", notification.getTopicId());
+            if (notification.getType().equals("REPLY"))
+                topicIntent.putExtra("replyId", notification.getActionId());
+            startActivity(topicIntent);
+        });
+
+        // Tự động ẩn sau BANNER_DURATION
+        bannerHandler.removeCallbacksAndMessages(null);
+        bannerHandler.postDelayed(this::hideNotificationBanner, BANNER_DURATION);
+    }
+
+    private void hideNotificationBanner() {
+        notificationBanner.setVisibility(View.GONE);
     }
 
     @Override
@@ -165,7 +229,9 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
 
     @Override
     public void onNewNotification(NotificationDTO notificationData) {
-
+        runOnUiThread(() -> {
+            showNotificationBanner(notificationData);
+        });
     }
 
     @Override
