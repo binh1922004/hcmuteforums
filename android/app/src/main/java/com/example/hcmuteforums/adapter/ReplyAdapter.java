@@ -317,7 +317,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                     public boolean onMenuItemClick(android.view.MenuItem item) {
                         int itemId = item.getItemId();
                         if (itemId == R.id.actionCopy){
-
+                            onMenuActionListener.onCopy(reply.getContent());
                         }
                         else if (itemId == R.id.actionEdit){
                             onMenuActionListener.onUpdate(reply.getId(), reply.getContent(), pos);

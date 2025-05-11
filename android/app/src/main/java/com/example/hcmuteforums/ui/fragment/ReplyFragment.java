@@ -1,6 +1,9 @@
 package com.example.hcmuteforums.ui.fragment;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -109,8 +112,6 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
         isLastPageReplyChildMap = new HashMap<>();
         positionDelete = new HashMap<>();
         positionUpdate = new HashMap<>();
-        //support
-        loadingDialog = new LoadingDialogFragment();
         replyAdapterConfig();
 
         loadMoreReplies();
@@ -123,7 +124,15 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
 
         return view;
     }
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Ẩn dialog nếu đang hiển thị
+        if (loadingDialog != null && loadingDialog.isAdded()) {
+            loadingDialog.dismiss();
+            loadingDialog = null;
+        }
+    }
     private void cancelReply() {
         btnCancel.setOnClickListener(v -> {
             btnCancel.setVisibility(View.GONE);
@@ -176,11 +185,17 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
         replyViewModel.getIsLoading().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isLoading) {
-                if (isLoading){
-                    loadingDialog.show(getParentFragmentManager(), "LoadingDiaglog");
-                }
-                else{
-                    loadingDialog.dismiss();
+                if (isLoading) {
+                    // Chỉ hiển thị dialog nếu chưa được thêm
+                    if (loadingDialog == null || !loadingDialog.isAdded()) {
+                        loadingDialog = new LoadingDialogFragment();
+                        loadingDialog.show(getParentFragmentManager(), "LoadingDialog");
+                    }
+                } else {
+                    // Ẩn dialog nếu đang hiển thị
+                    if (loadingDialog != null && loadingDialog.isAdded()) {
+                        loadingDialog.dismiss();
+                    }
                 }
             }
         });
@@ -352,5 +367,14 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
     public void onDelete(String replyId, int pos) {
         positionDelete.put(replyId, pos);
         replyViewModel.deleteReply(replyId);
+    }
+
+    @Override
+    public void onCopy(String content) {
+        // Sao chép văn bản vào clipboard
+        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("label", content);
+        clipboard.setPrimaryClip(clip);
+        // Thông báo cho người dùng
     }
 }
