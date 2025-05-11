@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -73,9 +74,8 @@ public class NotificationService {
     }
 
     public Boolean deleteNotification(String actionId) {
-        Notification notification = notificationRepository.findNotificationByActionId(actionId).orElseThrow(()
-                -> new AppException(ErrorCode.NOTIFICATION_NOT_FOUND));
-        notificationRepository.delete(notification);
+        Optional<Notification> notification = notificationRepository.findNotificationByActionId(actionId);
+        notification.ifPresent(notificationRepository::delete);
         return true;
     }
     public PageResponse<NotificationDTO> getNotifications(

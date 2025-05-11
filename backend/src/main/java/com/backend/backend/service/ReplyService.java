@@ -109,10 +109,11 @@ public class ReplyService {
         return toReplyResponse(replyRepository.save(reply));
     }
     @Transactional
-    public Boolean deleteReply(String replyId){
+    public String deleteReply(String replyId){
         replyRepository.deleteRepliesByParentReplyId(replyId);
         replyRepository.deleteById(replyId);
-        return true;
+        notificationService.deleteNotification(replyId);
+        return replyId;
     }
 
     public boolean isOwner(String replyId){
@@ -198,6 +199,7 @@ public class ReplyService {
         if (reply.getChildReplies() != null && !reply.getChildReplies().isEmpty()) {
             replyResponse.setHasChild(true);
         }
+        replyResponse.setOwner(isOwner(reply.getId()));
         return replyResponse;
     }
 }

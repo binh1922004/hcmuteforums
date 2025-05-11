@@ -38,8 +38,8 @@ public class ReplyController {
 
     @DeleteMapping("/delete")
     @PreAuthorize("@replyService.isOwner(#replyId)")
-    public ApiResponse<Boolean> deleteReply(String replyId){
-        return ApiResponse.<Boolean>builder()
+    public ApiResponse<String> deleteReply(String replyId){
+        return ApiResponse.<String>builder()
                 .result(replyService.deleteReply(replyId))
                 .build();
     }
