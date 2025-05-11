@@ -27,10 +27,12 @@ public class ProfileViewModel extends ViewModel {
         profileRepository = ProfileRepository.getInstance();
     }
     private final MutableLiveData<ProfileResponse> profileInfo = new MutableLiveData<>();
+    private final MutableLiveData<ProfileResponse> personProfileInfo = new MutableLiveData<>();
     private final MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
     private final MutableLiveData<Event<String>> messageSuccess = new MutableLiveData<>();
 
     private final MutableLiveData<Event<Boolean>> profileInfoError = new MutableLiveData<>();
+    private final MutableLiveData<Event<Boolean>> personProfileInfoError = new MutableLiveData<>();
 
     private final MutableLiveData<Event<Boolean>> profileUpdateResponse = new MutableLiveData<>();
 
@@ -45,6 +47,19 @@ public class ProfileViewModel extends ViewModel {
     public LiveData<Event<String>> getMessageError(){
         return messageError;
     }
+
+    public MutableLiveData<ProfileResponse> getPersonProfileInfo() {
+        return personProfileInfo;
+    }
+
+    public MutableLiveData<Event<String>> getMessageSuccess() {
+        return messageSuccess;
+    }
+
+    public MutableLiveData<Event<Boolean>> getPersonProfileInfoError() {
+        return personProfileInfoError;
+    }
+
     public LiveData<ProfileResponse> getProfileInfo(){
         return profileInfo;
     }
@@ -83,6 +98,37 @@ public class ProfileViewModel extends ViewModel {
               profileInfoError.setValue(new Event<>(true));
           }
       });
+    }
+    public void getPersonProfile(String username){
+        profileRepository.getPersonProfile(username, new Callback<ApiResponse<ProfileResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ProfileResponse>> call, Response<ApiResponse<ProfileResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<ProfileResponse> apiRes = response.body();
+                    if (apiRes.getResult() != null) {
+                        personProfileInfo.setValue(apiRes.getResult());
+                    } else {
+                        personProfileInfoError.setValue(new Event<>(true));
+                    }
+                } else {
+                    if (response.errorBody() != null) {
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(), ApiErrorResponse.class);
+                        if (apiError.getMessage() != null && !apiError.getMessage().trim().isEmpty()) {
+                            messageError.setValue(new Event<>(apiError.getMessage()));
+                        } else {
+                            messageError.setValue(new Event<>("Đã xảy ra lỗi không xác định."));
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ProfileResponse>> call, Throwable throwable) {
+                Log.d("Error PersonProfileInfo", throwable.getMessage());
+                personProfileInfoError.setValue(new Event<>(true));
+            }
+        });
     }
     public void updateProfile(String bio){
         profileRepository.updateProfile(bio, new Callback<ApiResponse<ProfileResponse>>() {

@@ -29,6 +29,8 @@ public class UserRepository {
     private final MutableLiveData<UserResponse> userInfo = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> userInfoError = new MutableLiveData<>();
 
+    private final MutableLiveData<UserResponse> personInfo = new MutableLiveData<>();
+    private final MutableLiveData<Event<Boolean>> personInfoError = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> userUpdateError = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> updateResponse = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> updatePasswordResponse = new MutableLiveData<>();
@@ -51,6 +53,10 @@ public class UserRepository {
         var call = userApi.myInfo();
         call.enqueue(callback);
     }
+    public void getInfoPerson(String username, Callback<ApiResponse<UserResponse>> callback){
+        var call = userApi.personInfo(username);
+        call.enqueue(callback);
+    }
 
     public void register(UserCreationRequest userCreationRequest, Callback<ApiResponse<Boolean>> callback) {
         var call = userApi.register(userCreationRequest);
@@ -66,6 +72,13 @@ public class UserRepository {
         call.enqueue(callback);
     }
 
+    public MutableLiveData<UserResponse> getPersonInfo() {
+        return personInfo;
+    }
+
+    public MutableLiveData<Event<Boolean>> getPersonInfoError() {
+        return personInfoError;
+    }
     // Getters
 
     public MutableLiveData<Event<Boolean>> getRegisterResponse() {

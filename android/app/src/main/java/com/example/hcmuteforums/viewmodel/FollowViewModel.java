@@ -2,6 +2,7 @@ package com.example.hcmuteforums.viewmodel;
 
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -12,6 +13,7 @@ import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.request.FollowRequest;
 import com.example.hcmuteforums.model.dto.response.FollowResponse;
+import com.example.hcmuteforums.model.dto.response.FollowStatusResponse;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
 import com.google.gson.Gson;
@@ -30,6 +32,9 @@ public class FollowViewModel extends ViewModel {
     private MutableLiveData<PageResponse<FollowerResponse>> getListFollower = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> getFollowerError = new MutableLiveData<>();
     private MutableLiveData<PageResponse<FollowingResponse>> getListFollowing = new MutableLiveData<>();
+    private MutableLiveData<PageResponse<FollowingResponse>> getListFollowingCurrentUser = new MutableLiveData<>(); // Dành cho currentUser
+    private  MutableLiveData<Event<Boolean>> followStatus = new MutableLiveData<>();
+    private  MutableLiveData<Event<Boolean>> errorFollowStatus = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> getFollowingError = new MutableLiveData<>();
     private MutableLiveData<Event<String>> messageError = new MutableLiveData<>();
 
@@ -49,8 +54,19 @@ public class FollowViewModel extends ViewModel {
         return unFollowError;
     }
 
+    public MutableLiveData<Event<Boolean>> getErrorFollowStatus() {
+        return errorFollowStatus;
+    }
+
+    public LiveData<Event<Boolean>> getFollowStatus() {
+        return followStatus;
+    }
     public MutableLiveData<PageResponse<FollowerResponse>> getGetListFollower() {
         return getListFollower;
+    }
+
+    public MutableLiveData<PageResponse<FollowingResponse>> getGetListFollowingCurrentUser() {
+        return getListFollowingCurrentUser;
     }
 
     public MutableLiveData<Event<Boolean>> getGetFollowerError() {
@@ -142,11 +158,11 @@ public class FollowViewModel extends ViewModel {
 
                 } else {
                     if (response.errorBody() != null) {
-//                        Gson gson = new Gson();
-//                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
-//                                ApiErrorResponse.class);
-//                        Log.d("Message", apiError.getMessage());
-                        messageError.setValue(new Event<>("loi"));
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        Log.d("Message", apiError.getMessage());
+                        messageError.setValue(new Event<>(apiError.getMessage()));
                     }
                     getFollowerError.setValue(new Event<>(true));
                 }
@@ -166,16 +182,21 @@ public class FollowViewModel extends ViewModel {
                 if(response.isSuccessful() && response.body()!=null){
                     ApiResponse<PageResponse<FollowingResponse>> apiResponse = response.body();
                     if(apiResponse.getResult()!=null){
-                        getListFollowing.setValue(apiResponse.getResult());
+                        if (username.equals("default_user")) { // Giả định "default_user" là currentUserUsername
+                            getListFollowingCurrentUser.setValue(apiResponse.getResult());
+                        } else {
+                            getListFollowing.setValue(apiResponse.getResult());
+                        }
+
                     }else{
                         getFollowingError.setValue(new Event<>(true));
                     }
                 }else {
                     if (response.errorBody() != null) {
-//                        Gson gson = new Gson();
-//                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
-//                                ApiErrorResponse.class);
-                        messageError.setValue(new Event<>("Loi"));
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        messageError.setValue(new Event<>(apiError.getMessage()));
                     }
                     getFollowingError.setValue(new Event<>(true));
                 }
@@ -185,6 +206,29 @@ public class FollowViewModel extends ViewModel {
             public void onFailure(Call<ApiResponse<PageResponse<FollowingResponse>>> call, Throwable throwable) {
                 Log.e("Get Followings", throwable.getMessage());
                 getFollowingError.setValue(new Event<>(true));
+            }
+        });
+    }
+    public void checkFollowStatus(String currentUsername, String targetUsername) {
+        followRespository.checkFollowStatus(currentUsername, targetUsername, new Callback<ApiResponse<FollowStatusResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<FollowStatusResponse>> call, Response<ApiResponse<FollowStatusResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getResult() != null) {
+                    boolean isFollowing = response.body().getResult().isFollowing();
+                    followStatus.setValue(new Event<>(isFollowing));
+                    Log.d("FollowViewModel", "Check follow status success: " + isFollowing);
+                } else {
+                    followStatus.setValue(new Event<>(false));
+                    messageError.setValue(new Event<>("Lỗi khi kiểm tra trạng thái theo dõi"));
+                    Log.d("FollowViewModel", "Check follow status failed: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<FollowStatusResponse>> call, Throwable t) {
+                followStatus.setValue(new Event<>(false));
+                messageError.setValue(new Event<>("Không thể kết nối đến server"));
+                Log.e("FollowViewModel", "Check follow status error: " + t.getMessage());
             }
         });
     }

@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,16 +21,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.FollowerAdapter;
 import com.example.hcmuteforums.adapter.FollowingAdapter;
-
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
-import com.example.hcmuteforums.model.modelAdapter.User;
 import com.example.hcmuteforums.viewmodel.FollowViewModel;
 import com.google.android.material.tabs.TabLayout;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class FollowFragment extends Fragment {
 
@@ -39,56 +42,69 @@ public class FollowFragment extends Fragment {
     private ImageButton backButton;
     private List<FollowerResponse> followerResponses;
     private List<FollowingResponse> followingResponses;
+    private Set<String> followingUsernames; // Danh sách username của những người đang follow
     private String username;
     private FollowViewModel followViewModel;
+    TextView tv_username;
+    private int defaultTab = 1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Lấy username từ Bundle hoặc nguồn khác
         if (getArguments() != null) {
             username = getArguments().getString("username", "default_username");
+            defaultTab = getArguments().getInt("defaultTab", 1);
         } else {
             username = "default_username";
         }
         Log.d("Username", username);
-        // Khởi tạo ViewModel
+        Log.d("DefaultTab", String.valueOf(defaultTab));
         followViewModel = new ViewModelProvider(this).get(FollowViewModel.class);
+        followingUsernames = new HashSet<>();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_follow, container, false);
 
-        // Khởi tạo nút quay lại
         backButton = view.findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getActivity() != null) {
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
-            }
-        });
+        tv_username = view.findViewById(R.id.tvUsername);
+        tv_username.setText(username);
 
-        // Khởi tạo RecyclerView
+        EventBackProfile();
+
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Khởi tạo Adapter
-        followerAdapter = new FollowerAdapter(getContext(), this::handleFollowClick, this::handleMoreClick);
-        followingAdapter = new FollowingAdapter(getContext(), this::handleMoreClick);
+        // Khởi tạo Adapter với các listener riêng
+        followerAdapter = new FollowerAdapter(
+                getContext(),
+                this::handleFollowClick,
+                this::handleFollowerMoreClick
+        );
+        followingAdapter = new FollowingAdapter(
+                getContext(),
+                this::handleFollowingMoreClick
+        );
 
-        // Mặc định sử dụng followingAdapter
-        recyclerView.setAdapter(followingAdapter);
-
-        // Khởi tạo TabLayout
         tabLayout = view.findViewById(R.id.tabLayout);
+        initializeTabs();
 
-        fetchFollowData();
         setupObservers();
+        fetchFollowData();
 
         return view;
+    }
+    private void EventBackProfile(){
+        backButton.setOnClickListener(v -> {
+            // Tạo instance của MenuFragment
+            MyProfileUserFragment myProfileUserFragment = new MyProfileUserFragment();
+            // Thay thế fragment hiện tại bằng MenuFragment
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, myProfileUserFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
 
     private void fetchFollowData() {
@@ -97,13 +113,13 @@ public class FollowFragment extends Fragment {
     }
 
     private void setupObservers() {
-        // Quan sát danh sách Followers
         followViewModel.getGetListFollower().observe(getViewLifecycleOwner(), new Observer<PageResponse<FollowerResponse>>() {
             @Override
             public void onChanged(PageResponse<FollowerResponse> pageResponse) {
                 if (pageResponse != null) {
                     followerResponses = pageResponse.getContent();
-                    updateTabsAndData();
+                    Log.d("FollowFragment", "Follower data loaded: " + (followerResponses != null ? followerResponses.size() : 0));
+                    updateFollowerData();
                 }
             }
         });
@@ -123,12 +139,19 @@ public class FollowFragment extends Fragment {
             public void onChanged(PageResponse<FollowingResponse> pageResponse) {
                 if (pageResponse != null) {
                     followingResponses = pageResponse.getContent();
-                    updateTabsAndData();
+                    Log.d("FollowFragment", "Following data loaded: " + (followingResponses != null ? followingResponses.size() : 0));
+                    // Cập nhật danh sách followingUsernames
+                    followingUsernames.clear();
+                    if (followingResponses != null) {
+                        for (FollowingResponse following : followingResponses) {
+                            followingUsernames.add(following.getUserGeneral().getUsername());
+                        }
+                    }
+                    updateFollowingData();
                 }
             }
         });
 
-        // Quan sát lỗi khi lấy Following
         followViewModel.getGetFollowingError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
             public void onChanged(Event<Boolean> event) {
@@ -139,7 +162,6 @@ public class FollowFragment extends Fragment {
             }
         });
 
-        // Quan sát thông báo lỗi từ API
         followViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
             public void onChanged(Event<String> event) {
@@ -150,42 +172,50 @@ public class FollowFragment extends Fragment {
             }
         });
 
-        // Quan sát sự kiện follow thành công
         followViewModel.getToFollowSuccess().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
             public void onChanged(Event<Boolean> event) {
                 Boolean success = event.getContent();
                 if (success != null && success) {
                     Toast.makeText(getContext(), "Theo dõi thành công", Toast.LENGTH_SHORT).show();
-                    fetchFollowData();
+                    // Cập nhật trạng thái nút "Theo dõi" thành ẩn
+                    if (followerAdapter != null) {
+                        followerAdapter.updateButtonVisibility(targetUsername, false); // Ẩn nút
+                    }
+                    fetchFollowData(); // Làm mới dữ liệu để đồng bộ
                 }
             }
         });
 
-        // Quan sát sự kiện follow thất bại
         followViewModel.getToFollowError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
             public void onChanged(Event<Boolean> event) {
                 Boolean error = event.getContent();
                 if (error != null && error) {
                     Toast.makeText(getContext(), "Lỗi khi theo dõi", Toast.LENGTH_SHORT).show();
+                    // Nếu follow thất bại, khôi phục trạng thái nút
+                    if (followerAdapter != null) {
+                        followerAdapter.updateButtonVisibility(targetUsername, true); // Hiện lại nút
+                    }
                 }
             }
         });
 
-        // Quan sát sự kiện unfollow thành công
         followViewModel.getUnFollowSuccess().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
             public void onChanged(Event<Boolean> event) {
                 Boolean success = event.getContent();
                 if (success != null && success) {
                     Toast.makeText(getContext(), "Bỏ theo dõi thành công", Toast.LENGTH_SHORT).show();
-                    fetchFollowData();
+                    // Cập nhật trạng thái nút "Theo dõi" thành hiện
+                    if (followerAdapter != null) {
+                        followerAdapter.updateButtonVisibility(targetUsername, true); // Hiện lại nút
+                    }
+                    fetchFollowData(); // Làm mới dữ liệu để đồng bộ
                 }
             }
         });
 
-        // Quan sát sự kiện unfollow thất bại
         followViewModel.getUnFollowError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
             public void onChanged(Event<Boolean> event) {
@@ -197,81 +227,116 @@ public class FollowFragment extends Fragment {
         });
     }
 
-    private void updateTabsAndData() {
-//        if (followerResponses != null && followingResponses != null) {
-//            // Cập nhật tab với số lượng
-//            tabLayout.removeAllTabs();
-//            tabLayout.addTab(tabLayout.newTab().setText(followerResponses.size() + " Người theo dõi"));
-//            tabLayout.addTab(tabLayout.newTab().setText(followingResponses.size() + " Đang theo dõi"));
-//            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-//
-//            // Xử lý sự kiện khi chọn tab
-//            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-//                @Override
-//                public void onTabSelected(TabLayout.Tab tab) {
-//                    if (tab.getPosition() == 0) {
-//                        // Hiển thị danh sách Người theo dõi
-//                        recyclerView.setAdapter(followerAdapter);
-//                        followerAdapter.updateData(followerResponses);
-//                    } else if (tab.getPosition() == 1) {
-//                        // Hiển thị danh sách Đang theo dõi
-//                        recyclerView.setAdapter(followingAdapter);
-//                        followingAdapter.updateData(followingResponses);
-//                    }
-//                }
-//
-//                @Override
-//                public void onTabUnselected(TabLayout.Tab tab) {}
-//
-//                @Override
-//                public void onTabReselected(TabLayout.Tab tab) {}
-//            });
-//
-//            // Hiển thị danh sách mặc định (Đang theo dõi)
-//            recyclerView.setAdapter(followingAdapter);
-//            followingAdapter.updateData(followingResponses);
-//        }
-        if(followerResponses!=null){
-            Log.d("Follower ID", followerResponses.get(0).getFollowId());
-            Log.d("Avatar Id", followerResponses.get(0).getUserGeneral().getAvt());
-            // Cập nhật tab với số lượng
-            tabLayout.removeAllTabs();
-            tabLayout.addTab(tabLayout.newTab().setText(followerResponses.size() + " Người theo dõi"));
-            //tabLayout.addTab(tabLayout.newTab().setText(followingResponses.size() + " Đang theo dõi"));
-            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+    private void initializeTabs() {
+        tabLayout.removeAllTabs();
+        tabLayout.addTab(tabLayout.newTab().setText("0 Người theo dõi"));
+        tabLayout.addTab(tabLayout.newTab().setText("0 Đang theo dõi"));
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-            // Xử lý sự kiện khi chọn tab
-            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                @Override
-                public void onTabSelected(TabLayout.Tab tab) {
-                    if (tab.getPosition() == 0) {
-                        // Hiển thị danh sách Người theo dõi
-                        recyclerView.setAdapter(followerAdapter);
-                        followerAdapter.updateData(followerResponses);
-                    }
-                }
+        if (defaultTab == 0) {
+            recyclerView.setAdapter(followerAdapter);
+            followerAdapter.updateData(new ArrayList<>(), followingUsernames);
+        } else {
+            recyclerView.setAdapter(followingAdapter);
+            followingAdapter.updateData(new ArrayList<>());
+        }
+        if (defaultTab == 0 || defaultTab == 1) {
+            tabLayout.getTabAt(defaultTab).select();
+        }
 
-                @Override
-                public void onTabUnselected(TabLayout.Tab tab) {}
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                updateTabContent(tab.getPosition());
+            }
 
-                @Override
-                public void onTabReselected(TabLayout.Tab tab) {}
-            });
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                updateTabContent(tab.getPosition());
+            }
+        });
+    }
+
+    private void updateTabContent(int position) {
+        if (position == 0) {
+            recyclerView.setAdapter(followerAdapter);
+            if (followerResponses != null && !followerResponses.isEmpty()) {
+                followerAdapter.updateData(followerResponses, followingUsernames);
+            } else {
+                followerAdapter.updateData(new ArrayList<>(), followingUsernames);
+                Toast.makeText(getContext(), "Tài khoản này không có người theo dõi.", Toast.LENGTH_SHORT).show();
+            }
+        } else if (position == 1) {
+            recyclerView.setAdapter(followingAdapter);
+            if (followingResponses != null && !followingResponses.isEmpty()) {
+                followingAdapter.updateData(followingResponses);
+            } else {
+                followingAdapter.updateData(new ArrayList<>());
+                Toast.makeText(getContext(), "Tài khoản này không theo dõi ai.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    private void handleFollowClick(String followId, String targetUsername, int position) {
-        if (followerResponses == null || position >= followerResponses.size()) return;
-
-        // Giả định nút "Theo dõi" chuyển thành "Bỏ theo dõi" sau khi nhấn
-        // Hiện tại tôi sẽ gọi toFollow() hoặc unFollow() trực tiếp
-        // Bạn có thể thêm logic để kiểm tra trạng thái (ví dụ: gọi API kiểm tra isFollowing)
-        followViewModel.toFollow(targetUsername); // Hoặc unFollow nếu cần logic toggle
+    private void updateFollowerData() {
+        int followerCount = (followerResponses != null) ? followerResponses.size() : 0;
+        TabLayout.Tab followerTab = tabLayout.getTabAt(0);
+        if (followerTab != null) {
+            followerTab.setText(followerCount + " Người theo dõi");
+        }
+        if (tabLayout.getSelectedTabPosition() == 0) {
+            updateTabContent(0);
+        }
     }
 
-    private void handleMoreClick(String followId, int position) {
-        // Xử lý khi nhấn nút More (ví dụ: mở PopupMenu)
-        Toast.makeText(getContext(), "More clicked for followId: " + followId, Toast.LENGTH_SHORT).show();
+    private void updateFollowingData() {
+        int followingCount = (followingResponses != null) ? followingResponses.size() : 0;
+        TabLayout.Tab followingTab = tabLayout.getTabAt(1);
+        if (followingTab != null) {
+            followingTab.setText(followingCount + " Đang theo dõi");
+        }
+        if (tabLayout.getSelectedTabPosition() == 1) {
+            updateTabContent(1);
+        }
     }
+
+    private void handleFollowClick(String followId, String targetUsername, int position, boolean isFollowing) {
+        if (followViewModel != null) {
+            this.targetUsername = targetUsername; // Lưu targetUsername để sử dụng trong setupObservers
+            if (isFollowing) {
+                followViewModel.unFollow(targetUsername); // Bỏ theo dõi
+            } else {
+                followViewModel.toFollow(targetUsername); // Theo dõi
+            }
+        }
+    }
+
+    // Xử lý "More" cho FollowerAdapter
+    private void handleFollowerMoreClick(String followId, int position) {
+        Toast.makeText(getContext(), "More clicked for follower followId: " + followId, Toast.LENGTH_SHORT).show();
+    }
+
+    // Xử lý "More" cho FollowingAdapter
+    private void handleFollowingMoreClick(String followId, String targetUsername, int position) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), recyclerView.getChildAt(position).findViewById(R.id.moreButton));
+        popupMenu.getMenu().add(0, 1, 0, "Bỏ theo dõi");
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == 1) {
+                if (followViewModel != null) {
+                    this.targetUsername = targetUsername; // Lưu targetUsername để sử dụng trong setupObservers
+                    followViewModel.unFollow(targetUsername);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        popupMenu.show();
+    }
+
+    // Thêm biến instance để lưu targetUsername
+    private String targetUsername;
 }

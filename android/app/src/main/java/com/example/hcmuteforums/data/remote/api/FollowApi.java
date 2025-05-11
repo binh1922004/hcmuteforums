@@ -7,6 +7,7 @@ import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.request.FollowRequest;
 import com.example.hcmuteforums.model.dto.response.FollowResponse;
+import com.example.hcmuteforums.model.dto.response.FollowStatusResponse;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
 
@@ -21,7 +22,7 @@ public interface FollowApi {
     @POST("api/follow")
     Call<ApiResponse<FollowResponse>> followUser(@Body FollowRequest followRequest);
     @DELETE("api/follow/unfollow")
-    Call<ApiResponse<FollowResponse>> unfollowUser(@Body FollowRequest followRequest);
+    Call<ApiResponse<FollowResponse>> unfollowUser(@Query("targetUsername")  String targetUsername);
     @GET("api/follow/followers")
     Call<ApiResponse<PageResponse<FollowerResponse>>> getFollowers(
             @Query("username") String username,
@@ -32,5 +33,10 @@ public interface FollowApi {
     Call<ApiResponse<PageResponse<FollowingResponse>>> getFollowings(
             @Query("username") String username,
             @Query("page") int page
+    );
+    @GET("api/follow/check")
+    Call<ApiResponse<FollowStatusResponse>> checkFollowStatus(
+            @Query("currentUsername") String currentUsername,
+            @Query("targetUsername") String targetUsername
     );
 }
