@@ -75,7 +75,7 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
         super.onResume();
         // Đăng ký lắng nghe thông báo
         webSocketManager.addNotificationListener(this);
-
+        currentNoti = webSocketManager.getUnreadNotificationCount(); // Cập nhật currentNoti
         // Cập nhật trạng thái badge ngay khi activity được resume
         updateNotificationBadge(webSocketManager.hasUnreadNotifications());
     }
@@ -103,6 +103,7 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
            }
            if (itemId == R.id.itemNotification){
                currentNoti = 0;
+               webSocketManager.markAllNotificationsAsRead();
                updateNotificationBadge(false);
                setCurrentFragment(notificationFragment);
            }
@@ -129,7 +130,7 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
         // Ngắt kết nối WebSocket khi activity bị hủy
         // Tùy theo yêu cầu của ứng dụng, bạn có thể chọn giữ kết nối
         // nếu muốn nhận thông báo ngay cả khi ứng dụng đang chạy nền
-        // webSocketManager.disconnect();
+         webSocketManager.disconnect();
     }
 
     private void connectWebSocket() {
@@ -148,21 +149,17 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
 
     // Phương thức để cập nhật badge thông báo
     private void updateNotificationBadge(boolean hasUnread) {
+        BadgeDrawable badge = bottomNavigationView.getOrCreateBadge(R.id.itemNotification);
+
         if (hasUnread) {
-            // Tạo và hiển thị badge
-            BadgeDrawable badge = bottomNavigationView.getOrCreateBadge(R.id.itemNotification);
+            // Chỉ tăng currentNoti nếu có thông báo mới thực sự
             badge.setVisible(true);
-            // Không hiển thị số, chỉ hiển thị badge
-            currentNoti++;
-            badge.setNumber(currentNoti);
-        }
-        else {
-            // Ẩn badge
-            BadgeDrawable badge = bottomNavigationView.getBadge(R.id.itemNotification);
-            if (badge != null) {
-                badge.setVisible(false);
-                bottomNavigationView.removeBadge(R.id.itemNotification);
-            }
+            badge.setNumber(currentNoti); // Hiển thị số lượng hiện tại
+        } else {
+            // Ẩn badge và đặt lại currentNoti
+            currentNoti = 0;
+            badge.setVisible(false);
+            bottomNavigationView.removeBadge(R.id.itemNotification);
         }
     }
 
@@ -174,6 +171,7 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
     @Override
     public void onNotificationStatusChanged(boolean hasUnread) {
         runOnUiThread(() -> {
+            currentNoti = webSocketManager.getUnreadNotificationCount(); // Cập nhật currentNoti
             updateNotificationBadge(hasUnread);
         });
     }

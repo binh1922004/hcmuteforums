@@ -21,6 +21,7 @@ import com.example.hcmuteforums.listeners.OnNotificationClickListener;
 import com.example.hcmuteforums.model.dto.NotificationDTO;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
+import com.example.hcmuteforums.utils.WebSocketManager;
 import com.example.hcmuteforums.viewmodel.NotificationViewModel;
 import com.google.android.material.button.MaterialButton;
 
@@ -142,6 +143,7 @@ public class NotificationFragment extends Fragment implements OnNotificationClic
     public void onResume() {
         super.onResume();
         currentPage = 0;
+        WebSocketManager.getInstance().markAllNotificationsAsRead(); // Đánh dấu đã đọc
         notificationAdapter.clearData();
         showMoreData();
     }
