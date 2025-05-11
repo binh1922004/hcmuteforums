@@ -1,6 +1,9 @@
 package com.example.hcmuteforums.ui.fragment;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -364,5 +367,14 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
     public void onDelete(String replyId, int pos) {
         positionDelete.put(replyId, pos);
         replyViewModel.deleteReply(replyId);
+    }
+
+    @Override
+    public void onCopy(String content) {
+        // Sao chép văn bản vào clipboard
+        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("label", content);
+        clipboard.setPrimaryClip(clip);
+        // Thông báo cho người dùng
     }
 }

@@ -1,6 +1,11 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -365,5 +370,15 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     public void onDelete(String replyId, int pos) {
         positionDelete.put(replyId, pos);
         replyViewModel.deleteReply(replyId);
+    }
+
+    @Override
+    public void onCopy(String content) {
+        // Sao chép văn bản vào clipboard
+        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("label", content);
+        clipboard.setPrimaryClip(clip);
+        // Thông báo cho người dùng
+        Toast.makeText(getContext(), "Đã sao chép!", Toast.LENGTH_SHORT).show();
     }
 }
