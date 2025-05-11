@@ -37,6 +37,6 @@ public class Notification {
     @JoinColumn(name = "received_user_id", nullable = false)
     private User recieveUser;
     @ManyToOne
-    @JoinColumn(name = "topic_id", nullable = false)
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 }

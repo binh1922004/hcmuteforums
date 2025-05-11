@@ -50,10 +50,9 @@ public class TopicController {
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("@topicService.isOwner(#id)")
-    public ApiResponse<String> deleteTopic(@PathVariable String id) {
-        topicService.deleteTopic(id);
-        return ApiResponse.<String>builder()
-                .result("Đã xoá bài viết")
+    public ApiResponse<Boolean> deleteTopic(@PathVariable String id) {
+        return ApiResponse.<Boolean>builder()
+                .result(topicService.deleteTopic(id))
                 .build();
     }
 

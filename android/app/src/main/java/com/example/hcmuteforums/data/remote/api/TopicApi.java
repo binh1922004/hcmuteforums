@@ -3,6 +3,7 @@ package com.example.hcmuteforums.data.remote.api;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.request.TopicPostRequest;
+import com.example.hcmuteforums.model.dto.request.TopicUpdateRequest;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 
 import java.util.List;
@@ -10,9 +11,11 @@ import java.util.List;
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -25,10 +28,10 @@ public interface TopicApi {
 
     @POST("api/topics/post")
     Call<ApiResponse<TopicDetailResponse>> postTopic(@Body TopicPostRequest topicPostRequest);
-    @POST("api/topics/delete/{id}")
+    @DELETE("api/topics/delete/{id}")
     Call<ApiResponse<Boolean>> deleteTopic(@Path("id") String id);
-    @POST("api/topics/update/{id}")
-    Call<ApiResponse<TopicDetailResponse>> updateTopic(@Path("id") String id);
+    @PUT("api/topics/update/{id}")
+    Call<ApiResponse<TopicDetailResponse>> updateTopic(@Path("id") String id, @Body TopicUpdateRequest topicUpdateRequest);
 
     @Multipart
     @POST("api/topic-images/{topicId}/upload")

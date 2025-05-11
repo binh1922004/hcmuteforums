@@ -14,6 +14,7 @@ import com.example.hcmuteforums.model.dto.ApiErrorResponse;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.request.TopicPostRequest;
+import com.example.hcmuteforums.model.dto.request.TopicUpdateRequest;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.utils.FileUtils;
 import com.google.gson.Gson;
@@ -76,6 +77,17 @@ public class TopicRepository {
 
     public void getTopicDetail(String id, Callback<ApiResponse<TopicDetailResponse>> callback){
         var call = topicApi.getTopicDetail(id);
+        call.enqueue(callback);
+    }
+
+    public void deleteTopic(String topicId, Callback<ApiResponse<Boolean>> callback){
+        var call = topicApi.deleteTopic(topicId);
+        call.enqueue(callback);
+    }
+
+    public void updateTopic(String topicId, String title, String content, Callback<ApiResponse<TopicDetailResponse>> callback){
+        TopicUpdateRequest topicUpdateRequest = new TopicUpdateRequest(content, title);
+        var call = topicApi.updateTopic(topicId, topicUpdateRequest);
         call.enqueue(callback);
     }
 }
