@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnLogUserProfileListener;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
@@ -31,6 +32,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     //listener interface
     private TopicLikeListener topicLikeListener;
     private OnReplyShowListener onReplyShowListener;
+    private OnLogUserProfileListener onLogUserProfileListener;
 
     private static final int ITEM_TYPE_NORMAL = 0;
     private static final int ITEM_TYPE_LOADING = 1;
@@ -38,10 +40,11 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private boolean isLoadingAdded = false;
 
 
-    public TopicDetailAdapter(Context context, OnReplyShowListener onReplyShowListener, TopicLikeListener topicLikeListener) {
+    public TopicDetailAdapter(Context context, OnReplyShowListener onReplyShowListener, TopicLikeListener topicLikeListener, OnLogUserProfileListener onLogUserProfileListener) {
         this.context = context;
         this.onReplyShowListener = onReplyShowListener;
         this.topicLikeListener = topicLikeListener;
+        this.onLogUserProfileListener = onLogUserProfileListener;
         topicDetailResponsesList = new ArrayList<>();
     }
 
@@ -210,6 +213,15 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             btnReply.setOnClickListener(v -> {
                 if (onReplyShowListener != null)
                     onReplyShowListener.onReply(topic.getId(), position);
+            });
+
+
+            //TODO: log to user profile
+            imgAvatar.setOnClickListener(v -> {
+                onLogUserProfileListener.onClick(topic.getUserGeneral().getUsername());
+            });
+            tvName.setOnClickListener(v -> {
+                onLogUserProfileListener.onClick(topic.getUserGeneral().getUsername());
             });
         }
     }

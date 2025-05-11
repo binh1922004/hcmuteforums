@@ -1,6 +1,9 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +22,7 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnLogUserProfileListener;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
@@ -30,13 +34,15 @@ import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements TopicLikeListener, OnReplyShowListener {
+public class HomeFragment extends Fragment implements
+        TopicLikeListener, OnReplyShowListener, OnLogUserProfileListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -119,7 +125,7 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
     }
 
     private void recyclerViewConfig(){
-        topicDetailAdapter = new TopicDetailAdapter(getContext(), this, this);
+        topicDetailAdapter = new TopicDetailAdapter(getContext(), this, this, this);
         RecyclerView.LayoutManager linearLayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         rcvTopic.setLayoutManager(linearLayout);
         rcvTopic.setAdapter(topicDetailAdapter);
@@ -243,6 +249,25 @@ public class HomeFragment extends Fragment implements TopicLikeListener, OnReply
         isLastPage = false;
         topicDetailAdapter.clearData(); // Xóa hết dữ liệu hiện có
         showMoreTopic();            // Gọi lại API trang đầu tiên
+    }
+
+    @Override
+    public void onClick(String username) {
+        SharedPreferences preferences = getContext().getSharedPreferences("User", MODE_PRIVATE); //Set danh dau dang nhap
+        if (preferences.getBoolean("isLoggedIn", false)){
+            String currentUserName = preferences.getString("username", null);
+            if (!Objects.equals(currentUserName, username)){
+                Intent myintent = new Intent(getContext(), AnyProfileUserFragment.class);
+                myintent.putExtra("username", username);
+                myintent.putExtra("currentUsername", currentUserName);
+                startActivity(myintent);
+            }
+        }
+        else{
+            Intent myintent = new Intent(getContext(), AnyProfileUserFragment.class);
+            myintent.putExtra("username", username);
+            startActivity(myintent);
+        }
     }
 }
 
