@@ -1,11 +1,18 @@
 package com.example.hcmuteforums.ui.activity.topic;
 
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.ImagePagerAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnMenuActionListener;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
@@ -33,13 +41,14 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class TopicDetailActivity extends AppCompatActivity {
+public class TopicDetailActivity extends AppCompatActivity{
     ImageView imgBack;
     TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount, tvToggle;
-    ImageView btnLike, btnReply;
+    ImageView btnLike, btnReply, imgMoreActions;
     CircleImageView imgAvatar;
     ViewPager2 viewPagerImages;
-
+    //attribute
+    TopicDetailResponse currentTopic;
     //view model
     TopicDetailViewModel topicDetailViewModel;
     @Override
@@ -51,6 +60,7 @@ public class TopicDetailActivity extends AppCompatActivity {
         Intent receivedIntent = getIntent();
         String topicId = receivedIntent.getStringExtra("topicId");
         String replyId = receivedIntent.getStringExtra("replyId");
+        boolean isOwner = receivedIntent.getBooleanExtra("isOwner", false);
         //mapping data
         mappingData();
 
@@ -58,6 +68,59 @@ public class TopicDetailActivity extends AppCompatActivity {
         setTopicData(topicId);
 
         // Thêm CommentFragment vào Activity
+        replyFragmentConfig(topicId, replyId);
+
+        //event handler
+        backEvent();
+
+        //observe data
+        observeData();
+
+        //menu action config
+        menuActionsConfig(true);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+    private void menuActionsConfig(boolean isOwner) {
+        imgMoreActions.setOnClickListener(v -> {
+            // Tạo PopupMenu
+            PopupMenu popupMenu = new PopupMenu(TopicDetailActivity.this, v);
+
+            //if is your reply have 3 selections
+            if (isOwner) {
+                popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_user, popupMenu.getMenu());
+            }
+            else{
+                popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_guest, popupMenu.getMenu());
+            }
+            // Xử lý sự kiện khi chọn mục trong menu
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(android.view.MenuItem item) {
+                    int itemId = item.getItemId();
+                    if (itemId == R.id.actionCopy){
+                        onCopy();
+                    }
+                    else if (itemId == R.id.actionEdit){
+                        onUpdate();
+                    }
+                    else if (itemId == R.id.actionDelete){
+                        onDelete();
+                    }
+                    return true;
+                }
+            });
+
+            // Hiển thị menu
+            popupMenu.show();
+        });
+    }
+
+    private void replyFragmentConfig(String topicId, String replyId) {
         ReplyFragment replyFragment;
         if (replyId == null){
             replyFragment = ReplyFragment.newInstance(topicId);
@@ -68,14 +131,6 @@ public class TopicDetailActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, replyFragment)
                 .commit();
-
-        //event handler
-        backEvent();
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
     }
 
     private void setTopicData(String topicId) {
@@ -85,6 +140,8 @@ public class TopicDetailActivity extends AppCompatActivity {
             public void onChanged(Event<TopicDetailResponse> topicDetailResponseEvent) {
                 TopicDetailResponse topic = topicDetailResponseEvent.getContent();
                 if (topic != null){
+                    currentTopic = topic;
+
                     tvName.setText(topic.getUserGeneral().getFullName());
                     tvTime.setText(topic.getCreatedAt().toString());
                     tvTitle.setText(topic.getTitle());
@@ -149,6 +206,7 @@ public class TopicDetailActivity extends AppCompatActivity {
         tvReplyCount = findViewById(R.id.tvReplyCount);
         tvLikeCount = findViewById(R.id.tvLikeCount);
         tvToggle = findViewById(R.id.tvToggle);
+        imgMoreActions = findViewById(R.id.imgMoreActions);
 
         topicDetailViewModel = new TopicDetailViewModel();
     }
@@ -157,5 +215,56 @@ public class TopicDetailActivity extends AppCompatActivity {
         imgBack.setOnClickListener(v -> {
             finish();
         });
+    }
+
+    private void observeData(){
+        topicDetailViewModel.getDeleteLiveData().observe(this, new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> booleanEvent) {
+                boolean isDel = booleanEvent.getContent();
+                if (isDel){
+                    finish();
+                }
+            }
+        });
+    }
+
+    public void onUpdate() {
+
+    }
+
+    public void onDelete() {
+        String topicId = currentTopic.getId();
+        // Tạo AlertDialog
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc chắn muốn xóa chủ đề này không?")
+                .setPositiveButton("Xóa", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Thực hiện logic xóa khi người dùng xác nhận
+                        // Ví dụ: Gọi hàm xóa topic với topicId
+                        topicDetailViewModel.deleteTopic(topicId);
+                    }
+                })
+                .setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Đóng dialog, không làm gì cả
+                        dialog.dismiss();
+                    }
+                })
+                .setCancelable(false) // Ngăn người dùng đóng dialog bằng nút back
+                .show();
+    }
+
+    public void onCopy() {
+        String content = tvContent.getText().toString();
+        // Sao chép văn bản vào clipboard
+        ClipboardManager clipboard = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("label", content);
+        clipboard.setPrimaryClip(clip);
+        // Thông báo cho người dùng
+        Toast.makeText(this, "Đã sao chép!", Toast.LENGTH_SHORT).show();
     }
 }
