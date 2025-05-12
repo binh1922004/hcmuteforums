@@ -1,6 +1,8 @@
 package com.example.hcmuteforums.model.dto;
 
-public class UserGeneral {
+import java.io.Serializable;
+
+public class UserGeneral implements Serializable {
     private String fullName;
     private String username;
     private String avt;

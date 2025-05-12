@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.AlertDialog;
@@ -11,6 +12,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -35,6 +38,7 @@ import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
+import com.example.hcmuteforums.ui.activity.topic.TopicUpdateActivity;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -53,8 +57,11 @@ public class TopicFragment extends Fragment implements
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
-    // TODO: Rename and change types of parameters
 
+    //launcher
+    ActivityResultLauncher<Intent> launcher;
+
+    // TODO: Rename and change types of parameters
     private String username = null;
 
     //elements
@@ -71,6 +78,7 @@ public class TopicFragment extends Fragment implements
 
     //hash map
     HashMap<String, Integer> positionDelete = new HashMap<>();
+    HashMap<String, Integer> positionUpdate= new HashMap<>();
     public TopicFragment() {
         // Required empty public constructor
     }
@@ -116,7 +124,25 @@ public class TopicFragment extends Fragment implements
         showMoreTopic();
         //menu action
         menuActionConfig();
+        //launcher config()
+        launcherConfig();
         return view;
+    }
+
+    private void launcherConfig() {
+        launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                Intent data = result.getData();
+                if (data != null) {
+                    TopicDetailResponse topic = (TopicDetailResponse) data.getSerializableExtra("topic");
+                    if (topic != null){
+                        int pos = positionUpdate.get(topic.getId());
+                        topicDetailAdapter.updateTopic(pos, topic);
+                        positionUpdate.remove(topic.getId());
+                    }
+                }
+            }
+        });
     }
 
     private void adapterConfig() {
@@ -268,7 +294,10 @@ public class TopicFragment extends Fragment implements
         topicDetailAdapter.setOnMenuActionListener(new OnMenuActionListener() {
             @Override
             public void onUpdate(String topicId, String content, int pos) {
-
+                positionUpdate.put(topicId, pos);
+                Intent myIntent = new Intent(getContext(), TopicUpdateActivity.class);
+                myIntent.putExtra("topicId", topicId);
+                launcher.launch(myIntent);
             }
 
             @Override

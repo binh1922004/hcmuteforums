@@ -63,10 +63,10 @@ public class TopicController {
 
     @PutMapping("/update/{id}")
     @PreAuthorize("@topicService.isOwner(#id)")
-    public ApiResponse<String> updateTopic(@PathVariable String id, @RequestBody TopicUpdateRequest topicUpdateRequest) {
+    public ApiResponse<TopicDetailResponse> updateTopic(@PathVariable String id, @RequestBody TopicUpdateRequest topicUpdateRequest) {
         topicService.updateTopic(id, topicUpdateRequest);
-        return ApiResponse.<String>builder()
-                .result("Đã cập nhật thông tin bài viết")
+        return ApiResponse.<TopicDetailResponse>builder()
+                .result(topicService.updateTopic(id, topicUpdateRequest))
                 .build();
     }
     @GetMapping
