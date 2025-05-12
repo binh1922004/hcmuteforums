@@ -137,6 +137,8 @@ public class MyProfileUserFragment extends Fragment {
                 if (userResponse.getUsername() != null) {
                     fetchFollowCounts(userResponse.getUsername());
                 }
+                //set up topic
+                topicFragmentConfig(userResponse.getUsername());
             }
         });
         userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
@@ -210,7 +212,6 @@ public class MyProfileUserFragment extends Fragment {
 
         //Load Image
         getProfile(view);
-
         //UploadImage
         initLaunchers();
         EventUploadAvatar(uploadAvatar);
@@ -220,7 +221,6 @@ public class MyProfileUserFragment extends Fragment {
         // Xử lý sự kiện nhấn vào Following và Follower
         EventBackMenu();
         setupFollowClickEvents();
-
         return view;
     }
 
@@ -505,5 +505,11 @@ public class MyProfileUserFragment extends Fragment {
         });
     }
 
-
+    private void topicFragmentConfig(String username) {
+        TopicFragment topicFragment;
+        topicFragment = TopicFragment.newInstance(username);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, topicFragment)
+                .commit();
+    }
 }
