@@ -368,8 +368,18 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
 
     @Override
     public void onDelete(String replyId, int pos) {
-        positionDelete.put(replyId, pos);
-        replyViewModel.deleteReply(replyId);
+        // Create and show AlertDialog for editing
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Bạn có muốn xoá câu trả lời");
+
+        // Set up buttons
+        builder.setPositiveButton("Xoá", (dialog, which) -> {
+            positionDelete.put(replyId, pos);
+            replyViewModel.deleteReply(replyId);
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
     }
 
     @Override
