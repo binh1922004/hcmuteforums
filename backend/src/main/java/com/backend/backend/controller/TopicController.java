@@ -34,12 +34,17 @@ public class TopicController {
                 .build();
     }
 
-//    @GetMapping("/list/{id}")
-//    public ApiResponse<List<Topic>> getAllTopicsBySubCategory(@PathVariable String id) {
-//        return ApiResponse.<List<Topic>>builder()
-//                .result(topicService.getAllTopicsBySubCategory(id))
-//                .build();
-//    }
+    @GetMapping("/user/{username}")
+    public ApiResponse<PageResponse<TopicDetailResponse>> getAllTopicsBySubCategory(
+            @PathVariable String username,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction) {
+        return ApiResponse.<PageResponse<TopicDetailResponse>>builder()
+                .result(topicService.getTopicByUsername(username, page, size, sortBy, direction))
+                .build();
+    }
 
     @GetMapping("/detail/{id}")
     public ApiResponse<TopicDetailResponse> topicDetail(@PathVariable String id) {
