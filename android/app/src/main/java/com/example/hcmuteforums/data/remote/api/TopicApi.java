@@ -31,7 +31,7 @@ public interface TopicApi {
     @POST("api/topics/post")
     Call<ApiResponse<TopicDetailResponse>> postTopic(@Body TopicPostRequest topicPostRequest);
     @DELETE("api/topics/delete/{id}")
-    Call<ApiResponse<Boolean>> deleteTopic(@Path("id") String id);
+    Call<ApiResponse<String>> deleteTopic(@Path("id") String id);
     @PUT("api/topics/update/{id}")
     Call<ApiResponse<TopicDetailResponse>> updateTopic(@Path("id") String id, @Body TopicUpdateRequest topicUpdateRequest);
 
