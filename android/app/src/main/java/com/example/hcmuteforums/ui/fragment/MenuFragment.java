@@ -114,7 +114,7 @@ public class MenuFragment extends Fragment {
                 FragmentTransaction transaction = requireActivity()
                         .getSupportFragmentManager()
                         .beginTransaction();
-                transaction.replace(R.id.flFragment, new AnyProfileUserFragment());
+                transaction.replace(R.id.flFragment, new MyProfileUserFragment());
                 transaction.addToBackStack(null); // Để người dùng có thể quay lại
                 transaction.commit();
             }

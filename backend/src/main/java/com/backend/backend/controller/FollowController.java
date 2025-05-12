@@ -36,7 +36,7 @@ public class FollowController {
     public ApiResponse<PageResponse<FollowerResponse>> getFollowers(
             @RequestParam String username,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String direction
     ) {
@@ -49,7 +49,7 @@ public class FollowController {
     public ApiResponse<PageResponse<FollowingResponse>> getFollowing(
             @RequestParam String username,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String direction
 
