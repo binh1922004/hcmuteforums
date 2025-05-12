@@ -131,6 +131,7 @@ public class FollowService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
 
+        String loginUserName = SecurityContextHolder.getContext().getAuthentication().getName();
         Sort sort = direction.equalsIgnoreCase("DESC")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
@@ -144,10 +145,21 @@ public class FollowService {
                     .avt(Constant.url+follow.getFollowed().getProfile().getAvatarUrl())
                     .build();
 
-            followingResponses.add(FollowingResponse.builder()
-                    .followId(follow.getId())
-                    .userGeneral(userGeneral)
-                    .build());
+            if (loginUserName == null){
+                followingResponses.add(FollowingResponse.builder()
+                        .followId(follow.getId())
+                        .hasFollowed(false)
+                        .userGeneral(userGeneral)
+                        .build());
+            }
+            else{
+                followingResponses.add(FollowingResponse.builder()
+                        .followId(follow.getId())
+                        .hasFollowed(loginUserName.equals(username) ||
+                                followRepository.existsByFollower_UsernameAndFollowed_Username(loginUserName, follow.getFollowed().getUsername()))
+                        .userGeneral(userGeneral)
+                        .build());
+            }
         }
         return PageResponse.<FollowingResponse>builder()
                 .content(followingResponses)
