@@ -21,6 +21,7 @@ import com.example.hcmuteforums.listeners.OnMenuActionListener;
 import com.example.hcmuteforums.listeners.OnSwitchActivityActionListener;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
+import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 
 import java.util.ArrayList;
@@ -70,6 +71,15 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             topicDetailResponsesList.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, topicDetailResponsesList.size());
+        }
+    }
+
+    public void updateTopic(int position, TopicDetailResponse updatedTopic) {
+        if (position >= 0 && position < topicDetailResponsesList.size()) {
+            TopicDetailResponse topic = topicDetailResponsesList.get(position);
+            topic.setContent(updatedTopic.getContent());
+            topic.setTitle(updatedTopic.getTitle());
+            notifyItemChanged(position);
         }
     }
 

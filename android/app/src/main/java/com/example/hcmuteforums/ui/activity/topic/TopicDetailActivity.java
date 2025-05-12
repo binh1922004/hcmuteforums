@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -45,6 +47,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class TopicDetailActivity extends AppCompatActivity{
+    ActivityResultLauncher<Intent> launcher;
     ImageView imgBack;
     TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount, tvToggle;
     ImageView btnLike, btnReply, imgMoreActions;
@@ -54,6 +57,7 @@ public class TopicDetailActivity extends AppCompatActivity{
     TopicDetailResponse currentTopic;
     //view model
     TopicDetailViewModel topicDetailViewModel;
+    String topicId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,17 +65,16 @@ public class TopicDetailActivity extends AppCompatActivity{
         setContentView(R.layout.activity_topic_detail);
         //TODO: Get data from before activity
         Intent receivedIntent = getIntent();
-        String topicId = receivedIntent.getStringExtra("topicId");
+        topicId = receivedIntent.getStringExtra("topicId");
         String replyId = receivedIntent.getStringExtra("replyId");
-        boolean isOwner = receivedIntent.getBooleanExtra("isOwner", false);
         //mapping data
         mappingData();
 
         //TODO: set topic data to element
-        setTopicData(topicId);
+        setTopicData();
 
         // Thêm CommentFragment vào Activity
-        replyFragmentConfig(topicId, replyId);
+        replyFragmentConfig(replyId);
 
         //event handler
         backEvent();
@@ -79,12 +82,27 @@ public class TopicDetailActivity extends AppCompatActivity{
         //observe data
         observeData();
 
-        //menu action config
-        menuActionsConfig(isOwner);
+        //launcher result from activity
+        launcherConfig();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+    }
+
+    private void launcherConfig() {
+        launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                Intent data = result.getData();
+                if (data != null) {
+                    TopicDetailResponse topic = (TopicDetailResponse) data.getSerializableExtra("topic");
+                    if (topic != null){
+                        tvTitle.setText(topic.getTitle());
+                        tvContent.setText(topic.getContent());
+                    }
+                }
+            }
         });
     }
 
@@ -123,7 +141,7 @@ public class TopicDetailActivity extends AppCompatActivity{
         });
     }
 
-    private void replyFragmentConfig(String topicId, String replyId) {
+    private void replyFragmentConfig(String replyId) {
         ReplyFragment replyFragment;
         if (replyId == null){
             replyFragment = ReplyFragment.newInstance(topicId);
@@ -136,7 +154,7 @@ public class TopicDetailActivity extends AppCompatActivity{
                 .commit();
     }
 
-    private void setTopicData(String topicId) {
+    private void setTopicData() {
         topicDetailViewModel.getTopicDetail(topicId);
         topicDetailViewModel.getTopicDetailLiveData().observe(this, new Observer<Event<TopicDetailResponse>>() {
             @Override
@@ -191,6 +209,8 @@ public class TopicDetailActivity extends AppCompatActivity{
                         btnLike.setSelected(false);
                         btnLike.setImageResource(R.drawable.love_unclick);
                     }
+                    //menu action config
+                    menuActionsConfig(topic.isOwner());
                 }
             }
         });
@@ -244,7 +264,10 @@ public class TopicDetailActivity extends AppCompatActivity{
     }
 
     public void onUpdate() {
+        Intent myIntent = new Intent(this, TopicUpdateActivity.class);
 
+        myIntent.putExtra("topicId", topicId);
+        launcher.launch(myIntent);
     }
 
     public void onDelete() {
