@@ -85,6 +85,7 @@ public class FollowService {
                         ,String sortBy,String direction) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+        String loginUserName = SecurityContextHolder.getContext().getAuthentication().getName();
         Sort sort = direction.equalsIgnoreCase("DESC")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
@@ -98,12 +99,22 @@ public class FollowService {
                     .username(follow.getFollower().getUsername())
                     .avt(Constant.url+follow.getFollower().getProfile().getAvatarUrl())
                     .build();
+            if (loginUserName != null){
 
-            followResponses.add(FollowerResponse.builder()
-                            .hasFollowed(followRepository.existsByFollowerAndFollowed(follow.getFollowed(), follow.getFollower()))
-                            .followId(follow.getId())
-                            .userGeneral(userGeneral)
-                    .build());
+                followResponses.add(FollowerResponse.builder()
+                        .hasFollowed(followRepository.existsByFollower_UsernameAndFollowed_Username(loginUserName, follow.getFollower().getUsername()))
+                        .followId(follow.getId())
+                        .userGeneral(userGeneral)
+                        .build());
+            }
+            else{
+
+                followResponses.add(FollowerResponse.builder()
+                        .hasFollowed(false)
+                        .followId(follow.getId())
+                        .userGeneral(userGeneral)
+                        .build());
+            }
         }
 
         return PageResponse.<FollowerResponse>builder()
