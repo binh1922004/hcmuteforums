@@ -25,6 +25,8 @@ public interface TopicApi {
     Call<ApiResponse<PageResponse<TopicDetailResponse>>> getAllTopic(@Query("page") int page);
     @GET("api/topics/detail/{id}")
     Call<ApiResponse<TopicDetailResponse>> getTopicDetail(@Path("id") String id);
+    @GET("api/topics/user/{username}")
+    Call<ApiResponse<PageResponse<TopicDetailResponse>>> getAllTopicByUsername(@Path("username") String username, @Query("page") int page);
 
     @POST("api/topics/post")
     Call<ApiResponse<TopicDetailResponse>> postTopic(@Body TopicPostRequest topicPostRequest);
