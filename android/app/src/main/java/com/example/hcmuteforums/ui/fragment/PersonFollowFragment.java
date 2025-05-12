@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hcmuteforums.R;
-import com.example.hcmuteforums.adapter.PersonFollowerAdapter;
+import com.example.hcmuteforums.adapter.FollowerAdapter;
 import com.example.hcmuteforums.adapter.PersonFollowingAdapter;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.PageResponse;
@@ -39,7 +39,7 @@ import java.util.Set;
 public class PersonFollowFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private PersonFollowerAdapter followerAdapter;
+    private FollowerAdapter followerAdapter;
     private PersonFollowingAdapter followingAdapter;
     private TabLayout tabLayout;
     private ImageButton backButton;
@@ -277,7 +277,7 @@ public class PersonFollowFragment extends Fragment {
         tabLayout.addTab(tabLayout.newTab().setText("0 Đang theo dõi"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        followerAdapter = new PersonFollowerAdapter(
+        followerAdapter = new FollowerAdapter(
                 getContext(),
                 this::handleFollowClick,
                 this::handleFollowerMoreClick
