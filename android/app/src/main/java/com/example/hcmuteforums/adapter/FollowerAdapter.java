@@ -29,7 +29,6 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
     private OnFollowClickListener followClickListener;
     private OnMoreClickListener moreClickListener;
     private Map<String, Boolean> followButtonVisibilityMap; // Theo dõi trạng thái hiển thị nút
-    private Set<String> followingUsernames; // Danh sách username của những người đã follow
 
     public interface OnFollowClickListener {
         void onFollowClick(String followId, String targetUsername, int position, boolean isFollowing);
@@ -45,7 +44,7 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         this.followClickListener = followClickListener;
         this.moreClickListener = moreClickListener;
         this.followButtonVisibilityMap = new HashMap<>();
-        this.followingUsernames = new HashSet<>();
+
     }
 
     @NonNull
@@ -77,7 +76,7 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         String targetUsername = follower.getUserGeneral().getUsername();
 
         // Kiểm tra trạng thái hiển thị nút "Theo dõi"
-        boolean isFollowing = followingUsernames.contains(targetUsername);
+        boolean isFollowing= follower.getHasFollowed();
         followButtonVisibilityMap.put(targetUsername, !isFollowing);
         boolean isButtonVisible = followButtonVisibilityMap.getOrDefault(targetUsername, true);
         holder.followButton.setVisibility(isButtonVisible ? View.VISIBLE : View.GONE);
@@ -88,9 +87,12 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
                 followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
                 // Ẩn nút ngay sau khi nhấn "Theo dõi"
                 if (!isFollowing) {
+
+                    follower.setHasFollowed(true);
                     followButtonVisibilityMap.put(targetUsername, false);
                     holder.followButton.setVisibility(View.GONE);
                     holder.unFollowButton.setVisibility(View.VISIBLE);
+                    notifyItemChanged(position);
                 }
             }
         });
@@ -99,9 +101,11 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
                 followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
                 // Ẩn nút ngay sau khi nhấn "Theo dõi"
                 if (isFollowing) {
+                    follower.setHasFollowed(false);
                     followButtonVisibilityMap.put(targetUsername, false);
                     holder.followButton.setVisibility(View.VISIBLE);
                     holder.unFollowButton.setVisibility(View.GONE);
+                    notifyItemChanged(position);
                 }
             }
         });
@@ -128,10 +132,8 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
     }
 
     public void updateData(List<FollowerResponse> newFollowerList, Set<String> followingUsernames) {
-        this.followerList.clear();
+
         this.followerList.addAll(newFollowerList);
-        this.followingUsernames.clear();
-        this.followingUsernames.addAll(followingUsernames);
         // Cập nhật trạng thái nút dựa trên danh sách following
         followButtonVisibilityMap.clear();
         for (FollowerResponse follower : newFollowerList) {
@@ -142,20 +144,16 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         notifyDataSetChanged();
     }
 
-    // Phương thức để cập nhật trạng thái nút từ bên ngoài
-    public void updateButtonVisibility(String targetUsername, boolean isVisible) {
-        followButtonVisibilityMap.put(targetUsername, isVisible);
-        if (isVisible) {
-            followingUsernames.remove(targetUsername); // Unfollow: Xóa khỏi danh sách following
-        } else {
-            followingUsernames.add(targetUsername); // Follow: Thêm vào danh sách following
-        }
-        // Cập nhật giao diện cho các item liên quan
-        for (int i = 0; i < followerList.size(); i++) {
-            if (followerList.get(i).getUserGeneral().getUsername().equals(targetUsername)) {
-                notifyItemChanged(i);
-                break;
-            }
+    public void addData(List<FollowerResponse> newList){
+        int oldSize = followerList.size();
+        followerList.addAll(newList);
+        notifyItemRangeInserted(oldSize, newList.size());
+    }
+    public void clearData(){
+        int size = this.followerList.size();
+        if(size>0){
+            this.followerList.clear();
+            notifyItemRangeRemoved(0, size);
         }
     }
 

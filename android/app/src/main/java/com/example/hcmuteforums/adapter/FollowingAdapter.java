@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
 
 import java.util.ArrayList;
@@ -66,6 +67,18 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.View
                 moreClickListener.onMoreClick(followId,targetUsername ,position);
             }
         });
+    }
+    public void addData(List<FollowingResponse> newList){
+        int oldSize = followingList.size();
+        followingList.addAll(newList);
+        notifyItemRangeInserted(oldSize, newList.size());
+    }
+    public void clearData(){
+        int size = this.followingList.size();
+        if(size>0){
+            this.followingList.clear();
+            notifyItemRangeRemoved(0, size);
+        }
     }
 
     @Override
