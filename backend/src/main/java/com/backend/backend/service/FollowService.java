@@ -91,7 +91,7 @@ public class FollowService {
         Pageable pageable = PageRequest.of(page, size, sort);
         List<FollowerResponse> followResponses = new ArrayList<>();
         Page<Follow> followerUserPage = followRepository.findAllByFollowed(user, pageable);
-        //mapping reply to replyresponse list
+        //mapping reply to follow response list
         for(var follow : followerUserPage.getContent()){
             UserGeneral userGeneral = UserGeneral.builder()
                     .fullName(follow.getFollower().getFullName())
@@ -100,6 +100,7 @@ public class FollowService {
                     .build();
 
             followResponses.add(FollowerResponse.builder()
+                            .hasFollowed(followRepository.existsByFollowerAndFollowed(follow.getFollowed(), follow.getFollower()))
                             .followId(follow.getId())
                             .userGeneral(userGeneral)
                     .build());

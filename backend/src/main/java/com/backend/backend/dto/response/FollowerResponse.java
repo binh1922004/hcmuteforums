@@ -12,5 +12,6 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FollowerResponse {
     String followId;
+    boolean hasFollowed;
     UserGeneral userGeneral;
 }
