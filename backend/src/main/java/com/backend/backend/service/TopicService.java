@@ -122,11 +122,10 @@ public class TopicService {
         return topicId;
     }
 
-    public void updateTopic(String topicId, TopicUpdateRequest topicUpdateRequest) {
+    public TopicDetailResponse updateTopic(String topicId, TopicUpdateRequest topicUpdateRequest) {
         Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOTEXISTED));
         topicMapper.updateTopic(topic, topicUpdateRequest);
-        Optional<SubCategory> subCategory = subCategoryRepository.findById(topicUpdateRequest.getSubCategoryId());
-        topicRepository.save(topic);
+        return toTopicDetailResponse(topicRepository.save(topic));
     }
 
     public boolean isOwner(String topicId) {
