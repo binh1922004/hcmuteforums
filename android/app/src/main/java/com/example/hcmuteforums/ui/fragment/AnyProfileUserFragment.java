@@ -90,8 +90,9 @@ public class AnyProfileUserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile_any_user, container, false);
         anhxa(view);
         followViewModel = new ViewModelProvider(this).get(FollowViewModel.class);
-        username = "trieudz";
-        currentUsername="javire";
+        Bundle bundle = getArguments();
+        username = bundle.getString("username");
+        currentUsername = bundle.getString("currentUsername");
         getInfo(tv_username, tv_email, tv_fullname);
         getPersonProfile(view);
         EventBackHome();
