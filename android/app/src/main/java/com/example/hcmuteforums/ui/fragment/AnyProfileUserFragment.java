@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -46,18 +47,18 @@ public class AnyProfileUserFragment extends Fragment {
     String currentUsername;
     TextView tv_username, tv_email, tv_countFollower, tv_countFollowing, tv_fullname;
     LinearLayout followingLayout, followerLayout;
+    private boolean isLoggedIn = false;
+    private String loginPrompt;
     private boolean isFollowing = false;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
     private String mParam1;
     private String mParam2;
 
     public AnyProfileUserFragment() {
         // Required empty public constructor
     }
-
     public static AnyProfileUserFragment newInstance(String param1, String param2) {
         AnyProfileUserFragment fragment = new AnyProfileUserFragment();
         Bundle args = new Bundle();
@@ -73,6 +74,15 @@ public class AnyProfileUserFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            username = getArguments().getString("username");
+            currentUsername = getArguments().getString("currentUsername", "guest"); // Mặc định "guest" nếu null
+            isLoggedIn = getArguments().getBoolean("isLoggedIn", false);
+            loginPrompt = getArguments().getString("loginPrompt");
+            Log.d("AnyProfileUserFragment", "Received - username: " + username + ", currentUsername: " + currentUsername + ", isLoggedIn: " + isLoggedIn);
+        }else{
+            Log.e("AnyProfileUserFragment", "Bundle is null");
+            username = "default_username";
+            currentUsername = "guest";
         }
     }
 
@@ -82,13 +92,6 @@ public class AnyProfileUserFragment extends Fragment {
         anhxa(view);
         followViewModel = new ViewModelProvider(this).get(FollowViewModel.class);
 
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            username = bundle.getString("username");
-            currentUsername = bundle.getString("currentUsername");
-        } else {
-            Log.e("AnyProfileUserFragment", "Bundle is null, username and currentUsername not set");
-        }
 
         getInfo(tv_username, tv_email, tv_fullname);
         getPersonProfile(view);
@@ -291,7 +294,7 @@ public class AnyProfileUserFragment extends Fragment {
     }
 
     private void setupFollowButton() {
-        if (btn_follow == null || currentUsername == null || username == null) {
+        /*if (btn_follow == null || currentUsername == null || username == null) {
             Log.e("AnyProfileUserFragment", "btn_follow or username is null");
             return;
         }
@@ -299,6 +302,15 @@ public class AnyProfileUserFragment extends Fragment {
         checkFollowStatus();
 
         btn_follow.setOnClickListener(v -> {
+            if (!isUserLoggedIn()) {
+                // Nếu chưa đăng nhập, điều hướng đến ProfileFragment
+                ProfileFragment profileFragment = ProfileFragment.newInstance("param1", "param2");
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.flFragment, profileFragment)
+                        .addToBackStack(null)
+                        .commit();
+                return;
+            }
             if (isFollowing) {
                 followViewModel.unFollow(username);
                 btn_follow.setImageResource(R.drawable.baseline_add_24); // Cập nhật UI ngay lập tức
@@ -314,7 +326,6 @@ public class AnyProfileUserFragment extends Fragment {
                             checkFollowStatus(); // Đồng bộ trạng thái với server
                         } else {
                             btn_follow.setImageResource(R.drawable.baseline_check_24); // Rollback nếu thất bại
-                            Toast.makeText(getContext(), "Hủy theo dõi thất bại", Toast.LENGTH_SHORT).show();
                             Log.e("AnyProfileUserFragment", "Unfollow failed for " + username);
                         }
                     }
@@ -334,7 +345,68 @@ public class AnyProfileUserFragment extends Fragment {
                             checkFollowStatus(); // Đồng bộ trạng thái với server
                         } else {
                             btn_follow.setImageResource(R.drawable.baseline_add_24); // Rollback nếu thất bại
-                            Toast.makeText(getContext(), "Theo dõi thất bại", Toast.LENGTH_SHORT).show();
+                            Log.e("AnyProfileUserFragment", "Follow failed for " + username);
+                        }
+                    }
+                });
+            }
+        });*/
+        if (btn_follow == null || username == null) {
+            Log.e("AnyProfileUserFragment", "btn_follow or username is null");
+            return;
+        }
+
+        btn_follow.setVisibility(View.VISIBLE); // Luôn hiển thị nút
+        checkFollowStatus();
+
+        btn_follow.setOnClickListener(v -> {
+            if (!isUserLoggedIn()) {
+                // Hiển thị thông báo trước khi điều hướng
+                if (loginPrompt != null) {
+                    Toast.makeText(getContext(), loginPrompt, Toast.LENGTH_LONG).show();
+                }
+                ProfileFragment profileFragment = ProfileFragment.newInstance("param1", loginPrompt);
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.flFragment, profileFragment)
+                        .addToBackStack(null)
+                        .commit();
+                return;
+            }
+
+            if (isFollowing) {
+                followViewModel.unFollow(username);
+                btn_follow.setImageResource(R.drawable.baseline_add_24);
+                followViewModel.getUnFollowSuccess().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+                    @Override
+                    public void onChanged(Event<Boolean> event) {
+                        Boolean success = event.getContent();
+                        if (success != null && success) {
+                            isFollowing = false;
+                            fetchFollowCounts(username);
+                            Toast.makeText(getContext(), "Đã hủy theo dõi", Toast.LENGTH_SHORT).show();
+                            Log.d("AnyProfileUserFragment", "Unfollow success for " + username);
+                            checkFollowStatus();
+                        } else {
+                            btn_follow.setImageResource(R.drawable.baseline_check_24); // Rollback
+                            Log.e("AnyProfileUserFragment", "Unfollow failed for " + username);
+                        }
+                    }
+                });
+            } else {
+                followViewModel.toFollow(username);
+                btn_follow.setImageResource(R.drawable.baseline_check_24);
+                followViewModel.getToFollowSuccess().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+                    @Override
+                    public void onChanged(Event<Boolean> event) {
+                        Boolean success = event.getContent();
+                        if (success != null && success) {
+                            isFollowing = true;
+                            fetchFollowCounts(username);
+                            Toast.makeText(getContext(), "Đã theo dõi", Toast.LENGTH_SHORT).show();
+                            Log.d("AnyProfileUserFragment", "Follow success for " + username);
+                            checkFollowStatus();
+                        } else {
+                            btn_follow.setImageResource(R.drawable.baseline_add_24); // Rollback
                             Log.e("AnyProfileUserFragment", "Follow failed for " + username);
                         }
                     }
@@ -346,24 +418,28 @@ public class AnyProfileUserFragment extends Fragment {
     private void checkFollowStatus() {
         if (currentUsername != null && username != null && !currentUsername.equals(username)) {
             Log.d("CurrenUsername", currentUsername);
-            followViewModel.checkFollowStatus(currentUsername, username);
+            followViewModel.getFollowStatus().removeObservers(getViewLifecycleOwner()); // Xóa observer cũ
+            followViewModel.checkFollowStatus(currentUsername, username, isLoggedIn);
             followViewModel.getFollowStatus().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
                 @Override
                 public void onChanged(Event<Boolean> event) {
                     Boolean status = event.getContent();
                     if (status != null) {
                         isFollowing = status;
-                        btn_follow.setImageResource(isFollowing ? R.drawable.baseline_check_24 : R.drawable.baseline_add_24);
-                        Log.d("AnyProfileUserFragment", "Check follow status for "+currentUsername+ " and " + username + ": " + isFollowing);
+                        updateFollowButton();
+                        Log.d("AnyProfileUserFragment", "Check follow status for " + currentUsername + " and " + username + ": " + isFollowing);
                     } else {
                         Log.e("AnyProfileUserFragment", "Failed to get follow status for " + username);
-                        btn_follow.setImageResource(R.drawable.baseline_add_24); // Mặc định nếu không lấy được
+                        btn_follow.setImageResource(R.drawable.baseline_add_24);
                     }
                 }
             });
         } else {
             btn_follow.setVisibility(View.GONE);
         }
+    }
+    private void updateFollowButton() {
+        btn_follow.setImageResource(isFollowing ? R.drawable.baseline_check_24 : R.drawable.baseline_add_24);
     }
 
     private void topicFragmentConfig(String username) {
@@ -373,4 +449,9 @@ public class AnyProfileUserFragment extends Fragment {
                 .replace(R.id.fragmentContainer, topicFragment)
                 .commit();
     }
+    private boolean isUserLoggedIn() {
+        return isLoggedIn; // Sử dụng giá trị từ Bundle
+    }
+
+
 }

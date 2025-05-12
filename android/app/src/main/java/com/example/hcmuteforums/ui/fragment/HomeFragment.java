@@ -253,7 +253,7 @@ public class HomeFragment extends Fragment implements
 
     @Override
     public void onClickProfile(String username) {
-        SharedPreferences preferences = getContext().getSharedPreferences("User", MODE_PRIVATE); //Set danh dau dang nhap
+        /*SharedPreferences preferences = getContext().getSharedPreferences("User", MODE_PRIVATE); //Set danh dau dang nhap
         if (preferences.getBoolean("isLoggedIn", false)){
             String currentUserName = preferences.getString("username", null);
             if (!Objects.equals(currentUserName, username)){
@@ -272,12 +272,29 @@ public class HomeFragment extends Fragment implements
             AnyProfileUserFragment anyProfileUserFragment = new AnyProfileUserFragment();
             Bundle bundle = new Bundle();
             bundle.putString("username", username);
+            bundle.putString("currentUsername", "guest");
             anyProfileUserFragment.setArguments(bundle);
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.flFragment, anyProfileUserFragment)
                     .addToBackStack(null)
                     .commit();
-        }
+        }*/
+        SharedPreferences preferences = getContext().getSharedPreferences("User", MODE_PRIVATE);
+        String currentUserName = preferences.getString("username", "guest"); // Giá trị mặc định "guest" nếu chưa đăng nhập
+        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
+
+        AnyProfileUserFragment anyProfileUserFragment = new AnyProfileUserFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        bundle.putString("currentUsername", currentUserName);
+        bundle.putBoolean("isLoggedIn", isLoggedIn); // Truyền trạng thái đăng nhập
+        bundle.putString("loginPrompt", isLoggedIn ? null : "Bạn cần đăng nhập để theo dõi người dùng này"); // Thông điệp tùy chỉnh
+        anyProfileUserFragment.setArguments(bundle);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.flFragment, anyProfileUserFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override

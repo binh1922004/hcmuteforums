@@ -209,7 +209,13 @@ public class FollowViewModel extends ViewModel {
             }
         });
     }
-    public void checkFollowStatus(String currentUsername, String targetUsername) {
+    public void checkFollowStatus(String currentUsername, String targetUsername, boolean isLoggedIn) {
+        if (!isLoggedIn) {
+            // Nếu là khách (chưa đăng nhập), không gọi API, đặt trạng thái mặc định là false
+            followStatus.setValue(new Event<>(false));
+            Log.d("FollowViewModel", "Guest detected, skipping checkFollowStatus for " + currentUsername + " and " + targetUsername);
+            return;
+        }
         followRespository.checkFollowStatus(currentUsername, targetUsername, new Callback<ApiResponse<FollowStatusResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<FollowStatusResponse>> call, Response<ApiResponse<FollowStatusResponse>> response) {

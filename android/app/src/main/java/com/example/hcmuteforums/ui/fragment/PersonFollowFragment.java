@@ -1,5 +1,6 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,6 +54,7 @@ public class PersonFollowFragment extends Fragment {
     private String currentUsername;
     private Map<String, Boolean> followStatusMap;
     private String lastCheckedUsername;
+    private String targetUsername;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +77,7 @@ public class PersonFollowFragment extends Fragment {
         followButtonVisibilityMap = new HashMap<>();
         followStatusMap = new HashMap<>();
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -100,9 +103,16 @@ public class PersonFollowFragment extends Fragment {
 
     private void setupBackButton() {
         backButton.setOnClickListener(v -> {
-            // Tạo instance của MenuFragment
+            // Tạo instance mới của AnyProfileUserFragment
             AnyProfileUserFragment anyProfileUserFragment = new AnyProfileUserFragment();
-            // Thay thế fragment hiện tại bằng MenuFragment
+
+            // Truyền username và currentUsername qua Bundle
+            Bundle bundle = new Bundle();
+            bundle.putString("username", username);
+            bundle.putString("currentUsername", currentUsername);
+            anyProfileUserFragment.setArguments(bundle);
+
+            // Thay thế Fragment hiện tại
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.flFragment, anyProfileUserFragment)
                     .addToBackStack(null)
@@ -133,7 +143,7 @@ public class PersonFollowFragment extends Fragment {
                                 Log.d("PersonFollowFragment", "Hiding follow button for self: " + targetUsername);
                             } else {
                                 lastCheckedUsername = targetUsername;
-                                followViewModel.checkFollowStatus(currentUsername, targetUsername);
+                                followViewModel.checkFollowStatus(currentUsername, targetUsername, isUserLoggedIn());
                             }
                         }
                     }
@@ -348,6 +358,16 @@ public class PersonFollowFragment extends Fragment {
     }
 
     private void handleFollowClick(String followId, String targetUsername, int position, boolean isFollowing) {
+        if (!isUserLoggedIn()) {
+            // Nếu chưa đăng nhập, điều hướng đến ProfileFragment
+            Toast.makeText(getContext(), "Bạn cần đăng nhập để theo dõi người dùng này", Toast.LENGTH_LONG).show();
+            ProfileFragment profileFragment = ProfileFragment.newInstance("param1", "Bạn cần đăng nhập để theo dõi " + targetUsername);
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, profileFragment)
+                    .addToBackStack(null)
+                    .commit();
+            return;
+        }
         if (followViewModel != null) {
             this.targetUsername = targetUsername;
             if (isFollowing) {
@@ -379,6 +399,12 @@ public class PersonFollowFragment extends Fragment {
 
         popupMenu.show();
     }
+    private boolean isUserLoggedIn() {
+        // Kiểm tra trạng thái đăng nhập từ SharedPreferences với key "User"
+        SharedPreferences prefs = getContext().getSharedPreferences("User", getContext().MODE_PRIVATE);
+        boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
+        Log.d("PersonFollowFragment", "isLoggedIn: " + isLoggedIn);
+        return isLoggedIn;
+    }
 
-    private String targetUsername;
 }
