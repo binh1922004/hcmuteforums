@@ -90,6 +90,18 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
                 if (!isFollowing) {
                     followButtonVisibilityMap.put(targetUsername, false);
                     holder.followButton.setVisibility(View.GONE);
+                    holder.unFollowButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        holder.unFollowButton.setOnClickListener(view -> {
+            if (followClickListener != null) {
+                followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
+                // Ẩn nút ngay sau khi nhấn "Theo dõi"
+                if (isFollowing) {
+                    followButtonVisibilityMap.put(targetUsername, false);
+                    holder.followButton.setVisibility(View.VISIBLE);
+                    holder.unFollowButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -100,6 +112,14 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
                 moreClickListener.onMoreClick(followId, position);
             }
         });
+
+        if(follower.getHasFollowed()){
+            holder.unFollowButton.setVisibility(View.VISIBLE);
+            holder.followButton.setVisibility(View.GONE);
+        }else{
+            holder.unFollowButton.setVisibility(View.GONE);
+            holder.followButton.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -143,7 +163,7 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         ImageView profileImage;
         TextView username;
         TextView displayName;
-        Button followButton;
+        Button followButton, unFollowButton;
         ImageView moreButton;
 
         public ViewHolder(@NonNull View itemView) {
@@ -153,6 +173,7 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             displayName = itemView.findViewById(R.id.displayName);
             followButton = itemView.findViewById(R.id.followButton);
             moreButton = itemView.findViewById(R.id.moreButton);
+            unFollowButton = itemView.findViewById(R.id.unFollowButton);
         }
     }
 }
