@@ -117,9 +117,9 @@ public class TopicService {
        return toTopicDetailResponse(topic);
     }
 
-    public Boolean deleteTopic(String topicId) {
+    public String deleteTopic(String topicId) {
         topicRepository.deleteById(topicId);
-        return true;
+        return topicId;
     }
 
     public void updateTopic(String topicId, TopicUpdateRequest topicUpdateRequest) {
