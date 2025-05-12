@@ -8,7 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -218,11 +220,11 @@ public class TopicDetailActivity extends AppCompatActivity{
     }
 
     private void observeData(){
-        topicDetailViewModel.getDeleteLiveData().observe(this, new Observer<Event<Boolean>>() {
+        topicDetailViewModel.getDeleteLiveData().observe(this, new Observer<Event<String>>() {
             @Override
-            public void onChanged(Event<Boolean> booleanEvent) {
-                boolean isDel = booleanEvent.getContent();
-                if (isDel){
+            public void onChanged(Event<String> booleanEvent) {
+                String topicId = booleanEvent.getContent();
+                if (topicId != null){
                     new AlertDialog.Builder(TopicDetailActivity.this)
                             .setTitle("Thông báo")
                             .setMessage("Chủ đề đã được xóa thành công!")
@@ -248,27 +250,25 @@ public class TopicDetailActivity extends AppCompatActivity{
 
     public void onDelete() {
         String topicId = currentTopic.getId();
-        // Tạo AlertDialog
-        new AlertDialog.Builder(this)
-                .setTitle("Xác nhận xóa")
-                .setMessage("Bạn có chắc chắn muốn xóa chủ đề này không?")
-                .setPositiveButton("Xóa", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Thực hiện logic xóa khi người dùng xác nhận
-                        // Ví dụ: Gọi hàm xóa topic với topicId
-                        topicDetailViewModel.deleteTopic(topicId);
-                    }
-                })
-                .setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Đóng dialog, không làm gì cả
-                        dialog.dismiss();
-                    }
-                })
-                .setCancelable(false) // Ngăn người dùng đóng dialog bằng nút back
-                .show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(TopicDetailActivity.this);
+        // Tạo view từ layout tùy chỉnh
+        LayoutInflater inflater = LayoutInflater.from(TopicDetailActivity.this);
+        View dialogView = inflater.inflate(R.layout.custom_dialog_delete_layout, null);
+        builder.setView(dialogView);
+        // Tạo dialog từ builder
+        AlertDialog alertDialog = builder.create();
+        alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        Button positiveButton = dialogView.findViewById(R.id.btn_positive);
+        Button negativeButton = dialogView.findViewById(R.id.btn_negative);
+
+        positiveButton.setOnClickListener(v -> {
+            topicDetailViewModel.deleteTopic(topicId);
+            alertDialog.dismiss();
+        });
+        negativeButton.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+        alertDialog.show();
     }
 
     public void onCopy() {
