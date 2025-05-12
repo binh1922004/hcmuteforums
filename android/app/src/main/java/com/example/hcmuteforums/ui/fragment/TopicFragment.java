@@ -2,6 +2,11 @@ package com.example.hcmuteforums.ui.fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,11 +20,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnMenuActionListener;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.OnSwitchActivityActionListener;
@@ -31,6 +38,7 @@ import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -59,6 +67,9 @@ public class TopicFragment extends Fragment implements
     private boolean isLoading = false;
     private int currentPage = 0;
     private final int pageSize = 6;
+
+    //hash map
+    HashMap<String, Integer> positionDelete = new HashMap<>();
     public TopicFragment() {
         // Required empty public constructor
     }
@@ -99,8 +110,11 @@ public class TopicFragment extends Fragment implements
         adapterConfig();
         //observe data
         observeData();
+        observeDataDetail();
         //show first time
         showMoreTopic();
+        //menu action
+        menuActionConfig();
         return view;
     }
 
@@ -167,20 +181,34 @@ public class TopicFragment extends Fragment implements
             }
         });
 
-//        topicViewModel.getIsLoading().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-//            @Override
-//            public void onChanged(Boolean loading) {
-//                isLoading = loading;
-//                if (loading){
-//                    topicDetailAdapter.addLoadingFooter();
-//                }
-//                else{
-//                    topicDetailAdapter.removeLoadingFooter();
-//                }
-//            }
-//        });
     }
-
+    private void observeDataDetail(){
+        //delete
+        topicDetailViewModel.getDeleteLiveData().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> booleanEvent) {
+                String topicId = booleanEvent.getContent();
+                if (topicId != null){
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Thông báo")
+                            .setMessage("Chủ đề đã được xóa thành công!")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    // Tùy chọn: Chuyển hướng hoặc cập nhật UI sau khi xóa
+                                    // Ví dụ: finish(); hoặc cập nhật danh sách
+                                }
+                            })
+                            .setCancelable(false)
+                            .show();
+                    int pos = positionDelete.get(topicId);
+                    topicDetailAdapter.deleteTopic(pos);
+                    positionDelete.remove(topicId);
+                }
+            }
+        });
+    }
     @Override
     public void onClickProfile(String username) {
         SharedPreferences preferences = getContext().getSharedPreferences("User", MODE_PRIVATE); //Set danh dau dang nhap
@@ -236,4 +264,45 @@ public class TopicFragment extends Fragment implements
         });
         replyBottomSheetFragment.show(getParentFragmentManager(), "ReplyBottomSheet");
     }
+
+    private void menuActionConfig() {
+        topicDetailAdapter.setOnMenuActionListener(new OnMenuActionListener() {
+            @Override
+            public void onUpdate(String topicId, String content, int pos) {
+
+            }
+
+            @Override
+            public void onDelete(String topicId, int pos) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                // Tạo view từ layout tùy chỉnh
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                View dialogView = inflater.inflate(R.layout.custom_dialog_delete_layout, null);
+                builder.setView(dialogView);
+                // Tạo dialog từ builder
+                AlertDialog alertDialog = builder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                Button positiveButton = dialogView.findViewById(R.id.btn_positive);
+                Button negativeButton = dialogView.findViewById(R.id.btn_negative);
+
+                positiveButton.setOnClickListener(v -> {
+                    positionDelete.put(topicId, pos);
+                    topicDetailViewModel.deleteTopic(topicId);
+                    alertDialog.dismiss();
+                });
+                negativeButton.setOnClickListener(v -> {
+                    alertDialog.dismiss();
+                });
+                alertDialog.show();
+            }
+
+            @Override
+            public void onCopy(String content) {
+                ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("label", content);
+                clipboard.setPrimaryClip(clip);
+            }
+        });
+    }
+
 }
