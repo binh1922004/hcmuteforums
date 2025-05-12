@@ -90,4 +90,9 @@ public class TopicRepository {
         var call = topicApi.updateTopic(topicId, topicUpdateRequest);
         call.enqueue(callback);
     }
+
+    public void getAllTopicsByUsername(String username, int page, Callback<ApiResponse<PageResponse<TopicDetailResponse>>> callback){
+        var call = topicApi.getAllTopicByUsername(username, page);
+        call.enqueue(callback);
+    }
 }

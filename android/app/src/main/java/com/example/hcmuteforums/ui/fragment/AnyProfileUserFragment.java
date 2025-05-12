@@ -98,7 +98,8 @@ public class AnyProfileUserFragment extends Fragment {
         EventBackHome();
         setupFollowClickEvents();
         setupFollowButton();
-
+        //topic fragment config
+        topicFragmentConfig(username);
         return view;
     }
     void anhxa(View view) {
@@ -359,5 +360,13 @@ public class AnyProfileUserFragment extends Fragment {
         } else {
             btn_follow.setVisibility(View.GONE); // Ẩn nút nếu xem profile của chính mình
         }
+    }
+
+    private void topicFragmentConfig(String username) {
+        TopicFragment topicFragment;
+        topicFragment = TopicFragment.newInstance(username);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, topicFragment)
+                .commit();
     }
 }
