@@ -37,6 +37,7 @@ import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -274,26 +275,16 @@ public class TopicFragment extends Fragment implements
 
             @Override
             public void onDelete(String topicId, int pos) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                // Tạo view từ layout tùy chỉnh
-                LayoutInflater inflater = LayoutInflater.from(getContext());
-                View dialogView = inflater.inflate(R.layout.custom_dialog_delete_layout, null);
-                builder.setView(dialogView);
-                // Tạo dialog từ builder
-                AlertDialog alertDialog = builder.create();
-                alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                Button positiveButton = dialogView.findViewById(R.id.btn_positive);
-                Button negativeButton = dialogView.findViewById(R.id.btn_negative);
-
-                positiveButton.setOnClickListener(v -> {
-                    positionDelete.put(topicId, pos);
-                    topicDetailViewModel.deleteTopic(topicId);
-                    alertDialog.dismiss();
-                });
-                negativeButton.setOnClickListener(v -> {
-                    alertDialog.dismiss();
-                });
-                alertDialog.show();
+                new MaterialAlertDialogBuilder(getContext())
+                        .setTitle("Xác nhận xóa")
+                        .setMessage("Bạn có chắc chắn muốn xóa chủ đề này không?")
+                        .setPositiveButton("Xóa", (dialog, which) -> {
+                            positionDelete.put(topicId, pos);
+                            topicDetailViewModel.deleteTopic(topicId);
+                        })
+                        .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                        .setCancelable(false)
+                        .show();
             }
 
             @Override

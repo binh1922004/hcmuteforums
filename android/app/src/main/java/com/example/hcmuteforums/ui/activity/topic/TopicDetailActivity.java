@@ -38,6 +38,7 @@ import com.example.hcmuteforums.ui.fragment.ReplyBottomSheetFragment;
 import com.example.hcmuteforums.ui.fragment.ReplyFragment;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 
@@ -250,25 +251,15 @@ public class TopicDetailActivity extends AppCompatActivity{
 
     public void onDelete() {
         String topicId = currentTopic.getId();
-        AlertDialog.Builder builder = new AlertDialog.Builder(TopicDetailActivity.this);
-        // Tạo view từ layout tùy chỉnh
-        LayoutInflater inflater = LayoutInflater.from(TopicDetailActivity.this);
-        View dialogView = inflater.inflate(R.layout.custom_dialog_delete_layout, null);
-        builder.setView(dialogView);
-        // Tạo dialog từ builder
-        AlertDialog alertDialog = builder.create();
-        alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        Button positiveButton = dialogView.findViewById(R.id.btn_positive);
-        Button negativeButton = dialogView.findViewById(R.id.btn_negative);
-
-        positiveButton.setOnClickListener(v -> {
-            topicDetailViewModel.deleteTopic(topicId);
-            alertDialog.dismiss();
-        });
-        negativeButton.setOnClickListener(v -> {
-            alertDialog.dismiss();
-        });
-        alertDialog.show();
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc chắn muốn xóa chủ đề này không?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    topicDetailViewModel.deleteTopic(topicId);
+                })
+                .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                .setCancelable(false)
+                .show();
     }
 
     public void onCopy() {
