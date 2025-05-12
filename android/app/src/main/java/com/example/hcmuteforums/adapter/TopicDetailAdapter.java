@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnMenuActionListener;
 import com.example.hcmuteforums.listeners.OnSwitchActivityActionListener;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
@@ -38,6 +40,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private static final int ITEM_TYPE_NORMAL = 0;
     private static final int ITEM_TYPE_LOADING = 1;
 
+    private OnMenuActionListener onMenuActionListener;
     private boolean isLoadingAdded = false;
 
 
@@ -48,6 +51,9 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.onSwitchActivityActionListener = onSwitchActivityActionListener;
         topicDetailResponsesList = new ArrayList<>();
     }
+    public void setOnMenuActionListener(OnMenuActionListener onMenuActionListener) {
+        this.onMenuActionListener = onMenuActionListener;
+    }
 
     public void setData(List<TopicDetailResponse> topicDetailResponses){
         this.topicDetailResponsesList = topicDetailResponses;
@@ -57,6 +63,14 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         int oldSize = topicDetailResponsesList.size();
         topicDetailResponsesList.addAll(newList);
         notifyItemRangeInserted(oldSize, newList.size());
+    }
+
+    public void deleteTopic(int position){
+        if (position >= 0 && position < topicDetailResponsesList.size()) {
+            topicDetailResponsesList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, topicDetailResponsesList.size());
+        }
     }
 
     public void clearData(){
@@ -122,7 +136,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public class TopicDetailViewHolder extends RecyclerView.ViewHolder{
         TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount, tvToggle;
-        ImageView btnLike, btnReply;
+        ImageView btnLike, btnReply, imgMoreActions;
         CircleImageView imgAvatar;
         ViewPager2 viewPagerImages;
         public TopicDetailViewHolder(@NonNull View itemView) {
@@ -138,6 +152,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvReplyCount = itemView.findViewById(R.id.tvReplyCount);
             tvLikeCount = itemView.findViewById(R.id.tvLikeCount);
             tvToggle = itemView.findViewById(R.id.tvToggle);
+            imgMoreActions = itemView.findViewById(R.id.imgMoreActions);
         }
 
         public void bind(TopicDetailResponse topic, int position) {
@@ -228,6 +243,47 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvTitle.setOnClickListener(v -> {
                 onSwitchActivityActionListener.onClickTopicDetail(topic.getId(), topic.isOwner());
             });
+
+            //TODO: if a topic of your topic, display a menu action
+            if (onMenuActionListener != null){
+                imgMoreActions.setVisibility(View.VISIBLE);
+                imgMoreActions.setOnClickListener(v -> {
+                    // Tạo PopupMenu
+                    PopupMenu popupMenu = new PopupMenu(context, v);
+
+                    //if is your reply have 3 selections
+                    if (topic.isOwner()){
+                        popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_user, popupMenu.getMenu());
+                    }
+                    else{
+                        popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_guest, popupMenu.getMenu());
+                    }
+
+                    // Xử lý sự kiện khi chọn mục trong menu
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(android.view.MenuItem item) {
+                            int itemId = item.getItemId();
+                            if (itemId == R.id.actionCopy){
+                                onMenuActionListener.onCopy(topic.getContent());
+                            }
+                            else if (itemId == R.id.actionEdit){
+                                onMenuActionListener.onUpdate(topic.getId(), topic.getContent(), position);
+                            }
+                            else if (itemId == R.id.actionDelete){
+                                onMenuActionListener.onDelete(topic.getId(), position);
+                            }
+                            return true;
+                        }
+                    });
+
+                    // Hiển thị menu
+                    popupMenu.show();
+                });
+            }
+            else {
+                imgMoreActions.setVisibility(View.GONE);
+            }
         }
     }
 

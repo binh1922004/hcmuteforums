@@ -80,7 +80,7 @@ public class TopicRepository {
         call.enqueue(callback);
     }
 
-    public void deleteTopic(String topicId, Callback<ApiResponse<Boolean>> callback){
+    public void deleteTopic(String topicId, Callback<ApiResponse<String>> callback){
         var call = topicApi.deleteTopic(topicId);
         call.enqueue(callback);
     }
