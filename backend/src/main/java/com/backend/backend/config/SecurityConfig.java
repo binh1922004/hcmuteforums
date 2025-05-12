@@ -29,7 +29,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT_GET).permitAll()
                         .anyRequest().authenticated());
         httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
+                    oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         //cai nay tu bat nen phai ta
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
