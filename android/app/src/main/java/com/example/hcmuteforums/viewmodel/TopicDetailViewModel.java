@@ -20,7 +20,7 @@ public class TopicDetailViewModel extends ViewModel {
     private TopicRepository topicRepository;
     private MutableLiveData<Event<Boolean>> likeTopicSuccess = new MutableLiveData<>();
     private MutableLiveData<Event<TopicDetailResponse>> topicDetailLiveData = new MutableLiveData<>();
-    private MutableLiveData<Event<Boolean>> deleteLiveData = new MutableLiveData<>();
+    private MutableLiveData<Event<String>> deleteLiveData = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> deleteError = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> updateError = new MutableLiveData<>();
     private MutableLiveData<Event<TopicDetailResponse>> updateLiveData = new MutableLiveData<>();
@@ -61,11 +61,11 @@ public class TopicDetailViewModel extends ViewModel {
         });
     }
     public void deleteTopic(String topicId){
-        topicRepository.deleteTopic(topicId, new Callback<ApiResponse<Boolean>>() {
+        topicRepository.deleteTopic(topicId, new Callback<ApiResponse<String>>() {
             @Override
-            public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {
+            public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<Boolean> apiRes = response.body();
+                    ApiResponse<String> apiRes = response.body();
                     if (apiRes.getResult() != null) {
                         deleteLiveData.setValue(new Event<>(apiRes.getResult()));  // ✅ Không dùng Event
                     } else {
@@ -84,7 +84,7 @@ public class TopicDetailViewModel extends ViewModel {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<Boolean>> call, Throwable throwable) {
+            public void onFailure(Call<ApiResponse<String>> call, Throwable throwable) {
                 Log.d("Error Topic", throwable.getMessage());
                 deleteError.setValue(new Event<>(true));
             }
@@ -172,7 +172,7 @@ public class TopicDetailViewModel extends ViewModel {
         return getTopicError;
     }
 
-    public MutableLiveData<Event<Boolean>> getDeleteLiveData() {
+    public MutableLiveData<Event<String>> getDeleteLiveData() {
         return deleteLiveData;
     }
 
