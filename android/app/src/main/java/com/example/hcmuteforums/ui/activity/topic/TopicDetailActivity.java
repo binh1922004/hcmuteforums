@@ -77,7 +77,7 @@ public class TopicDetailActivity extends AppCompatActivity{
         observeData();
 
         //menu action config
-        menuActionsConfig(true);
+        menuActionsConfig(isOwner);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

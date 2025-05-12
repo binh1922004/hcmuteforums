@@ -22,18 +22,18 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
-import com.example.hcmuteforums.listeners.OnLogUserProfileListener;
+import com.example.hcmuteforums.listeners.OnSwitchActivityActionListener;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
+import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -42,7 +42,7 @@ import java.util.Objects;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment implements
-        TopicLikeListener, OnReplyShowListener, OnLogUserProfileListener {
+        TopicLikeListener, OnReplyShowListener, OnSwitchActivityActionListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -252,7 +252,7 @@ public class HomeFragment extends Fragment implements
     }
 
     @Override
-    public void onClick(String username) {
+    public void onClickProfile(String username) {
         SharedPreferences preferences = getContext().getSharedPreferences("User", MODE_PRIVATE); //Set danh dau dang nhap
         if (preferences.getBoolean("isLoggedIn", false)){
             String currentUserName = preferences.getString("username", null);
@@ -278,6 +278,14 @@ public class HomeFragment extends Fragment implements
                     .addToBackStack(null)
                     .commit();
         }
+    }
+
+    @Override
+    public void onClickTopicDetail(String topicId, boolean isOwner) {
+        Intent topicIntent = new Intent(getContext(), TopicDetailActivity.class);
+        topicIntent.putExtra("topicId", topicId);
+        topicIntent.putExtra("isOwner", isOwner);
+        startActivity(topicIntent);
     }
 }
 
