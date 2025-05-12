@@ -190,15 +190,13 @@ public class TopicFragment extends Fragment implements
             public void onChanged(Event<String> booleanEvent) {
                 String topicId = booleanEvent.getContent();
                 if (topicId != null){
-                    new AlertDialog.Builder(getContext())
+                    new MaterialAlertDialogBuilder(getContext())
                             .setTitle("Thông báo")
                             .setMessage("Chủ đề đã được xóa thành công!")
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
-                                    // Tùy chọn: Chuyển hướng hoặc cập nhật UI sau khi xóa
-                                    // Ví dụ: finish(); hoặc cập nhật danh sách
                                 }
                             })
                             .setCancelable(false)

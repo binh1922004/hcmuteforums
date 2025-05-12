@@ -226,7 +226,7 @@ public class TopicDetailActivity extends AppCompatActivity{
             public void onChanged(Event<String> booleanEvent) {
                 String topicId = booleanEvent.getContent();
                 if (topicId != null){
-                    new AlertDialog.Builder(TopicDetailActivity.this)
+                    new MaterialAlertDialogBuilder(TopicDetailActivity.this)
                             .setTitle("Thông báo")
                             .setMessage("Chủ đề đã được xóa thành công!")
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -234,8 +234,6 @@ public class TopicDetailActivity extends AppCompatActivity{
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
                                     finish();
-                                    // Tùy chọn: Chuyển hướng hoặc cập nhật UI sau khi xóa
-                                    // Ví dụ: finish(); hoặc cập nhật danh sách
                                 }
                             })
                             .setCancelable(false)
