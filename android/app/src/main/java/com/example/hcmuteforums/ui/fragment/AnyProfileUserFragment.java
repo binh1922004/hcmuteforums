@@ -1,7 +1,6 @@
 package com.example.hcmuteforums.ui.fragment;
 
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -37,25 +36,21 @@ public class AnyProfileUserFragment extends Fragment {
     UserViewModel userViewModel;
     ProfileViewModel profileViewModel;
     FollowViewModel followViewModel;
-    UserResponse currentUserResponse;   //Xac nhan co ton du lieu nguoi dung hay chua
+    UserResponse currentUserResponse;
 
     String avatarProfile, coverProfile, bioProfile;
     ImageView coverPhoto;
     CircleImageView imgAvatar;
     ImageButton btn_follow, btn_back;
-    String username = "trieudz";
-    String currentUsername = "javire";
+    String username;
+    String currentUsername;
     TextView tv_username, tv_email, tv_countFollower, tv_countFollowing, tv_fullname;
     LinearLayout followingLayout, followerLayout;
     private boolean isFollowing = false;
 
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -63,8 +58,6 @@ public class AnyProfileUserFragment extends Fragment {
         // Required empty public constructor
     }
 
-
-    // TODO: Rename and change types and number of parameters
     public static AnyProfileUserFragment newInstance(String param1, String param2) {
         AnyProfileUserFragment fragment = new AnyProfileUserFragment();
         Bundle args = new Bundle();
@@ -84,23 +77,28 @@ public class AnyProfileUserFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile_any_user, container, false);
         anhxa(view);
         followViewModel = new ViewModelProvider(this).get(FollowViewModel.class);
+
         Bundle bundle = getArguments();
-        username = bundle.getString("username");
-        currentUsername = bundle.getString("currentUsername");
+        if (bundle != null) {
+            username = bundle.getString("username");
+            currentUsername = bundle.getString("currentUsername");
+        } else {
+            Log.e("AnyProfileUserFragment", "Bundle is null, username and currentUsername not set");
+        }
+
         getInfo(tv_username, tv_email, tv_fullname);
         getPersonProfile(view);
-        EventBackHome();
+        setupBackButton();
         setupFollowClickEvents();
         setupFollowButton();
 
         return view;
     }
+
     void anhxa(View view) {
         tv_username = view.findViewById(R.id.tvName);
         tv_email = view.findViewById(R.id.tvUsername);
@@ -114,29 +112,29 @@ public class AnyProfileUserFragment extends Fragment {
         btn_back = view.findViewById(R.id.btnBack);
         btn_follow = view.findViewById(R.id.btnFollow);
     }
-    private void getInfo(TextView tv_username, TextView tv_email, TextView tv_fullname){
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);   //Map viewmodel
+
+    private void getInfo(TextView tv_username, TextView tv_email, TextView tv_fullname) {
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         userViewModel.getInfoPerson(username);
         userViewModel.getPersonInfo().observe(getViewLifecycleOwner(), new Observer<Event<UserResponse>>() {
             @Override
             public void onChanged(Event<UserResponse> eUserResponse) {
                 UserResponse userResponse = eUserResponse.getContent();
-                if (userResponse == null)
-                    return;
+                if (userResponse == null) return;
                 currentUserResponse = userResponse;
                 tv_username.setText(userResponse.getUsername());
                 tv_email.setText(userResponse.getEmail());
                 tv_fullname.setText(userResponse.getFullName());
-                // Lấy số người theo dõi và đang theo dõi khi có username
                 if (userResponse.getUsername() != null) {
                     fetchFollowCounts(userResponse.getUsername());
                 }
             }
         });
+
         userViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
             public void onChanged(Event<String> event) {
-                String message = event.getContent(); // Lấy nội dung sự kiện chưa được xử lý
+                String message = event.getContent();
                 if (message != null) {
                     Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                 }
@@ -146,15 +144,15 @@ public class AnyProfileUserFragment extends Fragment {
         userViewModel.getPersonInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
             public void onChanged(Event<Boolean> event) {
-                Boolean errorOccurred = event.getContent(); // Lấy lỗi chưa được xử lý
+                Boolean errorOccurred = event.getContent();
                 if (errorOccurred != null && errorOccurred) {
                     Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
     }
-    private void getPersonProfile(View view){
+
+    private void getPersonProfile(View view) {
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         profileViewModel.getPersonProfile(username);
         profileViewModel.getPersonProfileInfo().observe(getViewLifecycleOwner(), new Observer<ProfileResponse>() {
@@ -170,41 +168,39 @@ public class AnyProfileUserFragment extends Fragment {
         profileViewModel.getPersonProfileInfoError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
             public void onChanged(Event<Boolean> booleanEvent) {
-                Boolean errorOccurred = booleanEvent.getContent(); // Lấy lỗi chưa được xử lý
+                Boolean errorOccurred = booleanEvent.getContent();
                 if (errorOccurred != null && errorOccurred) {
                     Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
         profileViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
             @Override
             public void onChanged(Event<String> stringEvent) {
-                String message = stringEvent.getContent(); // Lấy nội dung sự kiện chưa được xử lý
+                String message = stringEvent.getContent();
                 if (message != null) {
                     Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
     }
-    private void loadImage(View viewProfile){
-        CircleImageView avatar = (CircleImageView)viewProfile.findViewById(R.id.imgAvatar);
-        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" +avatarProfile)
+
+    private void loadImage(View viewProfile) {
+        CircleImageView avatar = viewProfile.findViewById(R.id.imgAvatar);
+        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" + avatarProfile)
                 .placeholder(R.drawable.avatar_boy)
                 .error(R.drawable.user_2)
                 .into(avatar);
-        ImageView cover = (ImageView) viewProfile.findViewById(R.id.coverPhoto);
-        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/"+coverProfile)
+        ImageView cover = viewProfile.findViewById(R.id.coverPhoto);
+        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" + coverProfile)
                 .placeholder(R.drawable.avatar_boy)
                 .error(R.drawable.user_2)
                 .centerCrop()
                 .into(cover);
-
     }
-    private void fetchFollowCounts(String username) {
-        followViewModel = new ViewModelProvider(this).get(FollowViewModel.class);
 
-        // Lấy danh sách Followers
+    private void fetchFollowCounts(String username) {
         followViewModel.getFollower(username, 0);
         followViewModel.getGetListFollower().observe(getViewLifecycleOwner(), pageResponse -> {
             if (pageResponse != null) {
@@ -221,7 +217,6 @@ public class AnyProfileUserFragment extends Fragment {
             }
         });
 
-        // Lấy danh sách Following
         followViewModel.getFollowing(username, 0);
         followViewModel.getGetListFollowing().observe(getViewLifecycleOwner(), pageResponse -> {
             if (pageResponse != null) {
@@ -245,106 +240,111 @@ public class AnyProfileUserFragment extends Fragment {
             }
         });
     }
-    private void EventBackHome(){
+
+    private void setupBackButton() {
         btn_back.setOnClickListener(v -> {
-            // Tạo instance của MenuFragment
             HomeFragment homeFragment = new HomeFragment();
-            // Thay thế fragment hiện tại bằng MenuFragment
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.flFragment, homeFragment)
                     .addToBackStack(null)
                     .commit();
         });
     }
-    private void setupFollowClickEvents() {
-        // Khi nhấn vào "Đang theo dõi"
-        followingLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentUserResponse == null) {
-                    Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                FollowFragment followingFragment = new FollowFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("username", currentUserResponse.getUsername());
-                bundle.putInt("defaultTab", 1); // 1: Tab "Đang theo dõi"
-                followingFragment.setArguments(bundle);
 
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.flFragment, followingFragment)
-                        .addToBackStack(null)
-                        .commit();
+    private void setupFollowClickEvents() {
+        followingLayout.setOnClickListener(v -> {
+            if (currentUserResponse == null) {
+                Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                return;
             }
+            PersonFollowFragment followingFragment = new PersonFollowFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", currentUserResponse.getUsername());
+            bundle.putString("currentUsername", currentUsername);
+            bundle.putInt("defaultTab", 1); // 1: Tab "Đang theo dõi"
+            followingFragment.setArguments(bundle);
+
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, followingFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
-        // Khi nhấn vào "Người theo dõi"
-        followerLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentUserResponse == null) {
-                    Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                FollowFragment followingFragment = new FollowFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("username", currentUserResponse.getUsername());
-                bundle.putInt("defaultTab", 0); // 0: Tab "Người theo dõi"
-                followingFragment.setArguments(bundle);
-
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.flFragment, followingFragment)
-                        .addToBackStack(null)
-                        .commit();
+        followerLayout.setOnClickListener(v -> {
+            if (currentUserResponse == null) {
+                Toast.makeText(getContext(), "Chưa có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                return;
             }
+            PersonFollowFragment followerFragment = new PersonFollowFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", currentUserResponse.getUsername());
+            bundle.putString("currentUsername", currentUsername);
+            bundle.putInt("defaultTab", 0); // 0: Tab "Người theo dõi"
+            followerFragment.setArguments(bundle);
+
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, followerFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
     }
-    private void setupFollowButton() {
-        //if (btn_follow == null || currentUserResponse == null || username == null) return;
 
-        // Kiểm tra trạng thái follow ban đầu
+    private void setupFollowButton() {
+        if (btn_follow == null || currentUsername == null || username == null) {
+            Log.e("AnyProfileUserFragment", "btn_follow or username is null");
+            return;
+        }
+
         checkFollowStatus();
 
         btn_follow.setOnClickListener(v -> {
             if (isFollowing) {
-                // Thực hiện unfollow
                 followViewModel.unFollow(username);
+                btn_follow.setImageResource(R.drawable.baseline_add_24); // Cập nhật UI ngay lập tức
                 followViewModel.getUnFollowSuccess().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
                     @Override
                     public void onChanged(Event<Boolean> event) {
                         Boolean success = event.getContent();
                         if (success != null && success) {
                             isFollowing = false;
-                            btn_follow.setImageResource(R.drawable.baseline_add_24); // Quay lại dấu cộng
-                            fetchFollowCounts(username); // Cập nhật lại số lượng follower
+                            fetchFollowCounts(username);
                             Toast.makeText(getContext(), "Đã hủy theo dõi", Toast.LENGTH_SHORT).show();
+                            Log.d("AnyProfileUserFragment", "Unfollow success for " + username);
+                            checkFollowStatus(); // Đồng bộ trạng thái với server
                         } else {
+                            btn_follow.setImageResource(R.drawable.baseline_check_24); // Rollback nếu thất bại
                             Toast.makeText(getContext(), "Hủy theo dõi thất bại", Toast.LENGTH_SHORT).show();
+                            Log.e("AnyProfileUserFragment", "Unfollow failed for " + username);
                         }
                     }
                 });
             } else {
-                // Thực hiện follow
                 followViewModel.toFollow(username);
+                btn_follow.setImageResource(R.drawable.baseline_check_24); // Cập nhật UI ngay lập tức
                 followViewModel.getToFollowSuccess().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
                     @Override
                     public void onChanged(Event<Boolean> event) {
                         Boolean success = event.getContent();
                         if (success != null && success) {
                             isFollowing = true;
-                            btn_follow.setImageResource(R.drawable.baseline_check_24); // Chuyển sang dấu tích
-                            fetchFollowCounts(username); // Cập nhật lại số lượng follower
+                            fetchFollowCounts(username);
                             Toast.makeText(getContext(), "Đã theo dõi", Toast.LENGTH_SHORT).show();
+                            Log.d("AnyProfileUserFragment", "Follow success for " + username);
+                            checkFollowStatus(); // Đồng bộ trạng thái với server
                         } else {
+                            btn_follow.setImageResource(R.drawable.baseline_add_24); // Rollback nếu thất bại
                             Toast.makeText(getContext(), "Theo dõi thất bại", Toast.LENGTH_SHORT).show();
+                            Log.e("AnyProfileUserFragment", "Follow failed for " + username);
                         }
                     }
                 });
             }
         });
     }
+
     private void checkFollowStatus() {
         if (currentUsername != null && username != null && !currentUsername.equals(username)) {
+            Log.d("CurrenUsername", currentUsername);
             followViewModel.checkFollowStatus(currentUsername, username);
             followViewModel.getFollowStatus().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
                 @Override
@@ -353,11 +353,15 @@ public class AnyProfileUserFragment extends Fragment {
                     if (status != null) {
                         isFollowing = status;
                         btn_follow.setImageResource(isFollowing ? R.drawable.baseline_check_24 : R.drawable.baseline_add_24);
+                        Log.d("AnyProfileUserFragment", "Check follow status for "+currentUsername+ " and " + username + ": " + isFollowing);
+                    } else {
+                        Log.e("AnyProfileUserFragment", "Failed to get follow status for " + username);
+                        btn_follow.setImageResource(R.drawable.baseline_add_24); // Mặc định nếu không lấy được
                     }
                 }
             });
         } else {
-            btn_follow.setVisibility(View.GONE); // Ẩn nút nếu xem profile của chính mình
+            btn_follow.setVisibility(View.GONE);
         }
     }
 }

@@ -1,17 +1,17 @@
 package com.example.hcmuteforums.model.dto.response;
 
 public class FollowStatusResponse {
-    private boolean isFollowing;
+    private boolean following;
 
     public boolean isFollowing() {
-        return isFollowing;
+        return following;
     }
 
     public void setFollowing(boolean following) {
-        isFollowing = following;
+        this.following = following;
     }
 
-    public FollowStatusResponse(boolean isFollowing) {
-        this.isFollowing = isFollowing;
+    public FollowStatusResponse(boolean following) {
+        this.following = following;
     }
 }

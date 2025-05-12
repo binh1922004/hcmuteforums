@@ -1,4 +1,6 @@
 package com.example.hcmuteforums.data.repository;
+import android.util.Log;
+
 import com.example.hcmuteforums.data.remote.api.FollowApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.model.dto.ApiResponse;
@@ -42,8 +44,10 @@ public class FollowRespository {
         Call<ApiResponse<PageResponse<FollowingResponse>>> call = followApi.getFollowings(username, page);
         call.enqueue(callback);
     }
-    public void checkFollowStatus(String username, String targetUsername, Callback<ApiResponse<FollowStatusResponse>> callback){
-        var call = followApi.checkFollowStatus(username, targetUsername);
+    public void checkFollowStatus(String currentUsername, String targetUsername, Callback<ApiResponse<FollowStatusResponse>> callback){
+        Log.d("CurrentUser", currentUsername);
+        Log.d("TargetUsername", targetUsername);
+        var call = followApi.checkFollowStatus(currentUsername, targetUsername);
         call.enqueue(callback);
     }
 }

@@ -60,8 +60,8 @@ public class FollowController {
     }
     @GetMapping("/check")
     public ApiResponse<FollowStatusResponse> checkFollowStatus(
-            @RequestParam("currentUsername") String currentUsername,
-            @RequestParam("targetUsername") String targetUsername) {
+            @RequestParam String currentUsername,
+            @RequestParam String targetUsername) {
         boolean isFollowing = followService.checkFollowStatus(currentUsername, targetUsername);
         return ApiResponse.<FollowStatusResponse>builder()
                 .result(new FollowStatusResponse(isFollowing))

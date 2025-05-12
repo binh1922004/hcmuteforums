@@ -213,22 +213,29 @@ public class FollowViewModel extends ViewModel {
         followRespository.checkFollowStatus(currentUsername, targetUsername, new Callback<ApiResponse<FollowStatusResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<FollowStatusResponse>> call, Response<ApiResponse<FollowStatusResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getResult() != null) {
-                    boolean isFollowing = response.body().getResult().isFollowing();
-                    followStatus.setValue(new Event<>(isFollowing));
-                    Log.d("FollowViewModel", "Check follow status success: " + isFollowing);
-                } else {
-                    followStatus.setValue(new Event<>(false));
-                    messageError.setValue(new Event<>("Lỗi khi kiểm tra trạng thái theo dõi"));
-                    Log.d("FollowViewModel", "Check follow status failed: " + response.message());
+                if(response.isSuccessful() && response.body()!=null){
+                    ApiResponse<FollowStatusResponse> apiRes= response.body();
+                    if(apiRes.getResult()!=null){
+                        followStatus.setValue(new Event<>(apiRes.getResult().isFollowing()));
+                        Log.d("FollowViewModel", "Check follow status success: "+currentUsername+" " + apiRes.getResult().isFollowing() + " for " + targetUsername);
+                    }else{
+                        errorFollowStatus.setValue(new Event<>(true));
+                    }
+                }else{
+                    if (response.errorBody() != null) {
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        messageError.setValue(new Event<>(apiError.getMessage()));
+                    }
+                    errorFollowStatus.setValue(new Event<>(true));
                 }
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<FollowStatusResponse>> call, Throwable t) {
-                followStatus.setValue(new Event<>(false));
-                messageError.setValue(new Event<>("Không thể kết nối đến server"));
-                Log.e("FollowViewModel", "Check follow status error: " + t.getMessage());
+            public void onFailure(Call<ApiResponse<FollowStatusResponse>> call, Throwable throwable) {
+                Log.e("Get Status", throwable.getMessage());
+                errorFollowStatus.setValue(new Event<>(true));
             }
         });
     }
