@@ -1,6 +1,7 @@
 package com.example.hcmuteforums.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnSwitchFragmentProfile;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
 
 import java.util.HashMap;
@@ -28,16 +30,19 @@ public class PersonFollowingAdapter extends RecyclerView.Adapter<PersonFollowing
 
     private OnFollowClickListener followClickListener;
     private Map<String, Boolean> followButtonVisibilityMap; // Theo dõi trạng thái hiển thị nút
+    private OnSwitchFragmentProfile onSwitchFragmentProfile;
 
     public interface OnFollowClickListener {
         void onFollowClick(String followId, String targetUsername, int position, boolean isFollowing);
     }
 
-    public PersonFollowingAdapter(Context context, List<FollowingResponse> followingList, OnFollowClickListener followClickListener) {
+    public PersonFollowingAdapter(Context context, List<FollowingResponse> followingList, OnFollowClickListener followClickListener
+                        ,OnSwitchFragmentProfile onSwitchFragmentProfile) {
         this.context = context;
         this.followingList = followingList;
         this.followClickListener = followClickListener;
         this.followButtonVisibilityMap = new HashMap<>();
+        this.onSwitchFragmentProfile = onSwitchFragmentProfile;
     }
 
     @NonNull
@@ -106,6 +111,15 @@ public class PersonFollowingAdapter extends RecyclerView.Adapter<PersonFollowing
             holder.unFollowButton.setVisibility(View.GONE);
             holder.followButton.setVisibility(View.VISIBLE);
         }
+        //Todo: Xử lí xự kiện ấn vào ảnh qua profile
+        holder.profileImage.setOnClickListener(view -> {
+            Log.d("Username", targetUsername);
+            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+        });
+        //Todo: Xử lí xự kiện ấn vào TextView Username qua profile
+        holder.username.setOnClickListener(view -> {
+            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+        });
 
 
     }

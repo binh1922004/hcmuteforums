@@ -1,5 +1,7 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +25,7 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.FollowerAdapter;
 import com.example.hcmuteforums.adapter.PersonFollowingAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnSwitchFragmentProfile;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
@@ -36,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PersonFollowFragment extends Fragment {
+public class PersonFollowFragment extends Fragment implements OnSwitchFragmentProfile {
 
     private RecyclerView recyclerView;
     private FollowerAdapter followerAdapter;
@@ -273,27 +276,29 @@ public class PersonFollowFragment extends Fragment {
 
     private void initializeTabs() {
         tabLayout.removeAllTabs();
-        tabLayout.addTab(tabLayout.newTab().setText("0 Người theo dõi"));
-        tabLayout.addTab(tabLayout.newTab().setText("0 Đang theo dõi"));
+        tabLayout.addTab(tabLayout.newTab().setText("0 Đang theo dõi")); // Đổi thứ tự, tab 0 là "Đang theo dõi"
+        tabLayout.addTab(tabLayout.newTab().setText("0 Người theo dõi")); // Tab 1 là "Người theo dõi"
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         followerAdapter = new FollowerAdapter(
                 getContext(),
                 this::handleFollowClick,
-                this::handleFollowerMoreClick
+                this::handleFollowerMoreClick,
+                this
         );
         followingAdapter = new PersonFollowingAdapter(
                 getContext(),
                 followingResponses,
-                this::handleFollowClick
+                this::handleFollowClick,
+                this
         );
 
         if (defaultTab == 0) {
-            recyclerView.setAdapter(followerAdapter);
-            followerAdapter.updateData(new ArrayList<>(), followingUsernames);
-        } else {
             recyclerView.setAdapter(followingAdapter);
             followingAdapter.updateData(new ArrayList<>());
+        } else {
+            recyclerView.setAdapter(followerAdapter);
+            followerAdapter.updateData(new ArrayList<>(), followingUsernames);
         }
         if (defaultTab == 0 || defaultTab == 1) {
             tabLayout.getTabAt(defaultTab).select();
@@ -316,7 +321,7 @@ public class PersonFollowFragment extends Fragment {
     }
     private void recyclerViewConfig(){
         followerAdapter = new FollowerAdapter(getContext(), this::handleFollowClick,
-                this::handleFollowerMoreClick);
+                this::handleFollowerMoreClick, this);
         RecyclerView.LayoutManager linearlayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearlayout);
         recyclerView.setAdapter(followerAdapter);
@@ -347,7 +352,7 @@ public class PersonFollowFragment extends Fragment {
     private void recyclerViewConfigFollowing(){
         followingAdapter = new PersonFollowingAdapter(getContext(),
                 followingResponses,
-                this::handleFollowClick);
+                this::handleFollowClick, this);
         RecyclerView.LayoutManager linearlayout = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearlayout);
         recyclerView.setAdapter(followingAdapter);
@@ -400,7 +405,6 @@ public class PersonFollowFragment extends Fragment {
 
         }
     }
-
     /*private void updateFollowerData() {
         int followerCount = (followerResponses != null) ? followerResponses.size() : 0;
         TabLayout.Tab followerTab = tabLayout.getTabAt(0);
@@ -474,4 +478,23 @@ public class PersonFollowFragment extends Fragment {
         return isLoggedIn;
     }
 
+    @Override
+    public void onClickAnyProfile(String username) {
+        SharedPreferences preferences = getContext().getSharedPreferences("User", MODE_PRIVATE);
+        String currentUserName = preferences.getString("username", "guest"); // Giá trị mặc định "guest" nếu chưa đăng nhập
+        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
+
+        AnyProfileUserFragment anyProfileUserFragment = new AnyProfileUserFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        bundle.putString("currentUsername", currentUserName);
+        bundle.putBoolean("isLoggedIn", isLoggedIn); // Truyền trạng thái đăng nhập
+        bundle.putString("loginPrompt", isLoggedIn ? null : "Bạn cần đăng nhập để theo dõi người dùng này"); // Thông điệp tùy chỉnh
+        anyProfileUserFragment.setArguments(bundle);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.flFragment, anyProfileUserFragment)
+                .addToBackStack(null)
+                .commit();
+    }
 }
