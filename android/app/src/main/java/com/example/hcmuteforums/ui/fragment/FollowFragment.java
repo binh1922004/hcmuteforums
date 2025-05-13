@@ -102,14 +102,14 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
         );
 
         tabLayout = view.findViewById(R.id.tabLayout);
+        recyclerViewConfigFollowing();
+        recyclerViewConfig();
+
         initializeTabs();
 
         setupObservers();
-        showMoreFollower();
-        showMoreFollowing();
         //Todo: Phân trang cho từng tab
-        recyclerViewConfigFollowing();
-        recyclerViewConfig();
+
 
         return view;
     }
@@ -315,9 +315,11 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
         Log.d("TAB", defaultTab+"");
         if (defaultTab == 0) {
             recyclerView.setAdapter(followerAdapter);
+            showMoreFollower();
             followerAdapter.updateData(new ArrayList<>(), followingUsernames);
         } else {
             recyclerView.setAdapter(followingAdapter);
+            showMoreFollowing();
             followingAdapter.updateData(new ArrayList<>());
         }
         if (defaultTab == 0 || defaultTab == 1) {

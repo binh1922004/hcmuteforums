@@ -35,6 +35,7 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.View
         this.context = context;
         this.followingList = new ArrayList<>();
         this.moreClickListener = moreClickListener;
+        this.onSwitchFragmentProfile = onSwitchFragmentProfile;
     }
 
     @NonNull
