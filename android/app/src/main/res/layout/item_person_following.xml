@@ -46,4 +46,31 @@
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray"/>
     </LinearLayout>
+
+    <!-- Nút Theo dõi -->
+    <Button
+        android:id="@+id/followButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Theo dõi"
+        android:backgroundTint="#4285F4"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp"/>
+    <Button
+        android:id="@+id/unFollowButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đang theo dõi"
+        android:backgroundTint="#000000"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp"/>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

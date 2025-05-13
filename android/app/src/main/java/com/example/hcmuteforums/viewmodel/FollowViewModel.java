@@ -57,6 +57,11 @@ public class FollowViewModel extends ViewModel {
     public MutableLiveData<Event<Boolean>> getErrorFollowStatus() {
         return errorFollowStatus;
     }
+    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+
+    public MutableLiveData<Boolean> getIsLoading() {
+        return isLoading;
+    }
 
     public LiveData<Event<Boolean>> getFollowStatus() {
         return followStatus;
@@ -145,6 +150,7 @@ public class FollowViewModel extends ViewModel {
         });
     }
     public void getFollower(String username, int page){
+        isLoading.setValue(true);
         followRespository.getFollower(username, page, new Callback<ApiResponse<PageResponse<FollowerResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<PageResponse<FollowerResponse>>> call, Response<ApiResponse<PageResponse<FollowerResponse>>> response) {
@@ -166,16 +172,20 @@ public class FollowViewModel extends ViewModel {
                     }
                     getFollowerError.setValue(new Event<>(true));
                 }
+                isLoading.setValue(false);
+
             }
 
             @Override
             public void onFailure(Call<ApiResponse<PageResponse<FollowerResponse>>> call, Throwable throwable) {
                 Log.e("Get Followers", throwable.getMessage());
                 getFollowerError.setValue(new Event<>(true));
+                isLoading.setValue(false);
             }
         });
     }
     public void getFollowing(String username, int page){
+        isLoading.setValue(true);
         followRespository.getFollowing(username, page, new Callback<ApiResponse<PageResponse<FollowingResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<PageResponse<FollowingResponse>>> call, Response<ApiResponse<PageResponse<FollowingResponse>>> response) {
@@ -200,12 +210,14 @@ public class FollowViewModel extends ViewModel {
                     }
                     getFollowingError.setValue(new Event<>(true));
                 }
+                isLoading.setValue(false);
             }
 
             @Override
             public void onFailure(Call<ApiResponse<PageResponse<FollowingResponse>>> call, Throwable throwable) {
                 Log.e("Get Followings", throwable.getMessage());
                 getFollowingError.setValue(new Event<>(true));
+                isLoading.setValue(false);
             }
         });
     }
