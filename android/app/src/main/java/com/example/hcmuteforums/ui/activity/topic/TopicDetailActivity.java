@@ -209,6 +209,25 @@ public class TopicDetailActivity extends AppCompatActivity{
                         btnLike.setSelected(false);
                         btnLike.setImageResource(R.drawable.love_unclick);
                     }
+                    btnLike.setOnClickListener(v -> {
+                        if (v.isSelected()){
+                            btnLike.setImageResource(R.drawable.love_unclick);
+                        }
+                        else{
+                            btnLike.setImageResource(R.drawable.love_click);
+                        }
+                        v.setSelected(!v.isSelected());
+                        int currentLike = topic.getLikeCount();
+
+                        currentLike += (v.isSelected() ? 1 : -1);
+                        topic.setLikeCount(currentLike);
+                        tvLikeCount.setText(String.valueOf(currentLike));
+                    });
+
+
+                    //biding for reply
+                    tvReplyCount.setText(String.valueOf(topic.getReplyCount()));
+
                     //menu action config
                     menuActionsConfig(topic.isOwner());
                 }
