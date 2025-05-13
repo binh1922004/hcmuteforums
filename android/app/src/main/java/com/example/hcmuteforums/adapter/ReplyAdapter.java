@@ -37,6 +37,12 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
     private OnReplyClickListener onReplyClickListener;
     private OnMenuActionListener onMenuActionListener;
     private Context context;
+    private boolean isReplyOfOwnTopic;
+
+    public void setReplyOfOwnTopic(boolean replyOfOwnTopic) {
+        isReplyOfOwnTopic = replyOfOwnTopic;
+    }
+
     //adapter
     public ReplyAdapter(Context context, List<ReplyResponse> replyList, OnReplyClickListener onReplyClickListener,
                         OnMenuActionListener onMenuActionListener) {
@@ -320,7 +326,12 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                     popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_user, popupMenu.getMenu());
                 }
                 else{
-                    popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_guest, popupMenu.getMenu());
+                    if (isReplyOfOwnTopic){
+                        popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_owner_topic, popupMenu.getMenu());
+                    }
+                    else{
+                        popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_guest, popupMenu.getMenu());
+                    }
                 }
                 // Xử lý sự kiện khi chọn mục trong menu
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

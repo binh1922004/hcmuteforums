@@ -52,6 +52,7 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
 
     //attribute
     private String topicId;
+    private boolean isOwnTopic;
     private boolean isLastPage = false;
     private boolean isLoading = false;
     private boolean isFirstLoad = true;
@@ -75,19 +76,21 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
     LoadingDialogFragment loadingDialog;
 
 
-    public static ReplyFragment newInstance(String topicId) {
+    public static ReplyFragment newInstance(String topicId, boolean isOwnTopic) {
         ReplyFragment fragment = new ReplyFragment();
         Bundle args = new Bundle();
         args.putString("topicId", topicId);
+        args.putBoolean("isOwnTopic", isOwnTopic);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static ReplyFragment newInstance(String topicId, String replyId) {
+    public static ReplyFragment newInstance(String topicId, String replyId, boolean isOwnTopic) {
         ReplyFragment fragment = new ReplyFragment();
         Bundle args = new Bundle();
         args.putString("topicId", topicId);
         args.putString("replyId", replyId);
+        args.putBoolean("isOwnTopic", isOwnTopic);
         fragment.setArguments(args);
         return fragment;
     }
@@ -106,8 +109,11 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
         btnCancel = view.findViewById(R.id.btnCancel);
         layoutText = view.findViewById(R.id.layoutText);
         replyViewModel = new ReplyViewModel();
-        topicId = getArguments().getString("topicId");
-        replyIdFromNotification = getArguments().getString("replyId");
+        if (getArguments() != null){
+            isOwnTopic = getArguments().getBoolean("isOwnTopic");
+            topicId = getArguments().getString("topicId");
+            replyIdFromNotification = getArguments().getString("replyId");
+        }
         currentPageReplyChildMap = new HashMap<>();
         isLastPageReplyChildMap = new HashMap<>();
         positionDelete = new HashMap<>();
@@ -148,7 +154,7 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
         rcvReplies.setLayoutManager(new LinearLayoutManager(getContext()));
         replyAdapter = new ReplyAdapter(getContext(), replyList, this, this);
         rcvReplies.setAdapter(replyAdapter);
-
+        replyAdapter.setReplyOfOwnTopic(isOwnTopic);
         rcvReplies.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
