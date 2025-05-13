@@ -32,6 +32,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
 
     private List<ReplyResponse> replyList;
     private Set<String> replyIds; // Lưu trữ id của các reply
+    private Set<String> replyChildIds; // Lưu trữ id của các reply
     //listener
     private OnReplyClickListener onReplyClickListener;
     private OnMenuActionListener onMenuActionListener;
@@ -44,6 +45,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
         this.context = context;
         this.onMenuActionListener = onMenuActionListener;
         replyIds = new HashSet<>();
+        replyChildIds = new HashSet<>();
     }
     // Lớp DiffUtil.Callback chung
     private static class ReplyDiffCallback extends DiffUtil.Callback {
@@ -117,7 +119,11 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                 if (replyList.get(pos).getListChild() == null){
                     replyList.get(pos).setListChild(new ArrayList<>());
                 }
-                replyList.get(pos).getListChild().addAll(childList);
+                for (var childReply: childList){
+                    if (!replyChildIds.contains(childReply.getId())){
+                        replyList.get(pos).getListChild().add(childReply);
+                    }
+                }
                 replyList.get(pos).setLast(isLast);
                 notifyItemChanged(pos);
                 break;
@@ -134,6 +140,9 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                     replyList.get(pos).setListChild(new ArrayList<>());
                 }
                 replyList.get(pos).getListChild().add(0, childReply);
+                replyList.get(pos).setHasChild(true);
+                replyList.get(pos).setShowChild(true);
+                replyChildIds.add(childReply.getId());
                 notifyItemChanged(pos);
                 break;
             }
@@ -238,7 +247,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                 if (onReplyClickListener != null)
                     onReplyClickListener.onReplyClick(reply);
             });
-
+            Log.d("REplyAdapter", reply.isShowChild() + " " + reply.isHasChild());
             //TODO: show more reply
             if (reply.isShowChild() ){
                 if (reply.isLast()){
@@ -246,6 +255,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                     tvHideChildReply.setVisibility(View.VISIBLE);
 
                     tvHideChildReply.setOnClickListener(v -> {
+                        replyChildIds.clear();
                         rcvChildReplies.setVisibility(View.GONE);
                         tvHideChildReply.setVisibility(View.GONE);
                         reply.getListChild().clear();
@@ -256,6 +266,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                     });
                 }
                 else{
+                    rcvChildReplies.setVisibility(View.VISIBLE);
                     tvShowMoreChildReply.setVisibility(View.VISIBLE);
                     tvHideChildReply.setVisibility(View.GONE);
 
@@ -272,13 +283,6 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
 
             //TODO: show reply child
             if (reply.isHasChild()) {
-                if (!reply.isShowChild()) {
-                    reply.setShowChild(true);
-                    tvShowChildReply.setVisibility(View.VISIBLE);
-                }
-                else{
-                    tvShowChildReply.setVisibility(View.GONE);
-                }
                 //recyclerview set up and add data
                 List<ReplyResponse> children = reply.getListChild();
                 replyChildAdapter.setData(children != null ? children : new ArrayList<>());
@@ -288,6 +292,13 @@ public class ReplyAdapter extends RecyclerView.Adapter<ReplyAdapter.ReplyViewHol
                                 ? View.VISIBLE
                                 : View.GONE
                 );
+                if (!reply.isShowChild()) {
+                    reply.setShowChild(true);
+                    tvShowChildReply.setVisibility(View.VISIBLE);
+                }
+                else{
+                    tvShowChildReply.setVisibility(View.GONE);
+                }
 
                 //show child
                 tvShowChildReply.setOnClickListener(v -> {
