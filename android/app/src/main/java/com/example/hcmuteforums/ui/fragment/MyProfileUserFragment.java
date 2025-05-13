@@ -461,6 +461,7 @@ public class MyProfileUserFragment extends Fragment {
                 }
                 FollowFragment followingFragment = new FollowFragment();
                 Bundle bundle = new Bundle();
+                bundle.putBoolean("isFollowing", true);
                 bundle.putString("username", currentUserResponse.getUsername());
                 bundle.putInt("defaultTab", 1); // 1: Tab "Đang theo dõi"
                 followingFragment.setArguments(bundle);
@@ -482,6 +483,7 @@ public class MyProfileUserFragment extends Fragment {
                 }
                 FollowFragment followingFragment = new FollowFragment();
                 Bundle bundle = new Bundle();
+                bundle.putBoolean("isFollowing", false);
                 bundle.putString("username", currentUserResponse.getUsername());
                 bundle.putInt("defaultTab", 0); // 0: Tab "Người theo dõi"
                 followingFragment.setArguments(bundle);

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnSwitchFragmentProfile;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
     private OnFollowClickListener followClickListener;
     private OnMoreClickListener moreClickListener;
     private Map<String, Boolean> followButtonVisibilityMap; // Theo dõi trạng thái hiển thị nút
-
+    private OnSwitchFragmentProfile onSwitchFragmentProfile;
     public interface OnFollowClickListener {
         void onFollowClick(String followId, String targetUsername, int position, boolean isFollowing);
     }
@@ -38,12 +39,14 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         void onMoreClick(String followId, int position);
     }
 
-    public FollowerAdapter(Context context, OnFollowClickListener followClickListener, OnMoreClickListener moreClickListener) {
+    public FollowerAdapter(Context context, OnFollowClickListener followClickListener,
+                           OnMoreClickListener moreClickListener, OnSwitchFragmentProfile onSwitchFragmentProfile) {
         this.context = context;
         this.followerList = new ArrayList<>();
         this.followClickListener = followClickListener;
         this.moreClickListener = moreClickListener;
         this.followButtonVisibilityMap = new HashMap<>();
+        this.onSwitchFragmentProfile = onSwitchFragmentProfile;
 
     }
 
@@ -59,11 +62,11 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FollowerResponse follower = followerList.get(position);
 
-        // Truy cập thông tin người dùng qua UserGeneral
+        //Todo: Truy cập thông tin người dùng qua UserGeneral
         holder.username.setText(follower.getUserGeneral().getUsername());
         holder.displayName.setText(follower.getUserGeneral().getFullName());
 
-        // Tải ảnh đại diện từ URL bằng Glide
+        //Todo: Tải ảnh đại diện từ URL bằng Glide
         Glide.with(context)
                 .load(follower.getUserGeneral().getAvt())
                 .placeholder(R.drawable.avatar_boy)
@@ -71,17 +74,17 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
                 .error(R.drawable.user_2)
                 .into(holder.profileImage);
 
-        // Lấy followId và targetUsername
+        //Todo: Lấy followId và targetUsername
         String followId = follower.getFollowId();
         String targetUsername = follower.getUserGeneral().getUsername();
 
-        // Kiểm tra trạng thái hiển thị nút "Theo dõi"
+        //Todo: Kiểm tra trạng thái hiển thị nút "Theo dõi"
         boolean isFollowing= follower.getHasFollowed();
         followButtonVisibilityMap.put(targetUsername, !isFollowing);
         boolean isButtonVisible = followButtonVisibilityMap.getOrDefault(targetUsername, true);
         holder.followButton.setVisibility(isButtonVisible ? View.VISIBLE : View.GONE);
 
-        // Xử lý sự kiện nhấn nút "Theo dõi"
+        //Todo: Xử lý sự kiện nhấn nút "Theo dõi"
         holder.followButton.setOnClickListener(v -> {
             if (followClickListener != null) {
                 followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
@@ -110,7 +113,7 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             }
         });
 
-        // Xử lý sự kiện nhấn nút "More"
+        //Todo: Xử lý sự kiện nhấn nút "More"
         holder.moreButton.setOnClickListener(v -> {
             if (moreClickListener != null) {
                 moreClickListener.onMoreClick(followId, position);
@@ -124,6 +127,14 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             holder.unFollowButton.setVisibility(View.GONE);
             holder.followButton.setVisibility(View.VISIBLE);
         }
+        //Todo: Xử lí xự kiện ấn vào ảnh qua profile
+        holder.profileImage.setOnClickListener(view -> {
+            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+        });
+        //Todo: Xử lí xự kiện ấn vào TextView Username qua profile
+        holder.username.setOnClickListener(view -> {
+            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+        });
     }
 
     @Override

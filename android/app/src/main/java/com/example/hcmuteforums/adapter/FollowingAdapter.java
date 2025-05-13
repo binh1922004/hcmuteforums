@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnSwitchFragmentProfile;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
 
@@ -23,15 +24,18 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.View
     private List<FollowingResponse> followingList;
     private Context context;
     private OnMoreClickListener moreClickListener;
+    private OnSwitchFragmentProfile onSwitchFragmentProfile;
 
     public interface OnMoreClickListener {
         void onMoreClick(String followId,String targetUsername ,int position);
     }
 
-    public FollowingAdapter(Context context, OnMoreClickListener moreClickListener) {
+    public FollowingAdapter(Context context, OnMoreClickListener moreClickListener,
+                            OnSwitchFragmentProfile onSwitchFragmentProfile) {
         this.context = context;
         this.followingList = new ArrayList<>();
         this.moreClickListener = moreClickListener;
+        this.onSwitchFragmentProfile = onSwitchFragmentProfile;
     }
 
     @NonNull
@@ -66,6 +70,14 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.View
             if (moreClickListener != null) {
                 moreClickListener.onMoreClick(followId,targetUsername ,position);
             }
+        });
+        //Todo: Xử lí xự kiện ấn vào ảnh qua profile
+        holder.profileImage.setOnClickListener(view -> {
+            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+        });
+        //Todo: Xử lí xự kiện ấn vào TextView Username qua profile
+        holder.username.setOnClickListener(view -> {
+            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
         });
     }
     public void addData(List<FollowingResponse> newList){
