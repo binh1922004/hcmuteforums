@@ -65,6 +65,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
 
     //attribute
     private String topicId;
+    private boolean isOwnTopic;
     private boolean isLastPage = false;
     private boolean isLoading = false;
     private boolean isFirstLoad = true;
@@ -82,10 +83,11 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     //reply information
     private String parentReplyId = null;
     private String replyingToUser = null;
-    public static ReplyBottomSheetFragment newInstance(String topicId) {
+    public static ReplyBottomSheetFragment newInstance(String topicId, boolean isOwnTopic) {
         ReplyBottomSheetFragment fragment = new ReplyBottomSheetFragment();
         Bundle args = new Bundle();
         args.putString("topicId", topicId);
+        args.putBoolean("isOwnTopic", isOwnTopic);
         fragment.setArguments(args);
         return fragment;
     }
@@ -105,8 +107,10 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         btnCancel = view.findViewById(R.id.btnCancel);
         layoutText = view.findViewById(R.id.layoutText);
         replyViewModel = new ReplyViewModel();
-        topicId = getArguments().getString("topicId");
-
+        if (getArguments() != null){
+            isOwnTopic = getArguments().getBoolean("isOwnTopic");
+            topicId = getArguments().getString("topicId");
+        }
         currentPageReplyChildMap = new HashMap<>();
         isLastPageReplyChildMap = new HashMap<>();
         positionDelete = new HashMap<>();
@@ -138,7 +142,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         rcvReplies.setLayoutManager(new LinearLayoutManager(getContext()));
         replyAdapter = new ReplyAdapter(getContext(), replyList, this, this);
         rcvReplies.setAdapter(replyAdapter);
-
+        replyAdapter.setReplyOfOwnTopic(isOwnTopic);
 
         rcvReplies.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

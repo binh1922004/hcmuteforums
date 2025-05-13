@@ -152,6 +152,7 @@ public class NotificationFragment extends Fragment implements OnNotificationClic
     public void onClickLike(String topicId) {
         Intent topicIntent = new Intent(getContext(), TopicDetailActivity.class);
         topicIntent.putExtra("topicId", topicId);
+        topicIntent.putExtra("isOwnTopic", true);
         startActivity(topicIntent);
     }
 
@@ -160,6 +161,7 @@ public class NotificationFragment extends Fragment implements OnNotificationClic
         Intent topicIntent = new Intent(getContext(), TopicDetailActivity.class);
         topicIntent.putExtra("topicId", topicId);
         topicIntent.putExtra("replyId", replyId);
+        topicIntent.putExtra("isOwnTopic", true);
         startActivity(topicIntent);
     }
 }

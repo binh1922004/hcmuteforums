@@ -238,7 +238,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvReplyCount.setText(String.valueOf(topic.getReplyCount()));
             btnReply.setOnClickListener(v -> {
                 if (onReplyShowListener != null)
-                    onReplyShowListener.onReply(topic.getId(), position);
+                    onReplyShowListener.onReply(topic.getId(), topic.isOwner(), position);
             });
 
 

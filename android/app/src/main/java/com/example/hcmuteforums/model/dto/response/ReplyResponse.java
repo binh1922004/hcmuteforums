@@ -15,6 +15,10 @@ public class ReplyResponse {
     private boolean isLast;
     private boolean owner;
 
+    public void setHasChild(boolean hasChild) {
+        this.hasChild = hasChild;
+    }
+
     public boolean isOwner() {
         return owner;
     }

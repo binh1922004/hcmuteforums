@@ -63,10 +63,11 @@ public class TopicDetailActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_topic_detail);
-        //TODO: Get data from before activity
+        //TODO: Get data before activity
         Intent receivedIntent = getIntent();
         topicId = receivedIntent.getStringExtra("topicId");
         String replyId = receivedIntent.getStringExtra("replyId");
+        boolean isOwnTopic =receivedIntent.getBooleanExtra("isOwnTopic", false);
         //mapping data
         mappingData();
 
@@ -74,7 +75,7 @@ public class TopicDetailActivity extends AppCompatActivity{
         setTopicData();
 
         // Thêm CommentFragment vào Activity
-        replyFragmentConfig(replyId);
+        replyFragmentConfig(replyId, isOwnTopic);
 
         //event handler
         backEvent();
@@ -141,13 +142,13 @@ public class TopicDetailActivity extends AppCompatActivity{
         });
     }
 
-    private void replyFragmentConfig(String replyId) {
+    private void replyFragmentConfig(String replyId, boolean isOwnTopic) {
         ReplyFragment replyFragment;
         if (replyId == null){
-            replyFragment = ReplyFragment.newInstance(topicId);
+            replyFragment = ReplyFragment.newInstance(topicId, isOwnTopic);
         }
         else{
-            replyFragment = ReplyFragment.newInstance(topicId, replyId);
+            replyFragment = ReplyFragment.newInstance(topicId, replyId, isOwnTopic);
         }
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, replyFragment)
