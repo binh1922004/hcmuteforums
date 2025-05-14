@@ -20,7 +20,7 @@ public class SecurityConfig {
     "/api/categories/**", "/api/subcategory/**", "/api/auth/introspect", "/ws", "/api/otp/getOTPResetPassword", "/api/otp/validatedOTP"
     ,"/api/users/updatePassword"};
     private final String[] PUBLIC_ENDPOINT_GET = {"/api/topics/**", "/upload/**", "/api/reply/**", "/api/follow/**"
-    ,"/api/users/personInfo","/api/profiles/personProfile","/api/follow/check"};
+    ,"/api/users/personInfo","/api/profiles/personProfile","/api/follow/check", "/api/search/**"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity, CustomJwtDecoder customJwtDecoder) throws Exception {
