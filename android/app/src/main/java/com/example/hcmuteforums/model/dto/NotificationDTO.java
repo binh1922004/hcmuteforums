@@ -10,9 +10,14 @@ public class NotificationDTO {
     private String type;         // Loại thông báo: "REPLY", "LIKE", "SYSTEM", etc.
     private String content;      // Nội dung thông báo
     private String topicId;      // ID của bài viết liên quan
-    private String replyId;      // ID của reply liên quan
+    private String actionId;      // ID của reply liên quan
     private boolean isRead;      // Trạng thái đã đọc hay chưa
     private Date createdAt;      // Thời điểm tạo thông báo
+    private String sendUserAvatar;
+
+    public String getSendUserAvatar() {
+        return sendUserAvatar;
+    }
 
     public String getId() {
         return id;
@@ -70,12 +75,12 @@ public class NotificationDTO {
         this.topicId = topicId;
     }
 
-    public String getReplyId() {
-        return replyId;
+    public String getActionId() {
+        return actionId;
     }
 
-    public void setReplyId(String replyId) {
-        this.replyId = replyId;
+    public void setActionId(String actionId) {
+        this.actionId = actionId;
     }
 
     public boolean isRead() {

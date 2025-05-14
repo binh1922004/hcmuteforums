@@ -34,6 +34,7 @@
                     android:src="@drawable/avatar_boy" />
 
                 <LinearLayout
+                    android:layout_weight="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -55,6 +56,18 @@
                         android:textColor="#666666"
                         android:textSize="12sp" />
                 </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/imgMoreActions"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_memu_more"
+                    android:layout_gravity="top"
+                    android:contentDescription="More actions"
+                    android:padding="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?android:selectableItemBackground" />
             </LinearLayout>
 
             <!-- Tiêu đề -->
@@ -69,7 +82,7 @@
                 android:textStyle="bold" />
 
             <!-- Nội dung -->
-            <io.github.glailton.expandabletextview.ExpandableTextView
+            <TextView
                 android:id="@+id/tvContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,6 +94,14 @@
                 expandableTextView:textMode="line"
                 app:expandType="layout"
                 android:text="Content" />
+            <TextView
+                android:id="@+id/tvToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xem thêm"
+                android:textSize="12sp"
+                android:textColor="@color/gray"
+                android:visibility="gone" />
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPagerImages"
                 android:layout_width="match_parent"

@@ -60,7 +60,32 @@ public class TopicService {
         Page<Topic> topicPage = topicRepository.findAll(pageable);
 
         List<TopicDetailResponse>  content= topicPage.getContent().stream()
-                .map(topic -> toTopicDetailResponse(topic, username))
+                .map(this::toTopicDetailResponse)
+                .collect(Collectors.toList());
+
+        return PageResponse.<TopicDetailResponse>builder()
+                .content(content)
+                .pageSize(topicPage.getSize())
+                .totalElements(topicPage.getTotalElements())
+                .totalPages(topicPage.getTotalPages())
+                .last(topicPage.isLast())
+                .build();
+    }
+
+    public PageResponse<TopicDetailResponse> getTopicByUsername(
+            String userName,
+            int page,
+            int size,
+            String sortBy,
+            String direction){
+
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Topic> topicPage = topicRepository.findAllByUser_Username(userName, pageable);
+
+        List<TopicDetailResponse>  content= topicPage.getContent().stream()
+                .map(this::toTopicDetailResponse)
                 .collect(Collectors.toList());
 
         return PageResponse.<TopicDetailResponse>builder()
@@ -76,33 +101,31 @@ public class TopicService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
-            return null;
+            throw new AppException(ErrorCode.USER_NOTEXISTED);
         }
 
         Topic topic = topicMapper.toTopic(topicPostRequest);
         topic.setUser(user.get());
         topic.setCreatedAt(new Date());
 
-        return toTopicDetailResponse(topicRepository.save(topic), username);
+        return toTopicDetailResponse(topicRepository.save(topic));
     }
 
     public TopicDetailResponse getTopicDetail(String topicId) {
         Topic topic = topicRepository.findById(topicId).orElseThrow(() ->
                 new AppException(ErrorCode.TOPIC_NOTEXISTED));
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : null;
-        return toTopicDetailResponse(topic, username);
+       return toTopicDetailResponse(topic);
     }
 
-    public void deleteTopic(String topicId) {
+    public String deleteTopic(String topicId) {
         topicRepository.deleteById(topicId);
+        return topicId;
     }
 
-    public void updateTopic(String topicId, TopicUpdateRequest topicUpdateRequest) {
+    public TopicDetailResponse updateTopic(String topicId, TopicUpdateRequest topicUpdateRequest) {
         Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOTEXISTED));
         topicMapper.updateTopic(topic, topicUpdateRequest);
-        Optional<SubCategory> subCategory = subCategoryRepository.findById(topicUpdateRequest.getSubCategoryId());
-        topicRepository.save(topic);
+        return toTopicDetailResponse(topicRepository.save(topic));
     }
 
     public boolean isOwner(String topicId) {
@@ -111,7 +134,10 @@ public class TopicService {
         return topicRepository.existsTopicByIdAndUser_Username(topicId, username);
     }
 
-    private TopicDetailResponse toTopicDetailResponse(Topic topic, String username) {
+    private TopicDetailResponse toTopicDetailResponse(Topic topic) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : null;
+
         String topicId = topic.getId();
         TopicDetailResponse topicDetailResponse = topicMapper.toTopicDetailResponse(topic);
 
@@ -125,6 +151,9 @@ public class TopicService {
         if (username != null){
             if (likeRepository.existsLikeByTopic_IdAndUser_Username(topicId, username)) {
                 topicDetailResponse.setLiked(true);
+            }
+            else{
+                topicDetailResponse.setLiked(false);
             }
         }
         //get user

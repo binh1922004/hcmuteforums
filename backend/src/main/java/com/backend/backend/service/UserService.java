@@ -58,6 +58,11 @@ public class UserService {
 
         return userMapper.toUserResponse(user);
     }
+    public UserResponse getUserInfoWithUserName(String username){
+        User user = userRepository.findByUsername(username).orElseThrow(()->
+                new AppException(ErrorCode.USER_NOTEXISTED));
+        return userMapper.toUserResponse(user);
+    }
 
     public UserResponse updateUserInfo(UserUpdateRequest userUpdateRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

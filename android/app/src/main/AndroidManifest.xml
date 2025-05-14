@@ -19,7 +19,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activity.topic.TopicUpdateActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.user.NewPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.topic.TopicDetailActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.user.ForgotPasswordOTPActivity"

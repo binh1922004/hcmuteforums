@@ -41,6 +41,10 @@ public class ProfileRepository {
         var call = profileApi.myProfile();
         call.enqueue(callback);
     }
+    public void getPersonProfile(String username, Callback<ApiResponse<ProfileResponse>> callback){
+        var call = profileApi.personProfile(username);
+        call.enqueue(callback);
+    }
 
     public void updateProfile(String bio,Callback<ApiResponse<ProfileResponse>> callback) {
         ProfileUpdateRequest profileUpdateRequest = new ProfileUpdateRequest(bio);

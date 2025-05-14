@@ -28,18 +28,26 @@ public class ReplyController {
                 .build();
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     @PreAuthorize("@replyService.isOwner(#replyId)")
-    public ApiResponse updateReply(String replyId, String content){
-        replyService.updateReply(replyId, content);
-        return ApiResponse.builder().build();
+    public ApiResponse<ReplyResponse> updateReply(String replyId, String content){
+        return ApiResponse.<ReplyResponse>builder()
+                .result(replyService.updateReply(replyId, content))
+                .build();
     }
 
     @DeleteMapping("/delete")
-    @PreAuthorize("@replyService.isOwner(#replyId)")
-    public ApiResponse deleteReply(String replyId){
-        replyService.deleteReply(replyId);
-        return ApiResponse.builder().build();
+    public ApiResponse<String> deleteReply(String replyId){
+        return ApiResponse.<String>builder()
+                .result(replyService.deleteReply(replyId))
+                .build();
+    }
+
+    @GetMapping("/detail/{replyId}")
+    public ApiResponse<ReplyResponse> detailReply(@PathVariable String replyId){
+        return ApiResponse.<ReplyResponse>builder()
+                .result(replyService.getDetailReply(replyId))
+                .build();
     }
 
     @GetMapping("/{topicId}")

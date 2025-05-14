@@ -21,6 +21,7 @@ public class WebSocketManager {
     private StompClient stompClient;
     private Disposable topicSubscription;
     private List<OnNotificationListener> listeners = new ArrayList<>();
+    private List<NotificationDTO> unreadNotifications = new ArrayList<>(); // Lưu danh sách thông báo chưa đọc
     private boolean hasUnreadNotifications = false;
     private String userId;
 
@@ -40,7 +41,7 @@ public class WebSocketManager {
         disconnect();
 
         // URL của WebSocket server
-        String url = "wss://ball.io.vn/ute/ws";
+        String url = "ws://10.0.2.2:8080/ute/ws";
 
         // Headers cho STOMP
         List<StompHeader> headers = new ArrayList<>();
@@ -69,13 +70,13 @@ public class WebSocketManager {
                             topicMessage.getPayload(),
                             NotificationDTO.class);
 
-                    // Cập nhật trạng thái thông báo
-                    hasUnreadNotifications = true;
+                    // Thêm thông báo vào danh sách
+                    unreadNotifications.add(notificationData);
 
-                    // Thông báo cho tất cả listeners
+                    // Thông báo cho các listener
                     for (OnNotificationListener listener : listeners) {
                         listener.onNewNotification(notificationData);
-                        listener.onNotificationStatusChanged(hasUnreadNotifications);
+                        listener.onNotificationStatusChanged(!unreadNotifications.isEmpty());
                     }
                 }, throwable -> {
                     Log.e(TAG, "Error on subscribe topic", throwable);
@@ -108,15 +109,19 @@ public class WebSocketManager {
 
     // Đánh dấu đã đọc tất cả thông báo
     public void markAllNotificationsAsRead() {
-        hasUnreadNotifications = false;
+        unreadNotifications.clear();
         for (OnNotificationListener listener : listeners) {
             listener.onNotificationStatusChanged(hasUnreadNotifications);
         }
     }
 
     // Kiểm tra có thông báo chưa đọc không
+    public int getUnreadNotificationCount() {
+        return unreadNotifications.size();
+    }
+
     public boolean hasUnreadNotifications() {
-        return hasUnreadNotifications;
+        return !unreadNotifications.isEmpty();
     }
 
 

@@ -34,12 +34,17 @@ public class TopicController {
                 .build();
     }
 
-//    @GetMapping("/list/{id}")
-//    public ApiResponse<List<Topic>> getAllTopicsBySubCategory(@PathVariable String id) {
-//        return ApiResponse.<List<Topic>>builder()
-//                .result(topicService.getAllTopicsBySubCategory(id))
-//                .build();
-//    }
+    @GetMapping("/user/{username}")
+    public ApiResponse<PageResponse<TopicDetailResponse>> getAllTopicsBySubCategory(
+            @PathVariable String username,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction) {
+        return ApiResponse.<PageResponse<TopicDetailResponse>>builder()
+                .result(topicService.getTopicByUsername(username, page, size, sortBy, direction))
+                .build();
+    }
 
     @GetMapping("/detail/{id}")
     public ApiResponse<TopicDetailResponse> topicDetail(@PathVariable String id) {
@@ -51,24 +56,23 @@ public class TopicController {
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("@topicService.isOwner(#id)")
     public ApiResponse<String> deleteTopic(@PathVariable String id) {
-        topicService.deleteTopic(id);
         return ApiResponse.<String>builder()
-                .result("Đã xoá bài viết")
+                .result(topicService.deleteTopic(id))
                 .build();
     }
 
     @PutMapping("/update/{id}")
     @PreAuthorize("@topicService.isOwner(#id)")
-    public ApiResponse<String> updateTopic(@PathVariable String id, @RequestBody TopicUpdateRequest topicUpdateRequest) {
+    public ApiResponse<TopicDetailResponse> updateTopic(@PathVariable String id, @RequestBody TopicUpdateRequest topicUpdateRequest) {
         topicService.updateTopic(id, topicUpdateRequest);
-        return ApiResponse.<String>builder()
-                .result("Đã cập nhật thông tin bài viết")
+        return ApiResponse.<TopicDetailResponse>builder()
+                .result(topicService.updateTopic(id, topicUpdateRequest))
                 .build();
     }
     @GetMapping
     public ApiResponse<PageResponse<TopicDetailResponse>> getAllTopics(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "1") int size,
+            @RequestParam(defaultValue = "6") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String direction
     ){

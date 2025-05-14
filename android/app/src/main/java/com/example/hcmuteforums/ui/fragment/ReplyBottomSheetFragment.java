@@ -1,5 +1,11 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,6 +29,7 @@ import android.widget.Toast;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.ReplyAdapter;
 import com.example.hcmuteforums.event.Event;
+import com.example.hcmuteforums.listeners.OnMenuActionListener;
 import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
@@ -42,7 +49,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implements
-        OnReplyClickListener {
+        OnReplyClickListener, OnMenuActionListener {
     //element from layout
     private RecyclerView rcvReplies;
     private EditText edtComment;
@@ -58,6 +65,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
 
     //attribute
     private String topicId;
+    private boolean isOwnTopic;
     private boolean isLastPage = false;
     private boolean isLoading = false;
     private boolean isFirstLoad = true;
@@ -70,14 +78,16 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     //hash map for storage page size of each reply child
     HashMap<String, Integer> currentPageReplyChildMap;
     HashMap<String, Boolean> isLastPageReplyChildMap;
-
+    HashMap<String, Integer> positionDelete;
+    HashMap<String, Integer> positionUpdate;
     //reply information
     private String parentReplyId = null;
     private String replyingToUser = null;
-    public static ReplyBottomSheetFragment newInstance(String topicId) {
+    public static ReplyBottomSheetFragment newInstance(String topicId, boolean isOwnTopic) {
         ReplyBottomSheetFragment fragment = new ReplyBottomSheetFragment();
         Bundle args = new Bundle();
         args.putString("topicId", topicId);
+        args.putBoolean("isOwnTopic", isOwnTopic);
         fragment.setArguments(args);
         return fragment;
     }
@@ -97,10 +107,14 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         btnCancel = view.findViewById(R.id.btnCancel);
         layoutText = view.findViewById(R.id.layoutText);
         replyViewModel = new ReplyViewModel();
-        topicId = getArguments().getString("topicId");
-
+        if (getArguments() != null){
+            isOwnTopic = getArguments().getBoolean("isOwnTopic");
+            topicId = getArguments().getString("topicId");
+        }
         currentPageReplyChildMap = new HashMap<>();
         isLastPageReplyChildMap = new HashMap<>();
+        positionDelete = new HashMap<>();
+        positionUpdate = new HashMap<>();
         replyAdapterConfig();
 
         loadMoreReplies();
@@ -113,20 +127,22 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         return view;
     }
 
-    private void cancelReply() {
+    private void    cancelReply() {
         btnCancel.setOnClickListener(v -> {
             btnCancel.setVisibility(View.GONE);
             edtComment.setText("");
             edtComment.setHint("Viết bình luận...");
+            replyingToUser = null;
+            parentReplyId = null;
         });
     }
 
     //mapping for data
     private void replyAdapterConfig() {
         rcvReplies.setLayoutManager(new LinearLayoutManager(getContext()));
-        replyAdapter = new ReplyAdapter(getContext(), replyList, this);
+        replyAdapter = new ReplyAdapter(getContext(), replyList, this, this);
         rcvReplies.setAdapter(replyAdapter);
-
+        replyAdapter.setReplyOfOwnTopic(isOwnTopic);
 
         rcvReplies.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -176,7 +192,7 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
             }
         });
         //reply post success
-        replyViewModel.getReplyPostSuccess().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
+        replyViewModel.getReplyPostLiveData().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
             @Override
             public void onChanged(Event<ReplyResponse> replyResponseEvent) {
                 ReplyResponse replyResponse = replyResponseEvent.getContent();
@@ -219,6 +235,31 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
             }
         });
 
+        //TODO: Delete reply
+        replyViewModel.getReplyDeleteLiveData().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> result) {
+                String replyId = result.getContent();
+                if (replyId != null && positionDelete.containsKey(replyId)){
+                    Integer pos = positionDelete.get(replyId);
+                    replyAdapter.deleteReply(pos);
+                    positionDelete.remove(replyId);
+                }
+            }
+        });
+
+        //TODO: Update reply
+        replyViewModel.getReplyUpdateLiveData().observe(getViewLifecycleOwner(), new Observer<Event<ReplyResponse>>() {
+            @Override
+            public void onChanged(Event<ReplyResponse> replyResponseEvent) {
+                ReplyResponse reply = replyResponseEvent.getContent();
+                if (reply != null && positionUpdate.containsKey(reply.getId())){
+                    int pos = positionUpdate.get(reply.getId());
+                    replyAdapter.updateReply(pos, reply.getContent());
+                    positionUpdate.remove(reply.getId());
+                }
+            }
+        });
     }
 
 
@@ -300,5 +341,58 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
         String replyId = reply.getId();
         currentPageReplyChildMap.remove(replyId);
         isLastPageReplyChildMap.remove(replyId);
+    }
+
+    @Override
+    public void onUpdate(String replyId, String content, int pos) {
+        // Create and show AlertDialog for editing
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Chỉnh sửa câu trả lời");
+
+        // Create EditText for input
+        final EditText input = new EditText(getContext());
+        input.setText(content);
+        builder.setView(input);
+
+        // Set up buttons
+        builder.setPositiveButton("Lưu", (dialog, which) -> {
+            String newContent = input.getText().toString().trim();
+            if (!newContent.isEmpty()) {
+                // Store position and call API
+                positionUpdate.put(replyId, pos);
+                replyViewModel.updateReply(replyId, newContent);
+            } else {
+                Toast.makeText(getContext(), "Nội dung không được để trống", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    @Override
+    public void onDelete(String replyId, int pos) {
+        // Create and show AlertDialog for editing
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Bạn có muốn xoá câu trả lời");
+
+        // Set up buttons
+        builder.setPositiveButton("Xoá", (dialog, which) -> {
+            positionDelete.put(replyId, pos);
+            replyViewModel.deleteReply(replyId);
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    @Override
+    public void onCopy(String content) {
+        // Sao chép văn bản vào clipboard
+        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("label", content);
+        clipboard.setPrimaryClip(clip);
+        // Thông báo cho người dùng
+        Toast.makeText(getContext(), "Đã sao chép!", Toast.LENGTH_SHORT).show();
     }
 }

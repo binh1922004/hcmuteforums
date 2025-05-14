@@ -13,6 +13,15 @@ public class ReplyResponse {
     private boolean hasChild;
     private boolean isShowChild;
     private boolean isLast;
+    private boolean owner;
+
+    public void setHasChild(boolean hasChild) {
+        this.hasChild = hasChild;
+    }
+
+    public boolean isOwner() {
+        return owner;
+    }
 
     public String getTargetUserName() {
         return targetUserName;
@@ -71,5 +80,9 @@ public class ReplyResponse {
 
     public void setListChild(List<ReplyResponse> listChild) {
         this.listChild = listChild;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

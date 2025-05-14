@@ -2,10 +2,11 @@ package com.example.hcmuteforums.model.dto.response;
 
 import com.example.hcmuteforums.model.dto.UserGeneral;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class TopicDetailResponse {
+public class TopicDetailResponse implements Serializable {
     private String id;
     private UserGeneral userGeneral;
     private String title;
@@ -16,6 +17,15 @@ public class TopicDetailResponse {
     private boolean liked;
     private boolean owner;
     private List<String> imgUrls;
+    private boolean isExpanded;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public UserGeneral getUserGeneral() {
         return userGeneral;
@@ -81,15 +91,19 @@ public class TopicDetailResponse {
         this.owner = owner;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public List<String> getImgUrls() {
         return imgUrls;
+    }
+
+    public void setImgUrls(List<String> imgUrls) {
+        this.imgUrls = imgUrls;
+    }
+
+    public boolean isExpanded() {
+        return isExpanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        isExpanded = expanded;
     }
 }

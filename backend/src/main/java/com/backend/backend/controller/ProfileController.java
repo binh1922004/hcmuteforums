@@ -31,6 +31,13 @@ public class ProfileController {
                 .message("Success")
                 .build();
     }
+    @GetMapping("/personProfile")
+    public ApiResponse<ProfileResponse> personProfile(@RequestParam String username) {
+        return ApiResponse.<ProfileResponse>builder()
+                .result(profileService.getProfilePerson(username))
+                .message("Success")
+                .build();
+    }
 
     @PutMapping("/updateProfile")
     public ApiResponse<ProfileResponse> updateProfile(@RequestBody ProfileUpdateRequest profileUpdateRequest)

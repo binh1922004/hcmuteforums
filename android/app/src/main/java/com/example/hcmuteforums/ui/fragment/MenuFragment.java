@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
@@ -115,7 +114,7 @@ public class MenuFragment extends Fragment {
                 FragmentTransaction transaction = requireActivity()
                         .getSupportFragmentManager()
                         .beginTransaction();
-                transaction.replace(R.id.flFragment, new ProfileUserFragment());
+                transaction.replace(R.id.flFragment, new MyProfileUserFragment());
                 transaction.addToBackStack(null); // Để người dùng có thể quay lại
                 transaction.commit();
             }

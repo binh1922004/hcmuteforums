@@ -76,19 +76,55 @@ public class ReplyService {
 
             notificationService.sendStructuredNotificationToUser(notification);
         }
+        System.out.println("send username: " + sendUsername);
+        System.out.println("received username: " + receivedUsername);
+
+        if (savedReply.getParentReplyId() != null && !savedReply.getParentReplyId().equals("")) {
+            var parentReply = replyRepository.findById(savedReply.getParentReplyId()).orElse(null);
+            if (parentReply != null) {
+                User parentUser = parentReply.getUser();
+                //parent reply not equal reply
+                if (!sendUser.getId().equals(parentUser.getId()) && !parentUser.getId().equals(receivedUser.getId())) {
+                    Notification notification = notificationService.createNotification(
+                            savedReply.getId(),
+                            sendUser,
+                            parentUser,
+                            NotificationContent.TAG,
+                            topic
+                    );
+
+                    notificationService.sendStructuredNotificationToUser(notification);
+                }
+                System.out.println("parent username: " + parentUser.getUsername());
+
+            }
+        }
 
         return replyResponse;
     }
 
-    public void updateReply(String replyId, String content){
+    public ReplyResponse updateReply(String replyId, String content){
         Reply reply = replyRepository.findRepliesById(replyId);
         reply.setContent(content);
-        replyRepository.save(reply);
+        return toReplyResponse(replyRepository.save(reply));
     }
     @Transactional
-    public void deleteReply(String replyId){
-        replyRepository.deleteRepliesByParentReplyId(replyId);
-        replyRepository.deleteById(replyId);
+    public String deleteReply(String replyId){
+        if (isOwner(replyId) || isOwnerTopic(replyId)){
+            replyRepository.deleteRepliesByParentReplyId(replyId);
+            replyRepository.deleteById(replyId);
+            notificationService.deleteNotification(replyId);
+            return replyId;
+        }
+        throw new AppException(ErrorCode.UNAUTHORIZED);
+    }
+
+    private boolean isOwnerTopic(String replyId) {
+        Reply reply = replyRepository.findById(replyId).orElse(null);
+        if (reply == null)
+            return false;
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return topicRepository.existsTopicByIdAndUser_Username(reply.getTopic().getId(), username);
     }
 
     public boolean isOwner(String replyId){
@@ -160,6 +196,12 @@ public class ReplyService {
                 .build();
     }
 
+    public ReplyResponse getDetailReply(String replyId){
+        Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new AppException(ErrorCode.REPLY_NOTEXISTED));
+
+        return toReplyResponse(reply);
+    }
+
     private ReplyResponse toReplyResponse(Reply reply){
         ReplyResponse replyResponse = replyMapper.toReplyResponse(reply);
         UserGeneral userGeneral = userMapper.toUserGeneral(reply.getUser());
@@ -168,6 +210,7 @@ public class ReplyService {
         if (reply.getChildReplies() != null && !reply.getChildReplies().isEmpty()) {
             replyResponse.setHasChild(true);
         }
+        replyResponse.setOwner(isOwner(reply.getId()));
         return replyResponse;
     }
 }

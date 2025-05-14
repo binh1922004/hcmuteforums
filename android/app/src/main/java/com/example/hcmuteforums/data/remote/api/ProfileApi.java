@@ -15,10 +15,14 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 
 public interface ProfileApi {
     @GET("api/profiles/myProfile")
     public Call<ApiResponse<ProfileResponse>> myProfile();
+
+    @GET("api/profiles/personProfile")
+    public Call<ApiResponse<ProfileResponse>> personProfile(@Query("username") String username);
     @PUT("api/profiles/updateProfile")
     public Call<ApiResponse<ProfileResponse>> updateProfile(@Body ProfileUpdateRequest profileUpdateRequest);
 

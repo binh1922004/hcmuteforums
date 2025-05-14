@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,8 +17,11 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
+import com.example.hcmuteforums.listeners.OnMenuActionListener;
+import com.example.hcmuteforums.listeners.OnSwitchActivityActionListener;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
+import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 
 import java.util.ArrayList;
@@ -31,18 +36,24 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     //listener interface
     private TopicLikeListener topicLikeListener;
     private OnReplyShowListener onReplyShowListener;
+    private OnSwitchActivityActionListener onSwitchActivityActionListener;
 
     private static final int ITEM_TYPE_NORMAL = 0;
     private static final int ITEM_TYPE_LOADING = 1;
 
+    private OnMenuActionListener onMenuActionListener;
     private boolean isLoadingAdded = false;
 
 
-    public TopicDetailAdapter(Context context, OnReplyShowListener onReplyShowListener, TopicLikeListener topicLikeListener) {
+    public TopicDetailAdapter(Context context, OnReplyShowListener onReplyShowListener, TopicLikeListener topicLikeListener, OnSwitchActivityActionListener onSwitchActivityActionListener) {
         this.context = context;
         this.onReplyShowListener = onReplyShowListener;
         this.topicLikeListener = topicLikeListener;
+        this.onSwitchActivityActionListener = onSwitchActivityActionListener;
         topicDetailResponsesList = new ArrayList<>();
+    }
+    public void setOnMenuActionListener(OnMenuActionListener onMenuActionListener) {
+        this.onMenuActionListener = onMenuActionListener;
     }
 
     public void setData(List<TopicDetailResponse> topicDetailResponses){
@@ -53,6 +64,31 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         int oldSize = topicDetailResponsesList.size();
         topicDetailResponsesList.addAll(newList);
         notifyItemRangeInserted(oldSize, newList.size());
+    }
+
+    public void deleteTopic(int position){
+        if (position >= 0 && position < topicDetailResponsesList.size()) {
+            topicDetailResponsesList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, topicDetailResponsesList.size());
+        }
+    }
+
+    public void updateTopic(int position, TopicDetailResponse updatedTopic) {
+        if (position >= 0 && position < topicDetailResponsesList.size()) {
+            TopicDetailResponse topic = topicDetailResponsesList.get(position);
+            topic.setContent(updatedTopic.getContent());
+            topic.setTitle(updatedTopic.getTitle());
+            notifyItemChanged(position);
+        }
+    }
+
+    public void clearData(){
+        int size = this.topicDetailResponsesList.size();
+        if (size > 0) {
+            this.topicDetailResponsesList.clear();
+            notifyItemRangeRemoved(0, size);
+        }
     }
 
     public List<TopicDetailResponse> getData() {
@@ -109,8 +145,8 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
     public class TopicDetailViewHolder extends RecyclerView.ViewHolder{
-        TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount;
-        ImageView btnLike, btnReply;
+        TextView tvName, tvTime, tvTitle, tvContent, tvReplyCount, tvLikeCount, tvToggle;
+        ImageView btnLike, btnReply, imgMoreActions;
         CircleImageView imgAvatar;
         ViewPager2 viewPagerImages;
         public TopicDetailViewHolder(@NonNull View itemView) {
@@ -125,13 +161,31 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewPagerImages = itemView.findViewById(R.id.viewPagerImages);
             tvReplyCount = itemView.findViewById(R.id.tvReplyCount);
             tvLikeCount = itemView.findViewById(R.id.tvLikeCount);
+            tvToggle = itemView.findViewById(R.id.tvToggle);
+            imgMoreActions = itemView.findViewById(R.id.imgMoreActions);
         }
 
         public void bind(TopicDetailResponse topic, int position) {
             tvName.setText(topic.getUserGeneral().getFullName());
             tvTime.setText(topic.getCreatedAt().toString());
             tvTitle.setText(topic.getTitle());
+            //TODO: Expand text view
+            String content = topic.getContent();
+            tvContent.setText(content);
+            //setup for content and max lines
+            tvContent.setMaxLines(topic.isExpanded() ? Integer.MAX_VALUE : 3);
+            tvToggle.setText(topic.isExpanded() ? "Thu gọn" : "Xem thêm");
+            tvToggle.setVisibility(content.length() > 100 ? View.VISIBLE : View.GONE);
+            //content and toggle use both event
+            // Toggle xử lý khi nhấn
+            View.OnClickListener toggleListener = v -> {
+                topic.setExpanded(!topic.isExpanded());
+                notifyItemChanged(position); // Dùng notify để đảm bảo UI được update
+            };
+            tvToggle.setOnClickListener(toggleListener);
+            tvContent.setOnClickListener(toggleListener);
             tvContent.setText(topic.getContent());
+
             List<String> imageUrls = topic.getImgUrls();
             if (imageUrls != null && !imageUrls.isEmpty()) {
                 viewPagerImages.setVisibility(View.VISIBLE);
@@ -155,6 +209,10 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 btnLike.setSelected(true);
                 btnLike.setImageResource(R.drawable.love_click);
             }
+            else{
+                btnLike.setSelected(false);
+                btnLike.setImageResource(R.drawable.love_unclick);
+            }
 
             btnLike.setOnClickListener(v -> {
                 if (v.isSelected()){
@@ -171,6 +229,7 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 int currentLike = topic.getLikeCount();
 
                 currentLike += (v.isSelected() ? 1 : -1);
+                topic.setLikeCount(currentLike);
                 tvLikeCount.setText(String.valueOf(currentLike));
             });
 
@@ -179,8 +238,62 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvReplyCount.setText(String.valueOf(topic.getReplyCount()));
             btnReply.setOnClickListener(v -> {
                 if (onReplyShowListener != null)
-                    onReplyShowListener.onReply(topic.getId(), position);
+                    onReplyShowListener.onReply(topic.getId(), topic.isOwner(), position);
             });
+
+
+            //TODO: log to user profile
+            imgAvatar.setOnClickListener(v -> {
+                onSwitchActivityActionListener.onClickProfile(topic.getUserGeneral().getUsername());
+            });
+            tvName.setOnClickListener(v -> {
+                onSwitchActivityActionListener.onClickProfile(topic.getUserGeneral().getUsername());
+            });
+            //TODO: log to topic detail
+            tvTitle.setOnClickListener(v -> {
+                onSwitchActivityActionListener.onClickTopicDetail(topic.getId(), topic.isOwner());
+            });
+
+            //TODO: if a topic of your topic, display a menu action
+            if (onMenuActionListener != null){
+                imgMoreActions.setVisibility(View.VISIBLE);
+                imgMoreActions.setOnClickListener(v -> {
+                    // Tạo PopupMenu
+                    PopupMenu popupMenu = new PopupMenu(context, v);
+
+                    //if is your reply have 3 selections
+                    if (topic.isOwner()){
+                        popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_user, popupMenu.getMenu());
+                    }
+                    else{
+                        popupMenu.getMenuInflater().inflate(R.menu.reply_actions_menu_guest, popupMenu.getMenu());
+                    }
+
+                    // Xử lý sự kiện khi chọn mục trong menu
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(android.view.MenuItem item) {
+                            int itemId = item.getItemId();
+                            if (itemId == R.id.actionCopy){
+                                onMenuActionListener.onCopy(topic.getContent());
+                            }
+                            else if (itemId == R.id.actionEdit){
+                                onMenuActionListener.onUpdate(topic.getId(), topic.getContent(), position);
+                            }
+                            else if (itemId == R.id.actionDelete){
+                                onMenuActionListener.onDelete(topic.getId(), position);
+                            }
+                            return true;
+                        }
+                    });
+
+                    // Hiển thị menu
+                    popupMenu.show();
+                });
+            }
+            else {
+                imgMoreActions.setVisibility(View.GONE);
+            }
         }
     }
 
