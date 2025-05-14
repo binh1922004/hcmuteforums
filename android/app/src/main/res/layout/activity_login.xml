@@ -84,16 +84,7 @@
                 android:layout_marginTop="20dp"
                 android:backgroundTint="@color/blue"
                 app:cornerRadius = "20dp"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:id="@+id/btnLoginGoogle"
-                android:text="Đăng nhập với Google"
-                android:backgroundTint="@color/gray"
-                android:textSize="18dp"
-                android:textColor="@color/blue"
-                android:drawableLeft="@drawable/icongg"
-                android:layout_marginTop="5dp"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

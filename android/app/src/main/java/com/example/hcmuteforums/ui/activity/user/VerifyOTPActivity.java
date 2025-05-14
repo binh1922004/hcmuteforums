@@ -101,9 +101,14 @@ public class VerifyOTPActivity extends AppCompatActivity {
                 Boolean registerSuccess = event.getContent(); // Lấy kết quả đăng ký chưa được xử lý
                 if (registerSuccess != null && registerSuccess) {
                     Toast.makeText(VerifyOTPActivity.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
+                    EventSwitchLogin();
                 }
             }
         });
 
+    }
+    private void EventSwitchLogin(){
+        Intent intent = new Intent(VerifyOTPActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 }
