@@ -10,6 +10,7 @@ FROM openjdk:21-jdk-slim
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/upload ./upload
 
 EXPOSE 8080
 
