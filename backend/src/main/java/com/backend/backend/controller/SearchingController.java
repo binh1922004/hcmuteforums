@@ -1,28 +1,31 @@
 package com.backend.backend.controller;
 
 import com.backend.backend.dto.ApiResponse;
-import com.backend.backend.dto.request.UserCreationRequest;
-import com.backend.backend.dto.request.UserUpdateRequest;
-import com.backend.backend.dto.response.UserResponse;
+import com.backend.backend.dto.response.PageResponse;
+import com.backend.backend.dto.response.TopicDetailResponse;
 import com.backend.backend.service.LikeService;
-import com.backend.backend.service.UserService;
-import io.lettuce.core.dynamic.annotation.Param;
+import com.backend.backend.service.TopicService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/like")
+@RequestMapping("/api/search")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class LikeController {
-    LikeService likeService;
-
-    @PostMapping
-    public ApiResponse<Boolean> likeTopic(@RequestParam String topicId){
-        return ApiResponse.<Boolean>builder()
-                .result(likeService.likeTopic(topicId))
+public class SearchingController {
+    TopicService topicService;
+    @GetMapping()
+    public ApiResponse<PageResponse<TopicDetailResponse>> searchTopic(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String direction
+    ){
+        return ApiResponse.<PageResponse<TopicDetailResponse>>builder()
+                .result(topicService.searchTopic(keyword, page, size, sortBy, direction))
                 .build();
     }
 
