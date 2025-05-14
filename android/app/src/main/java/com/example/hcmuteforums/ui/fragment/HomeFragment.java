@@ -343,6 +343,7 @@ public class HomeFragment extends Fragment implements
         boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
 
         AnyProfileUserFragment anyProfileUserFragment = new AnyProfileUserFragment();
+        MyProfileUserFragment myProfileUserFragment = new MyProfileUserFragment();
         Bundle bundle = new Bundle();
         bundle.putString("username", username);
         bundle.putString("currentUsername", currentUserName);
@@ -354,6 +355,12 @@ public class HomeFragment extends Fragment implements
                 .replace(R.id.flFragment, anyProfileUserFragment)
                 .addToBackStack(null)
                 .commit();
+        if(currentUserName.equals(username)){
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.flFragment, myProfileUserFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
     @Override
