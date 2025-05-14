@@ -163,7 +163,7 @@ public class EditUserBottomSheet extends BottomSheetDialogFragment {
     }
     void loadImage(View view){
         CircleImageView imgAvatar = view.findViewById(R.id.img_User);
-        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" + avatarProfile)
+        Glide.with(requireContext()).load(avatarProfile)
                 .placeholder(R.drawable.avatar_boy)
                 .error(R.drawable.anhhoixua)
                 .into(imgAvatar);

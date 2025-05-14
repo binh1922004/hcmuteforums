@@ -394,12 +394,12 @@ public class MyProfileUserFragment extends Fragment {
     }
     private void loadImage(View viewProfile){
         CircleImageView avatar = (CircleImageView)viewProfile.findViewById(R.id.imgAvatar);
-        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/" +avatarProfile)
+        Glide.with(requireContext()).load(avatarProfile)
                 .placeholder(R.drawable.avatar_boy)
                 .error(R.drawable.user_2)
                 .into(avatar);
         ImageView cover = (ImageView) viewProfile.findViewById(R.id.coverPhoto);
-        Glide.with(requireContext()).load("http://10.0.2.2:8080/ute/"+coverProfile)
+        Glide.with(requireContext()).load(coverProfile)
                 .placeholder(R.drawable.avatar_boy)
                 .error(R.drawable.user_2)
                 .centerCrop()

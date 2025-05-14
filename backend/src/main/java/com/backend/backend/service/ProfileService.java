@@ -9,6 +9,7 @@ import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.ProfileMapper;
 import com.backend.backend.repository.ProfileRepository;
 import com.backend.backend.repository.UserRepository;
+import com.backend.backend.utils.Constant;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -40,14 +41,18 @@ public class ProfileService {
         String username = jwt.getSubject();
         Profile profile = profileRepository.findProfileByUser_Username(username).orElseThrow(()->
                 new AppException(ErrorCode.USER_NOTEXISTED));
-
-        return profileMapper.toProfileResponse(profile);
+        var profileResponse = profileMapper.toProfileResponse(profile);
+        profileResponse.setAvatarUrl(Constant.url + profileResponse.getAvatarUrl());
+        profileResponse.setCoverUrl(Constant.url + profileResponse.getCoverUrl());
+        return profileResponse;
     }
     public ProfileResponse getProfilePerson(String username) {
         Profile profile = profileRepository.findProfileByUser_Username(username).orElseThrow(()->
                 new AppException(ErrorCode.USER_NOTEXISTED));
-
-        return profileMapper.toProfileResponse(profile);
+        var profileResponse = profileMapper.toProfileResponse(profile);
+        profileResponse.setAvatarUrl(Constant.url + profileResponse.getAvatarUrl());
+        profileResponse.setCoverUrl(Constant.url + profileResponse.getCoverUrl());
+        return profileResponse;
     }
     public Profile getAll(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

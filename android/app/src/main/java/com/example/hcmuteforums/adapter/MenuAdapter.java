@@ -1,6 +1,7 @@
 package com.example.hcmuteforums.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,8 +111,9 @@ public class MenuAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     }
     void loadImage(HeaderViewHolder vh){
         if(avatarUrl!=null && !avatarUrl.isEmpty()){
+            Log.d("MenuAdapterError", avatarUrl);
             Glide.with(context)
-                    .load("http://10.0.2.2:8080/ute/" + avatarUrl)
+                    .load(avatarUrl)
                     .placeholder(R.drawable.avatar_boy)
                     .error(R.drawable.anhhoixua)
                     .into(vh.avatar);
