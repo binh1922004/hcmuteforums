@@ -218,8 +218,8 @@ public class HomeFragment extends Fragment implements
     }
 
     @Override
-    public void onReply(String topicId, int position) {
-        var replyBottomSheetFragment = ReplyBottomSheetFragment.newInstance(topicId);
+    public void onReply(String topicId, boolean isOwner, int position) {
+        var replyBottomSheetFragment = ReplyBottomSheetFragment.newInstance(topicId, isOwner);
         replyBottomSheetFragment.setOnReplyAddedListener(new OnReplyAddedListener() {
             @Override
             public void onReplyAdded(ReplyResponse replyResponse) {
@@ -301,7 +301,7 @@ public class HomeFragment extends Fragment implements
     public void onClickTopicDetail(String topicId, boolean isOwner) {
         Intent topicIntent = new Intent(getContext(), TopicDetailActivity.class);
         topicIntent.putExtra("topicId", topicId);
-        topicIntent.putExtra("isOwner", isOwner);
+        topicIntent.putExtra("isOwnTopic", isOwner);
         startActivity(topicIntent);
     }
 }

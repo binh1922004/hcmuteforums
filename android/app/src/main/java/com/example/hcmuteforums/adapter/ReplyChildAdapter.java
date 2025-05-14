@@ -33,48 +33,69 @@ public class ReplyChildAdapter extends RecyclerView.Adapter<ReplyChildAdapter.Re
         this.context = context;
         replyList = new ArrayList<>();
     }
+    private static class ReplyDiffCallback extends DiffUtil.Callback {
+        private final List<ReplyResponse> oldList;
+        private final List<ReplyResponse> newList;
+
+        public ReplyDiffCallback(List<ReplyResponse> oldList, List<ReplyResponse> newList) {
+            this.oldList = oldList != null ? oldList : new ArrayList<>();
+            this.newList = newList != null ? newList : new ArrayList<>();
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId().equals(newList.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            ReplyResponse oldReply = oldList.get(oldItemPosition);
+            ReplyResponse newReply = newList.get(newItemPosition);
+            return oldReply.getContent().equals(newReply.getContent());
+        }
+    }
+
+    private void applyDiffUtil(List<ReplyResponse> oldList, List<ReplyResponse> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ReplyChildAdapter.ReplyDiffCallback(oldList, newList));
+        replyList = new ArrayList<>(newList);
+        diffResult.dispatchUpdatesTo(this);
+    }
+
     public void setData(List<ReplyResponse> newList) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-            @Override
-            public int getOldListSize() {
-                return replyList != null ? replyList.size() : 0;
-            }
-
-            @Override
-            public int getNewListSize() {
-                return newList != null ? newList.size() : 0;
-            }
-
-            @Override
-            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                return replyList.get(oldItemPosition).getId()
-                        .equals(newList.get(newItemPosition).getId());
-            }
-
-            @Override
-            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                return replyList.get(oldItemPosition).getContent().equals(newList.get(newItemPosition).getContent());
-            }
-        });
-
-        this.replyList = new ArrayList<>(newList);
-        diffResult.dispatchUpdatesTo(this); // Chỉ cập nhật phần thay đổi
+        List<ReplyResponse> oldList = new ArrayList<>(replyList);
+        applyDiffUtil(oldList, newList != null ? newList : new ArrayList<>());
     }
 
-    public void addData(List<ReplyResponse> newList){
-        int oldSize = replyList.size();
-        replyList.addAll(newList);
-        notifyItemInserted(oldSize);
-    }
-    public void addNewReply(ReplyResponse newReply){
-        replyList.add(0, newReply);
-        notifyItemInserted(0);
+    public void addData(List<ReplyResponse> newList) {
+        List<ReplyResponse> oldList = new ArrayList<>(replyList);
+        List<ReplyResponse> updatedList = new ArrayList<>(replyList);
+        updatedList.addAll(newList != null ? newList : new ArrayList<>());
+        applyDiffUtil(oldList, updatedList);
     }
 
+
+    public void addNewReply(ReplyResponse newReply) {
+        List<ReplyResponse> oldList = new ArrayList<>(replyList);
+        List<ReplyResponse> updatedList = new ArrayList<>(replyList);
+        if (newReply != null) {
+            updatedList.add(0, newReply);
+        }
+        applyDiffUtil(oldList, updatedList);
+    }
 
     public void clearData() {
-        replyList.clear();
-        notifyItemChanged(0);
+        List<ReplyResponse> oldList = new ArrayList<>(replyList);
+        applyDiffUtil(oldList, new ArrayList<>());
     }
 
     @NonNull

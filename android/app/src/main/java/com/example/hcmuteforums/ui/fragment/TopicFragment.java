@@ -276,8 +276,8 @@ public class TopicFragment extends Fragment implements
     }
 
     @Override
-    public void onReply(String topicId, int position) {
-        var replyBottomSheetFragment = ReplyBottomSheetFragment.newInstance(topicId);
+    public void onReply(String topicId, boolean isOwner, int position) {
+        var replyBottomSheetFragment = ReplyBottomSheetFragment.newInstance(topicId, isOwner);
         replyBottomSheetFragment.setOnReplyAddedListener(new OnReplyAddedListener() {
             @Override
             public void onReplyAdded(ReplyResponse replyResponse) {

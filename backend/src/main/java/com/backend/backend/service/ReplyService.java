@@ -110,10 +110,21 @@ public class ReplyService {
     }
     @Transactional
     public String deleteReply(String replyId){
-        replyRepository.deleteRepliesByParentReplyId(replyId);
-        replyRepository.deleteById(replyId);
-        notificationService.deleteNotification(replyId);
-        return replyId;
+        if (isOwner(replyId) || isOwnerTopic(replyId)){
+            replyRepository.deleteRepliesByParentReplyId(replyId);
+            replyRepository.deleteById(replyId);
+            notificationService.deleteNotification(replyId);
+            return replyId;
+        }
+        throw new AppException(ErrorCode.UNAUTHORIZED);
+    }
+
+    private boolean isOwnerTopic(String replyId) {
+        Reply reply = replyRepository.findById(replyId).orElse(null);
+        if (reply == null)
+            return false;
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return topicRepository.existsTopicByIdAndUser_Username(reply.getTopic().getId(), username);
     }
 
     public boolean isOwner(String replyId){
