@@ -72,54 +72,62 @@ public class PersonFollowingAdapter extends RecyclerView.Adapter<PersonFollowing
         String targetUsername = following.getUserGeneral().getUsername();
 
         boolean isFollowing = following.isHasFollowed();
-        followButtonVisibilityMap.put(targetUsername, !isFollowing);
-        boolean isButtonVisible = followButtonVisibilityMap.getOrDefault(targetUsername, true);
-        holder.followButton.setVisibility(isButtonVisible ? View.VISIBLE : View.GONE);
-
-
-        holder.followButton.setOnClickListener(v -> {
-            if (followClickListener != null) {
-                followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
-                // Ẩn nút ngay sau khi nhấn "Theo dõi"
-                if (!isFollowing) {
-                    following.setHasFollowed(true);
-                    followButtonVisibilityMap.put(targetUsername, false);
-                    holder.followButton.setVisibility(View.GONE);
-                    holder.unFollowButton.setVisibility(View.VISIBLE);
-                    notifyItemChanged(position);
-                }
-            }
-        });
-        holder.unFollowButton.setOnClickListener(view -> {
-            if (followClickListener != null) {
-                followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
-                // Ẩn nút ngay sau khi nhấn "Theo dõi"
-                if (isFollowing) {
-                    following.setHasFollowed(false);
-                    followButtonVisibilityMap.put(targetUsername, false);
-                    holder.followButton.setVisibility(View.VISIBLE);
-                    holder.unFollowButton.setVisibility(View.GONE);
-                    notifyItemChanged(position);
-                }
-            }
-        });
-
-        if(following.isHasFollowed()){
-            holder.unFollowButton.setVisibility(View.VISIBLE);
+        boolean isCurrentUser = Boolean.TRUE.equals(following.isCurrentMe());
+        if(isCurrentUser){
             holder.followButton.setVisibility(View.GONE);
-        }else{
             holder.unFollowButton.setVisibility(View.GONE);
-            holder.followButton.setVisibility(View.VISIBLE);
+        }else{
+            followButtonVisibilityMap.put(targetUsername, !isFollowing);
+            boolean isButtonVisible = followButtonVisibilityMap.getOrDefault(targetUsername, true);
+            holder.followButton.setVisibility(isButtonVisible ? View.VISIBLE : View.GONE);
+
+
+            holder.followButton.setOnClickListener(v -> {
+                if (followClickListener != null) {
+                    followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
+                    // Ẩn nút ngay sau khi nhấn "Theo dõi"
+                    if (!isFollowing) {
+                        following.setHasFollowed(true);
+                        followButtonVisibilityMap.put(targetUsername, false);
+                        holder.followButton.setVisibility(View.GONE);
+                        holder.unFollowButton.setVisibility(View.VISIBLE);
+                        notifyItemChanged(position);
+                    }
+                }
+            });
+            holder.unFollowButton.setOnClickListener(view -> {
+                if (followClickListener != null) {
+                    followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
+                    // Ẩn nút ngay sau khi nhấn "Theo dõi"
+                    if (isFollowing) {
+                        following.setHasFollowed(false);
+                        followButtonVisibilityMap.put(targetUsername, false);
+                        holder.followButton.setVisibility(View.VISIBLE);
+                        holder.unFollowButton.setVisibility(View.GONE);
+                        notifyItemChanged(position);
+                    }
+                }
+            });
+
+            if(following.isHasFollowed()){
+                holder.unFollowButton.setVisibility(View.VISIBLE);
+                holder.followButton.setVisibility(View.GONE);
+            }else{
+                holder.unFollowButton.setVisibility(View.GONE);
+                holder.followButton.setVisibility(View.VISIBLE);
+            }
+            //Todo: Xử lí xự kiện ấn vào ảnh qua profile
+            holder.profileImage.setOnClickListener(view -> {
+                Log.d("Username", targetUsername);
+                onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+            });
+            //Todo: Xử lí xự kiện ấn vào TextView Username qua profile
+            holder.username.setOnClickListener(view -> {
+                onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+            });
         }
-        //Todo: Xử lí xự kiện ấn vào ảnh qua profile
-        holder.profileImage.setOnClickListener(view -> {
-            Log.d("Username", targetUsername);
-            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
-        });
-        //Todo: Xử lí xự kiện ấn vào TextView Username qua profile
-        holder.username.setOnClickListener(view -> {
-            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
-        });
+
+
 
 
     }

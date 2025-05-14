@@ -18,7 +18,6 @@ import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +30,7 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
     private OnMoreClickListener moreClickListener;
     private Map<String, Boolean> followButtonVisibilityMap; // Theo dõi trạng thái hiển thị nút
     private OnSwitchFragmentProfile onSwitchFragmentProfile;
+    String currentUsername;     //Lấy biến currentUsername để check có phải chính mình trong list Follow không
     public interface OnFollowClickListener {
         void onFollowClick(String followId, String targetUsername, int position, boolean isFollowing);
     }
@@ -48,6 +48,9 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         this.followButtonVisibilityMap = new HashMap<>();
         this.onSwitchFragmentProfile = onSwitchFragmentProfile;
 
+    }
+    public void setCurrentUsername(String currentUsername) {
+        this.currentUsername = currentUsername;
     }
 
     @NonNull
@@ -78,12 +81,16 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         String followId = follower.getFollowId();
         String targetUsername = follower.getUserGeneral().getUsername();
 
-        //Todo: Kiểm tra trạng thái hiển thị nút "Theo dõi"
+        //Todo: Check có phải là bản thân không
+        boolean isCurrentUser = Boolean.TRUE.equals(follower.getCurrentMe());
+        boolean isFollowing= follower.getHasFollowed();
+
+
+        /*//Todo: Kiểm tra trạng thái hiển thị nút "Theo dõi"
         boolean isFollowing= follower.getHasFollowed();
         followButtonVisibilityMap.put(targetUsername, !isFollowing);
         boolean isButtonVisible = followButtonVisibilityMap.getOrDefault(targetUsername, true);
         holder.followButton.setVisibility(isButtonVisible ? View.VISIBLE : View.GONE);
-
         //Todo: Xử lý sự kiện nhấn nút "Theo dõi"
         holder.followButton.setOnClickListener(v -> {
             if (followClickListener != null) {
@@ -134,7 +141,47 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         //Todo: Xử lí xự kiện ấn vào TextView Username qua profile
         holder.username.setOnClickListener(view -> {
             onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+        });*/
+        // Ẩn nút nếu là chính mình
+        if (isCurrentUser) {
+            holder.followButton.setVisibility(View.GONE);
+            holder.unFollowButton.setVisibility(View.GONE);
+        } else {
+            // Nếu không phải chính mình thì mới xử lý follow/unfollow
+            holder.followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
+            holder.unFollowButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
+
+            holder.followButton.setOnClickListener(v -> {
+                if (followClickListener != null) {
+                    followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
+                    follower.setHasFollowed(true);
+                    notifyItemChanged(position);
+                }
+            });
+
+            holder.unFollowButton.setOnClickListener(v -> {
+                if (followClickListener != null) {
+                    followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
+                    follower.setHasFollowed(false);
+                    notifyItemChanged(position);
+                }
+            });
+        }
+
+        holder.moreButton.setOnClickListener(v -> {
+            if (moreClickListener != null) {
+                moreClickListener.onMoreClick(followId, position);
+            }
         });
+
+        holder.profileImage.setOnClickListener(view -> {
+            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+        });
+
+        holder.username.setOnClickListener(view -> {
+            onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
+        });
+
     }
 
     @Override

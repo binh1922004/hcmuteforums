@@ -12,5 +12,6 @@ import lombok.experimental.FieldDefaults;
 public class FollowingResponse {
     String followId;
     boolean hasFollowed;
+    boolean currentMe;
     UserGeneral userGeneral;
 }

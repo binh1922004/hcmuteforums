@@ -5,12 +5,22 @@ import com.example.hcmuteforums.model.dto.UserGeneral;
 public class FollowingResponse {
     String followId;
     boolean hasFollowed;
+    boolean currentMe;
     UserGeneral userGeneral;
 
-    public FollowingResponse(String followId, boolean hasFollowed, UserGeneral userGeneral) {
+    public FollowingResponse(String followId, boolean hasFollowed, boolean currentMe, UserGeneral userGeneral) {
         this.followId = followId;
         this.hasFollowed = hasFollowed;
+        this.currentMe = currentMe;
         this.userGeneral = userGeneral;
+    }
+
+    public boolean isCurrentMe() {
+        return currentMe;
+    }
+
+    public void setCurrentMe(boolean currentMe) {
+        this.currentMe = currentMe;
     }
 
     public boolean isHasFollowed() {

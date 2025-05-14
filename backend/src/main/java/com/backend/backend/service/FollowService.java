@@ -94,6 +94,10 @@ public class FollowService {
         Page<Follow> followerUserPage = followRepository.findAllByFollowed(user, pageable);
         //mapping reply to follow response list
         for(var follow : followerUserPage.getContent()){
+            String followerUserName = follow.getFollower().getUsername();
+            boolean isCurrentUser = loginUserName != null &&
+                    loginUserName.equals(followerUserName);
+
             UserGeneral userGeneral = UserGeneral.builder()
                     .fullName(follow.getFollower().getFullName())
                     .username(follow.getFollower().getUsername())
@@ -103,6 +107,7 @@ public class FollowService {
 
                 followResponses.add(FollowerResponse.builder()
                         .hasFollowed(followRepository.existsByFollower_UsernameAndFollowed_Username(loginUserName, follow.getFollower().getUsername()))
+                        .currentMe(isCurrentUser)
                         .followId(follow.getId())
                         .userGeneral(userGeneral)
                         .build());
@@ -139,6 +144,9 @@ public class FollowService {
         List<FollowingResponse> followingResponses = new ArrayList<>();
         Page<Follow> followingUserPage = followRepository.findAllByFollower(user, pageable);
         for(var follow : followingUserPage.getContent()){
+            String followedUserName = follow.getFollowed().getUsername();
+            boolean isCurrentUser = loginUserName != null &&
+                    loginUserName.equals(followedUserName);
             UserGeneral userGeneral = UserGeneral.builder()
                     .fullName(follow.getFollowed().getFullName())
                     .username(follow.getFollowed().getUsername())
@@ -157,6 +165,7 @@ public class FollowService {
                         .followId(follow.getId())
                         .hasFollowed(loginUserName.equals(username) ||
                                 followRepository.existsByFollower_UsernameAndFollowed_Username(loginUserName, follow.getFollowed().getUsername()))
+                        .currentMe(isCurrentUser)
                         .userGeneral(userGeneral)
                         .build());
             }

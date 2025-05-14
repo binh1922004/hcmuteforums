@@ -13,5 +13,6 @@ import java.util.Date;
 public class FollowerResponse {
     String followId;
     boolean hasFollowed;
+    boolean currentMe;
     UserGeneral userGeneral;
 }

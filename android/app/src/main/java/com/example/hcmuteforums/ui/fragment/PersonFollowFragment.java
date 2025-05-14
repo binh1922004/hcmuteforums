@@ -101,14 +101,14 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
 
         recyclerView = view.findViewById(R.id.recyclerView);
 
-
         tabLayout = view.findViewById(R.id.tabLayout);
-        initializeTabs();
-        showMoreFollower();
-        showMoreFollowing();
-        //Todo: Phân trang cho từng tab
         recyclerViewConfigFollowing();
         recyclerViewConfig();
+
+        initializeTabs();
+
+
+        //Todo: Phân trang cho từng tab
 
         setupObservers();
 
@@ -276,29 +276,20 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
 
     private void initializeTabs() {
         tabLayout.removeAllTabs();
-        tabLayout.addTab(tabLayout.newTab().setText("0 Đang theo dõi")); // Đổi thứ tự, tab 0 là "Đang theo dõi"
-        tabLayout.addTab(tabLayout.newTab().setText("0 Người theo dõi")); // Tab 1 là "Người theo dõi"
+        tabLayout.addTab(tabLayout.newTab().setText("0 Người theo dõi"));
+        tabLayout.addTab(tabLayout.newTab().setText("0 Đang theo dõi"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
-        followerAdapter = new FollowerAdapter(
-                getContext(),
-                this::handleFollowClick,
-                this::handleFollowerMoreClick,
-                this
-        );
-        followingAdapter = new PersonFollowingAdapter(
-                getContext(),
-                followingResponses,
-                this::handleFollowClick,
-                this
-        );
-
+        Log.d("TAB", defaultTab+"");
         if (defaultTab == 0) {
-            recyclerView.setAdapter(followingAdapter);
-            followingAdapter.updateData(new ArrayList<>());
-        } else {
             recyclerView.setAdapter(followerAdapter);
+            Log.d("CurrentUsername", currentUsername);
+            followerAdapter.setCurrentUsername(currentUsername);
+            showMoreFollower();
             followerAdapter.updateData(new ArrayList<>(), followingUsernames);
+        } else {
+            recyclerView.setAdapter(followingAdapter);
+            showMoreFollowing();
+            followingAdapter.updateData(new ArrayList<>());
         }
         if (defaultTab == 0 || defaultTab == 1) {
             tabLayout.getTabAt(defaultTab).select();
@@ -307,6 +298,7 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                Log.d("All tab selection", tab.getPosition()+"");
                 updateTabContent(tab.getPosition());
             }
 

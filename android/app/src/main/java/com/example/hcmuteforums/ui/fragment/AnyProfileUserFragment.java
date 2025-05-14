@@ -247,11 +247,7 @@ public class AnyProfileUserFragment extends Fragment {
 
     private void setupBackButton() {
         btn_back.setOnClickListener(v -> {
-            HomeFragment homeFragment = new HomeFragment();
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.flFragment, homeFragment)
-                    .addToBackStack(null)
-                    .commit();
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
     }
 
