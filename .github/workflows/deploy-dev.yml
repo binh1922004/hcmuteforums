@@ -11,8 +11,6 @@ on:
   push:
     branches:
       - dev_deploy  # Chạy khi có push trực tiếp vào nhánh dev_deploy
-    paths:
-      - 'backend/**'  # Chỉ chạy khi có thay đổi trong thư mục backend
 
 jobs:
   deploy:
