@@ -39,6 +39,7 @@ import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.ui.activity.topic.TopicUpdateActivity;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -272,7 +273,12 @@ public class TopicFragment extends Fragment implements
     }
     @Override
     public void likeTopic(String topicId) {
-        topicDetailViewModel.likeTopic(topicId);
+        if (LoginPromptDialog.isLogged) {
+            topicDetailViewModel.likeTopic(topicId);
+        }
+        else{
+            LoginPromptDialog.showLoginPrompt(getContext());
+        }
     }
 
     @Override

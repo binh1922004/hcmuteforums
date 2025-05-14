@@ -20,6 +20,7 @@ import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.response.AuthenticationResponse;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 
 public class LoginActivity extends AppCompatActivity {
@@ -108,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                     editor.apply();
                     LocalAuthInterceptor.setInstance(LoginActivity.this);
                     LocalRetrofit.setInterceptor();
+                    LoginPromptDialog.isLogged = true;
 
                     Intent intent = new Intent(LoginActivity.this, UserMainActivity.class);
                     startActivity(intent);

@@ -38,6 +38,7 @@ import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.fragment.ReplyBottomSheetFragment;
 import com.example.hcmuteforums.ui.fragment.ReplyFragment;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -211,6 +212,10 @@ public class TopicDetailActivity extends AppCompatActivity{
                         btnLike.setImageResource(R.drawable.love_unclick);
                     }
                     btnLike.setOnClickListener(v -> {
+                        if (!LoginPromptDialog.isLogged){
+                            LoginPromptDialog.showLoginPrompt(TopicDetailActivity.this);
+                            return;
+                        }
                         if (v.isSelected()){
                             btnLike.setImageResource(R.drawable.love_unclick);
                         }
