@@ -8,41 +8,42 @@ on:
       - closed  # Chỉ khi PR được đóng (đã merge hoặc bị hủy)
     paths:
       - 'backend/**'  # Chỉ chạy khi có thay đổi trong thư mục backend
+  push:
+    branches:
+      - dev_deploy  # Chạy khi có push trực tiếp vào nhánh dev_deploy
+    paths:
+      - 'backend/**'  # Chỉ chạy khi có thay đổi trong thư mục backend
 
 jobs:
   deploy:
-    if: github.event.pull_request.merged == true # Chỉ chạy khi PR thực sự được merge
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)  # Chạy khi push hoặc PR được merge
     name: Deploy Backend to Dev VPS
     runs-on: [self-hosted, Linux, X64]
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4 # Lấy code mới nhất từ nhánh dev_deploy
+      uses: actions/checkout@v4  # Lấy code mới nhất
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    # - name: Login to Docker Hub # Nếu bạn dùng private registry
-    #   uses: docker/login-action@v3
-    #   with:
-    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Clean Buildx
+      run: |
+        docker buildx prune
+        docker buildx create --use --name mybuilder
 
-    #build docker image hcmuteforums
     - name: Build Docker Image
-      working-directory: ./backend # Chạy trong thư mục backend
+      working-directory: ./backend
       run: |
         echo "Building new image..."
-        # Lệnh này chỉ build image dựa trên docker-compose.yml và Dockerfile
-        # Nó không dừng hay khởi động lại container đang chạy.
-        docker compose build hcmuteforums # Chỉ build service hcmuteforums
+        docker compose build --progress=plain hcmuteforums
 
     - name: Deploy using Docker Compose
-      working-directory: ./backend # <-- THÊM DÒNG NÀY: Chỉ định chạy lệnh trong thư mục backend
+      working-directory: ./backend
       run: |
-        docker compose down # Dừng và xóa container cũ (dựa trên docker-compose.yml)
-        docker compose up -d --no-build # Build lại image (nếu có thay đổi) và khởi chạy container mới ở chế độ detached
+        docker compose down
+        docker compose up -d --no-build
 
     - name: Clean up old images
       run: |
-        docker image prune -a -f --filter "label!=maintainer=actions-runner" # Xóa các image không được dùng nữa, trừ image của runner
+        docker image prune -a -f --filter "label!=maintainer=actions-runner"
