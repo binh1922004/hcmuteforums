@@ -433,7 +433,7 @@ public class AnyProfileUserFragment extends Fragment {
 
     private void topicFragmentConfig(String username) {
         TopicFragment topicFragment;
-        topicFragment = TopicFragment.newInstance(username);
+        topicFragment = TopicFragment.newInstance(username, null);
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, topicFragment)
                 .commit();

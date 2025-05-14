@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,8 +68,9 @@ public class HomeFragment extends Fragment implements
     private TopicDetailViewModel topicDetailViewModel;
     //element
     private CardView cvPostTopic;
-    private TextView tvName;
+    private TextView tvName, etSearch;
     private CircleImageView imgAvatar;
+    private ImageView imgSearch;
     RecyclerView rcvTopic;
     //adapter
     TopicDetailAdapter topicDetailAdapter;
@@ -119,11 +122,27 @@ public class HomeFragment extends Fragment implements
         profileConfig();
         //recyclerView
         recyclerViewConfig();
-
+        //set up search
+        searchConfig();
         observeData();
         //go to post topic
         postTopic();
         return view;
+    }
+
+    private void searchConfig() {
+        imgSearch.setOnClickListener(v -> {
+            String keyword = etSearch.getText().toString();
+            if (!keyword.isEmpty()){
+                SearchFragment searchFragment = SearchFragment.newInstance(keyword);
+                FragmentTransaction transaction = requireActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction();
+                transaction.replace(R.id.flFragment, searchFragment);
+                transaction.addToBackStack(null); // Để người dùng có thể quay lại
+                transaction.commit();
+            }
+        });
     }
 
     private void profileConfig() {
@@ -150,6 +169,8 @@ public class HomeFragment extends Fragment implements
         //init data
         tvName = view.findViewById(R.id.tvName);
         imgAvatar = view.findViewById(R.id.imgAvatar);
+        imgSearch = view.findViewById(R.id.imgSearch);
+        etSearch = view.findViewById(R.id.etSearch);
         topicViewModel = new TopicViewModel();
         profileViewModel = new ProfileViewModel();
         topicDetailViewModel = new TopicDetailViewModel();
