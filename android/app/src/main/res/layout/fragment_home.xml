@@ -52,7 +52,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
-s
+
             <!-- CardView -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cvPostTopic"
