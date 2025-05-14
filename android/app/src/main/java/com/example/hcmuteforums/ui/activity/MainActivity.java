@@ -14,6 +14,7 @@ import com.example.hcmuteforums.data.remote.api.AuthenticationApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
             executor.execute(() -> {
                 if (!isTokenValid(jwt)) {
                     removeJwt();
+                }
+                else{
+                    LoginPromptDialog.isLogged = true;
                 }
                 // Gọi callback hoặc cập nhật UI ở đây
                 onTokenVerificationCompleted();

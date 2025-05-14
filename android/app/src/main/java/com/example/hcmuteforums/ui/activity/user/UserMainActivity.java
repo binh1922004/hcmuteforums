@@ -166,10 +166,15 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
                 setCurrentFragment(homeFragment);
            }
            if (itemId == R.id.itemNotification){
-               currentNoti = 0;
-               webSocketManager.markAllNotificationsAsRead();
-               updateNotificationBadge(false);
-               setCurrentFragment(notificationFragment);
+               if (isLoggedIn()){
+                   currentNoti = 0;
+                   webSocketManager.markAllNotificationsAsRead();
+                   updateNotificationBadge(false);
+                   setCurrentFragment(notificationFragment);
+               }
+               else{
+                   setCurrentFragment(profileFragment);
+               }
            }
            if(itemId == R.id.itemMenu){
                if(isLoggedIn()){

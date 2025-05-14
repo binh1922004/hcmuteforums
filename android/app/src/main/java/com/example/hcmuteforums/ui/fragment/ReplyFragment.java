@@ -29,6 +29,8 @@ import com.example.hcmuteforums.listeners.OnMenuActionListener;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
+import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 import com.example.hcmuteforums.viewmodel.ReplyViewModel;
 
 import java.util.ArrayList;
@@ -308,6 +310,10 @@ public class ReplyFragment extends Fragment implements OnReplyClickListener, OnM
 
     private void sendReply() {
         btnSend.setOnClickListener(v -> {
+            if (!LoginPromptDialog.isLogged){
+                LoginPromptDialog.showLoginPrompt(getContext());
+                return;
+            }
             String comment = edtComment.getText().toString().trim();
             if (!comment.isEmpty()) {
                 replyViewModel.postReply(comment, parentReplyId, replyingToUser, topicId);
