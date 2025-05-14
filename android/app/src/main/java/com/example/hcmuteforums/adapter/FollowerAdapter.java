@@ -168,11 +168,6 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             });
         }
 
-        holder.moreButton.setOnClickListener(v -> {
-            if (moreClickListener != null) {
-                moreClickListener.onMoreClick(followId, position);
-            }
-        });
 
         holder.profileImage.setOnClickListener(view -> {
             onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
