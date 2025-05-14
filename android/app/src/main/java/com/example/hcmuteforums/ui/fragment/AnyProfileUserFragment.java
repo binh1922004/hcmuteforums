@@ -21,6 +21,7 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.event.Event;
 import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 import com.example.hcmuteforums.viewmodel.FollowViewModel;
 import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
@@ -357,15 +358,7 @@ public class AnyProfileUserFragment extends Fragment {
 
         btn_follow.setOnClickListener(v -> {
             if (!isUserLoggedIn()) {
-                // Hiển thị thông báo trước khi điều hướng
-                if (loginPrompt != null) {
-                    Toast.makeText(getContext(), loginPrompt, Toast.LENGTH_LONG).show();
-                }
-                ProfileFragment profileFragment = ProfileFragment.newInstance("param1", loginPrompt);
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.flFragment, profileFragment)
-                        .addToBackStack(null)
-                        .commit();
+                LoginPromptDialog.showLoginPrompt(getContext());
                 return;
             }
 
@@ -440,7 +433,7 @@ public class AnyProfileUserFragment extends Fragment {
 
     private void topicFragmentConfig(String username) {
         TopicFragment topicFragment;
-        topicFragment = TopicFragment.newInstance(username);
+        topicFragment = TopicFragment.newInstance(username, null);
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, topicFragment)
                 .commit();
