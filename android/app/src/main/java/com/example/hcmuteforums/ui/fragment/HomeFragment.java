@@ -17,8 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.adapter.TopicDetailAdapter;
 import com.example.hcmuteforums.event.Event;
@@ -27,15 +29,19 @@ import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
+import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.ui.activity.topic.TopicPostActivity;
 import com.example.hcmuteforums.utils.LoginPromptDialog;
+import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 
 import java.util.Objects;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,10 +61,13 @@ public class HomeFragment extends Fragment implements
     private String mParam2;
 
     //view model
+    private ProfileViewModel profileViewModel;
     private TopicViewModel topicViewModel;
     private TopicDetailViewModel topicDetailViewModel;
     //element
     private CardView cvPostTopic;
+    private TextView tvName;
+    private CircleImageView imgAvatar;
     RecyclerView rcvTopic;
     //adapter
     TopicDetailAdapter topicDetailAdapter;
@@ -106,7 +115,8 @@ public class HomeFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         //mapping data
         mappingData(view);
-
+        //profile set up
+        profileConfig();
         //recyclerView
         recyclerViewConfig();
 
@@ -116,10 +126,32 @@ public class HomeFragment extends Fragment implements
         return view;
     }
 
+    private void profileConfig() {
+        if (LoginPromptDialog.isLogged){
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("User", MODE_PRIVATE);
+            String username = sharedPreferences.getString("username", "");
+            tvName.setText(username);
+            profileViewModel.getProfile();
+            profileViewModel.getProfileInfo().observe(getViewLifecycleOwner(), new Observer<ProfileResponse>() {
+                @Override
+                public void onChanged(ProfileResponse profileResponse) {
+                    String avt = profileResponse.getAvatarUrl();
+                    Glide.with(getContext())
+                            .load("http://10.0.2.2:8080/ute/" + avt)
+                            .centerCrop()
+                            .into(imgAvatar);
+                }
+            });
+        }
+    }
+
     private void mappingData(View view) {
 
         //init data
+        tvName = view.findViewById(R.id.tvName);
+        imgAvatar = view.findViewById(R.id.imgAvatar);
         topicViewModel = new TopicViewModel();
+        profileViewModel = new ProfileViewModel();
         topicDetailViewModel = new TopicDetailViewModel();
         cvPostTopic = view.findViewById(R.id.cvPostTopic);
         rcvTopic = view.findViewById(R.id.rcvTopic);
