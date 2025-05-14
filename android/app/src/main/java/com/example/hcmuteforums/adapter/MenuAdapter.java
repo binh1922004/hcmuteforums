@@ -113,7 +113,7 @@ public class MenuAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         if(avatarUrl!=null && !avatarUrl.isEmpty()){
             Log.d("MenuAdapterError", avatarUrl);
             Glide.with(context)
-                    .load("https://10.0.2.2:8080/ute/" + avatarUrl)
+                    .load(avatarUrl)
                     .placeholder(R.drawable.avatar_boy)
                     .error(R.drawable.anhhoixua)
                     .into(vh.avatar);
