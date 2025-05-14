@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +32,7 @@ import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
 import com.example.hcmuteforums.viewmodel.FollowViewModel;
+import com.example.hcmuteforums.viewmodel.SearchViewModel;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -46,6 +49,9 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
     private PersonFollowingAdapter followingAdapter;
     private TabLayout tabLayout;
     private ImageButton backButton;
+    private ImageView imgSearch;
+    private EditText edtSearch;
+    private SearchViewModel searchViewModel;
     private List<FollowerResponse> followerResponses;
     private List<FollowingResponse> followingResponses;
     private Set<String> followingUsernames;
@@ -96,7 +102,9 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
         backButton = view.findViewById(R.id.backButton);
         tv_username = view.findViewById(R.id.tvUsername);
         tv_username.setText(username);
-
+        edtSearch = view.findViewById(R.id.edtSearch);
+        searchViewModel = new SearchViewModel();
+        imgSearch = view.findViewById(R.id.imgSearch);
         setupBackButton();
 
         recyclerView = view.findViewById(R.id.recyclerView);
@@ -109,6 +117,7 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
 
 
         //Todo: Phân trang cho từng tab
+        setupObserversBySearch();
 
         setupObservers();
 
@@ -116,7 +125,14 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
     }
 
 
-
+    private void showMoreFollowingByUser(String usernameSearch){
+        searchViewModel.searchFollowing(usernameSearch, username, currentPageFollowing);
+        currentPageFollowing++;
+    }
+    private void showMoreFollowerByUser(String usernameSearch){
+        searchViewModel.searchFollower(usernameSearch, username, currentPageFollower);
+        currentPageFollower++;
+    }
 
     private void setupBackButton() {
         backButton.setOnClickListener(v -> {
@@ -137,7 +153,25 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
         });
     }
 
+    public void setupObserversBySearch(){
+        searchViewModel.getSearchFollowerLiveData().observe(getViewLifecycleOwner(), new Observer<Event<PageResponse<FollowerResponse>>>() {
+            @Override
+            public void onChanged(Event<PageResponse<FollowerResponse>> pageResponseEvent) {
+                var followerResponsePageResponse = pageResponseEvent.getContent();
+                if (followerResponsePageResponse != null)
+                    followerAdapter.addData(followerResponsePageResponse.getContent());
+            }
+        });
 
+        searchViewModel.getSearchFollowingLiveData().observe(getViewLifecycleOwner(), new Observer<Event<PageResponse<FollowingResponse>>>() {
+            @Override
+            public void onChanged(Event<PageResponse<FollowingResponse>> pageResponseEvent) {
+                var followingResponsePageResponse = pageResponseEvent.getContent();
+                if (followingResponsePageResponse != null)
+                    followingAdapter.addData(followingResponsePageResponse.getContent());
+            }
+        });
+    }
     private void setupObservers() {
         followViewModel.getGetListFollower().observe(getViewLifecycleOwner(), new Observer<PageResponse<FollowerResponse>>() {
             @Override
@@ -295,6 +329,35 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
             tabLayout.getTabAt(defaultTab).select();
         }
 
+        imgSearch.setOnClickListener(v -> {
+            String usernameSearch = edtSearch.getText().toString();
+            if (defaultTab == 0){
+                if (!usernameSearch.isEmpty()){
+                    currentPageFollower = 0;
+                    followerAdapter.clearData();
+                    showMoreFollowerByUser(usernameSearch);
+                }
+                else{
+                    currentPageFollower = 0;
+                    followerAdapter.clearData();
+                    showMoreFollower();
+                }
+            }
+            else{
+                if (!usernameSearch.isEmpty()){
+                    currentPageFollowing = 0;
+                    followingAdapter.clearData();
+                    showMoreFollowingByUser(usernameSearch);
+                }
+                else{
+                    currentPageFollowing = 0;
+                    followingAdapter.clearData();
+                    showMoreFollowing();
+                }
+            }
+
+        });
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -396,6 +459,8 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
             recyclerView.setAdapter(followingAdapter);
 
         }
+
+        defaultTab = position;
     }
     /*private void updateFollowerData() {
         int followerCount = (followerResponses != null) ? followerResponses.size() : 0;
