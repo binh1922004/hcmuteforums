@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.listeners.OnSwitchFragmentProfile;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -147,6 +148,7 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             holder.followButton.setVisibility(View.GONE);
             holder.unFollowButton.setVisibility(View.GONE);
         } else {
+
             // Nếu không phải chính mình thì mới xử lý follow/unfollow
             holder.followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
             holder.unFollowButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
@@ -154,6 +156,8 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             holder.followButton.setOnClickListener(v -> {
                 if (followClickListener != null) {
                     followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
+                    if (!LoginPromptDialog.isLogged)
+                        return;
                     follower.setHasFollowed(true);
                     notifyItemChanged(position);
                 }
@@ -162,6 +166,9 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             holder.unFollowButton.setOnClickListener(v -> {
                 if (followClickListener != null) {
                     followClickListener.onFollowClick(followId, targetUsername, position, isFollowing);
+
+                    if (!LoginPromptDialog.isLogged)
+                        return;
                     follower.setHasFollowed(false);
                     notifyItemChanged(position);
                 }

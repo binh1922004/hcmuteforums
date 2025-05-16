@@ -61,7 +61,7 @@ public class TopicRepository {
         call.enqueue(callback);
     }
 
-    public void uploadImage(String topicId, List<Uri> imageUris, Context context, Callback<ApiResponse<Boolean>> callback){
+    public void uploadImage(String topicId, List<Uri> imageUris, Context context, Callback<ApiResponse<TopicDetailResponse>> callback){
         List<MultipartBody.Part> parts = new ArrayList<>();
         for (Uri uri : imageUris) {
             File file = FileUtils.getFileFromUri(context, uri);
@@ -101,6 +101,11 @@ public class TopicRepository {
 
     public void searchTopics(String keyword, int page, Callback<ApiResponse<PageResponse<TopicDetailResponse>>> callback){
         var call = searchApi.searchTopic(keyword, page);
+        call.enqueue(callback);
+    }
+
+    public void deleteTopicImages(String topicId, List<String> images, Callback<ApiResponse<Boolean>> callback){
+        var call =topicApi.deleteImage(topicId, images);
         call.enqueue(callback);
     }
 }

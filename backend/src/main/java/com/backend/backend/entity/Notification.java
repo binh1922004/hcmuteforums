@@ -21,6 +21,7 @@ public class Notification {
     @Column(name = "action_id")
     private String actionId;
 
+    @Enumerated(EnumType.STRING)  // Hoặc EnumType.ORDINAL nếu muốn lưu theo số nguyên
     private NotificationContent content;
 
     @Column(name = "create_at")
@@ -37,6 +38,6 @@ public class Notification {
     @JoinColumn(name = "received_user_id", nullable = false)
     private User recieveUser;
     @ManyToOne
-    @JoinColumn(name = "topic_id")
+    @JoinColumn(name = "topic_id", nullable = true)
     private Topic topic;
 }

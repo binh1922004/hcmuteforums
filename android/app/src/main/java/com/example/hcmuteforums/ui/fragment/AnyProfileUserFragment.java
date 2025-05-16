@@ -48,7 +48,6 @@ public class AnyProfileUserFragment extends Fragment {
     String currentUsername;
     TextView tv_username, tv_email, tv_countFollower, tv_countFollowing, tv_fullname;
     LinearLayout followingLayout, followerLayout;
-    private boolean isLoggedIn = false;
     private String loginPrompt;
     private boolean isFollowing = false;
 
@@ -77,9 +76,7 @@ public class AnyProfileUserFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
             username = getArguments().getString("username");
             currentUsername = getArguments().getString("currentUsername", "guest"); // Mặc định "guest" nếu null
-            isLoggedIn = getArguments().getBoolean("isLoggedIn", false);
             loginPrompt = getArguments().getString("loginPrompt");
-            Log.d("AnyProfileUserFragment", "Received - username: " + username + ", currentUsername: " + currentUsername + ", isLoggedIn: " + isLoggedIn);
         }else{
             Log.e("AnyProfileUserFragment", "Bundle is null");
             username = "default_username";
@@ -96,12 +93,18 @@ public class AnyProfileUserFragment extends Fragment {
 
         getInfo(tv_username, tv_email, tv_fullname);
         getPersonProfile(view);
-        setupBackButton();
         setupFollowClickEvents();
+        setupBackButton();
         setupFollowButton();
         //topic fragment config
         topicFragmentConfig(username);
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkFollowStatus(); // Kiểm tra lại trạng thái follow
     }
 
     void anhxa(View view) {
@@ -141,7 +144,7 @@ public class AnyProfileUserFragment extends Fragment {
             public void onChanged(Event<String> event) {
                 String message = event.getContent();
                 if (message != null) {
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "user loi", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -185,7 +188,7 @@ public class AnyProfileUserFragment extends Fragment {
             public void onChanged(Event<String> stringEvent) {
                 String message = stringEvent.getContent();
                 if (message != null) {
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "profile loi", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -218,7 +221,6 @@ public class AnyProfileUserFragment extends Fragment {
             Boolean error = event.getContent();
             if (error != null && error) {
                 tv_countFollower.setText("0");
-                Toast.makeText(getContext(), "Lỗi khi lấy số lượng người theo dõi", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -357,7 +359,7 @@ public class AnyProfileUserFragment extends Fragment {
         checkFollowStatus();
 
         btn_follow.setOnClickListener(v -> {
-            if (!isUserLoggedIn()) {
+            if (!LoginPromptDialog.isLogged) {
                 LoginPromptDialog.showLoginPrompt(getContext());
                 return;
             }
@@ -372,7 +374,6 @@ public class AnyProfileUserFragment extends Fragment {
                         if (success != null && success) {
                             isFollowing = false;
                             fetchFollowCounts(username);
-                            Toast.makeText(getContext(), "Đã hủy theo dõi", Toast.LENGTH_SHORT).show();
                             Log.d("AnyProfileUserFragment", "Unfollow success for " + username);
                             checkFollowStatus();
                         } else {
@@ -391,7 +392,6 @@ public class AnyProfileUserFragment extends Fragment {
                         if (success != null && success) {
                             isFollowing = true;
                             fetchFollowCounts(username);
-                            Toast.makeText(getContext(), "Đã theo dõi", Toast.LENGTH_SHORT).show();
                             Log.d("AnyProfileUserFragment", "Follow success for " + username);
                             checkFollowStatus();
                         } else {
@@ -406,21 +406,25 @@ public class AnyProfileUserFragment extends Fragment {
 
     private void checkFollowStatus() {
         if (currentUsername != null && username != null && !currentUsername.equals(username)) {
-            Log.d("CurrenUsername", currentUsername);
-            followViewModel.getFollowStatus().removeObservers(getViewLifecycleOwner()); // Xóa observer cũ
-            followViewModel.checkFollowStatus(currentUsername, username, isLoggedIn);
-            followViewModel.getFollowStatus().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
-                @Override
-                public void onChanged(Event<Boolean> event) {
-                    Boolean status = event.getContent();
-                    if (status != null) {
-                        isFollowing = status;
-                        updateFollowButton();
-                        Log.d("AnyProfileUserFragment", "Check follow status for " + currentUsername + " and " + username + ": " + isFollowing);
-                    } else {
-                        Log.e("AnyProfileUserFragment", "Failed to get follow status for " + username);
-                        btn_follow.setImageResource(R.drawable.baseline_add_24);
-                    }
+            Log.d("AnyProfileUserFragment", "Checking follow status for " + currentUsername + " and " + username);
+            followViewModel.getFollowStatus().removeObservers(getViewLifecycleOwner());
+            followViewModel.checkFollowStatus(currentUsername, username, LoginPromptDialog.isLogged);
+            followViewModel.getFollowStatus().observe(getViewLifecycleOwner(), status -> {
+                if (status != null) {
+                    isFollowing = status;
+                    updateFollowButton();
+                    Log.d("AnyProfileUserFragment", "Follow status updated: " + isFollowing);
+                } else {
+                    // Trạng thái đang tải hoặc chưa có dữ liệu, không cập nhật UI
+                    Log.d("AnyProfileUserFragment", "Follow status is null, waiting for data");
+                }
+            });
+            followViewModel.getErrorFollowStatus().observe(getViewLifecycleOwner(), event -> {
+                Boolean error = event.getContent();
+                if (error != null && error) {
+                    isFollowing = false;
+                    updateFollowButton();
+                    Toast.makeText(getContext(), "Lỗi khi kiểm tra trạng thái theo dõi", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -438,9 +442,5 @@ public class AnyProfileUserFragment extends Fragment {
                 .replace(R.id.fragmentContainer, topicFragment)
                 .commit();
     }
-    private boolean isUserLoggedIn() {
-        return isLoggedIn; // Sử dụng giá trị từ Bundle
-    }
-
 
 }

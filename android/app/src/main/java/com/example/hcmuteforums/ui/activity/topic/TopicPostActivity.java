@@ -34,6 +34,8 @@ import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.fragment.LoadingDialogFragment;
 import com.example.hcmuteforums.viewmodel.TopicPostViewModel;
 
+import java.util.List;
+
 public class TopicPostActivity extends AppCompatActivity implements ImageActionListener {
     private static final int PICK_IMAGES_REQUEST = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -103,8 +105,10 @@ public class TopicPostActivity extends AppCompatActivity implements ImageActionL
                 TopicDetailResponse topicDetailResponse = topic.getContent();
                 if (topicDetailResponse != null){
                     Toast.makeText(TopicPostActivity.this, "Post thanhg cong", Toast.LENGTH_SHORT).show();
-                    if (imageAdapter.getImageList() != null && !imageAdapter.getImageList().isEmpty())
-                        topicPostViewModel.uploadImage(topicDetailResponse.getId(), imageAdapter.getImageList(), TopicPostActivity.this);
+                    if (imageAdapter.getImageList() != null && !imageAdapter.getImageList().isEmpty()) {
+                        List<Uri> listUri = imageAdapter.getImageList();
+                        topicPostViewModel.uploadImage(topicDetailResponse.getId(), listUri, TopicPostActivity.this);
+                    }
                     else
                         finish();
                 }
@@ -130,9 +134,9 @@ public class TopicPostActivity extends AppCompatActivity implements ImageActionL
             }
         });
 
-        topicPostViewModel.getImageUploadSuccess().observe(this, new Observer<Event<Boolean>>() {
+        topicPostViewModel.getImageUploadSuccess().observe(this, new Observer<TopicDetailResponse>() {
             @Override
-            public void onChanged(Event<Boolean> booleanEvent) {
+            public void onChanged(TopicDetailResponse booleanEvent) {
                 if (booleanEvent.getContent() != null){
                     finish();
                 }

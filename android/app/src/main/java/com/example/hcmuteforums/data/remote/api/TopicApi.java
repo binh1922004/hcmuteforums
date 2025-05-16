@@ -37,5 +37,8 @@ public interface TopicApi {
 
     @Multipart
     @POST("api/topic-images/{topicId}/upload")
-    Call<ApiResponse<Boolean>> uploadImages(@Path("topicId") String id, @Part List<MultipartBody.Part> images);
+    Call<ApiResponse<TopicDetailResponse>> uploadImages(@Path("topicId") String id, @Part List<MultipartBody.Part> images);
+
+    @DELETE("api/topic-images/{topicId}/delete")
+    Call<ApiResponse<Boolean>> deleteImage(@Path("topicId") String id, @Query("images") List<String> images);
 }
