@@ -41,8 +41,14 @@ public class NotificationService {
         messagingTemplate.convertAndSend("/topic/notifications/" + userId, message);
     }
     //send with structure
-    public void sendStructuredNotificationToUser(Notification notificatio) {
-        var savedNotification = notificationRepository.save(notificatio);
+    public void sendStructuredNotificationToUser(Notification notification) {
+        var savedNotification = notificationRepository.save(notification);
+        // Gửi object notification đến client
+        messagingTemplate.convertAndSend("/topic/notifications/" + savedNotification.getRecieveUser().getId(), convertToNotificationDTO(savedNotification));
+    }
+
+    public void sendStructuredNotificationToUserFollow(Notification notification) {
+        var savedNotification = notificationRepository.save(notification);
         // Gửi object notification đến client
         messagingTemplate.convertAndSend("/topic/notifications/" + savedNotification.getRecieveUser().getId(), convertToNotificationDTO(savedNotification));
     }
@@ -54,7 +60,7 @@ public class NotificationService {
                 .receivedUser(notification.getRecieveUser().getFullName()) //receivedUser is user who receive notificaion
                 .type(notification.getContent().name())
                 .content(notification.getContent().getContent())
-                .topicId(notification.getTopic().getId())
+                .topicId(notification.getTopic() != null ?  notification.getTopic().getId() : "")
                 .senderName(notification.getSendUser().getFullName())
                 .actionId(notification.getActionId())
                 .isRead(false)

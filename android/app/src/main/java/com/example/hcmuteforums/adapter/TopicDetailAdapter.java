@@ -217,22 +217,19 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             if (LoginPromptDialog.isLogged){
                 btnLike.setOnClickListener(v -> {
-                    if (v.isSelected()){
-                        btnLike.setImageResource(R.drawable.love_unclick);
-                    }
-                    else{
-                        btnLike.setImageResource(R.drawable.love_click);
-                    }
-                    v.setSelected(!v.isSelected());
+                    boolean newLikeState = !topic.isLiked(); // Đảo trạng thái like
+                    topic.setLiked(newLikeState); // Cập nhật trạng thái isLiked trong TopicDetailResponse
+                    topic.setLikeCount(topic.getLikeCount() + (newLikeState ? 1 : -1)); // Cập nhật số lượng like
 
-                    if (topicLikeListener != null){
+                    // Cập nhật giao diện
+                    btnLike.setSelected(newLikeState);
+                    btnLike.setImageResource(newLikeState ? R.drawable.love_click : R.drawable.love_unclick);
+                    tvLikeCount.setText(String.valueOf(topic.getLikeCount()));
+
+                    // Gọi API để lưu trạng thái like
+                    if (topicLikeListener != null) {
                         topicLikeListener.likeTopic(topic.getId());
                     }
-                    int currentLike = topic.getLikeCount();
-
-                    currentLike += (v.isSelected() ? 1 : -1);
-                    topic.setLikeCount(currentLike);
-                    tvLikeCount.setText(String.valueOf(currentLike));
                 });
             }
             else{

@@ -31,6 +31,7 @@ import com.example.hcmuteforums.listeners.OnSwitchFragmentProfile;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 import com.example.hcmuteforums.viewmodel.FollowViewModel;
 import com.example.hcmuteforums.viewmodel.SearchViewModel;
 import com.google.android.material.tabs.TabLayout;
@@ -426,6 +427,9 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
     }
 
     private void handleFollowClick(String followId, String targetUsername, int position, boolean isFollowing) {
+        if (!LoginPromptDialog.isLogged){
+            LoginPromptDialog.showLoginPrompt(getContext());
+        }
         if (followViewModel != null) {
             this.targetUsername = targetUsername; // Lưu targetUsername để sử dụng trong setupObservers
             if (isFollowing) {

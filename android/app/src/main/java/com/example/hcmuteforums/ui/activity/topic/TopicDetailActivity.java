@@ -102,6 +102,14 @@ public class TopicDetailActivity extends AppCompatActivity{
                     if (topic != null){
                         tvTitle.setText(topic.getTitle());
                         tvContent.setText(topic.getContent());
+                        List<String> imageUrls = topic.getImgUrls();
+                        if (imageUrls != null && !imageUrls.isEmpty()) {
+                            viewPagerImages.setVisibility(View.VISIBLE);
+                            ImagePagerAdapter pagerAdapter = new ImagePagerAdapter(TopicDetailActivity.this, imageUrls);
+                            viewPagerImages.setAdapter(pagerAdapter);
+                        } else {
+                            viewPagerImages.setVisibility(View.GONE);
+                        }
                     }
                 }
             }

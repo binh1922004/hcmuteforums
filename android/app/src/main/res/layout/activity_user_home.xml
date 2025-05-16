@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".ui.activity.user.UserMainActivity">
     <FrameLayout
         android:id="@+id/flFragment"
@@ -17,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="75dp"
         app:menu="@menu/bottom_nav_menu"
+        android:background="@color/white"
         app:itemIconTint="@null"
         app:labelVisibilityMode="unlabeled"
         android:layout_gravity="bottom"/>
