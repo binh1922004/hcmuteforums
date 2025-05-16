@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.hcmuteforums.data.remote.api.LikeApi;
+import com.example.hcmuteforums.data.remote.api.SearchApi;
 import com.example.hcmuteforums.data.remote.api.TopicApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.event.Event;
@@ -34,6 +35,7 @@ public class TopicRepository {
     private static TopicRepository instance;
 
     private TopicApi topicApi;
+    private SearchApi searchApi;
     private LikeApi likeApi;
 
     public static TopicRepository getInstance() {
@@ -45,6 +47,7 @@ public class TopicRepository {
     public TopicRepository() {
         topicApi = LocalRetrofit.getRetrofit().create(TopicApi.class);
         likeApi = LocalRetrofit.getRetrofit().create(LikeApi.class);
+        searchApi = LocalRetrofit.getRetrofit().create(SearchApi.class);
     }
 
     public void getAllTopics(int page, Callback<ApiResponse<PageResponse<TopicDetailResponse>>> callback) {
@@ -93,6 +96,11 @@ public class TopicRepository {
 
     public void getAllTopicsByUsername(String username, int page, Callback<ApiResponse<PageResponse<TopicDetailResponse>>> callback){
         var call = topicApi.getAllTopicByUsername(username, page);
+        call.enqueue(callback);
+    }
+
+    public void searchTopics(String keyword, int page, Callback<ApiResponse<PageResponse<TopicDetailResponse>>> callback){
+        var call = searchApi.searchTopic(keyword, page);
         call.enqueue(callback);
     }
 }

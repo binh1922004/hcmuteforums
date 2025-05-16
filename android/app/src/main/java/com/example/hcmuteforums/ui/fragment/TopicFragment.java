@@ -3,7 +3,6 @@ package com.example.hcmuteforums.ui.fragment;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -23,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.hcmuteforums.R;
@@ -39,6 +37,8 @@ import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.ui.activity.topic.TopicUpdateActivity;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
+import com.example.hcmuteforums.viewmodel.SearchViewModel;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
 import com.example.hcmuteforums.viewmodel.TopicViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -63,11 +63,13 @@ public class TopicFragment extends Fragment implements
 
     // TODO: Rename and change types of parameters
     private String username = null;
+    private String keyword = null;
 
     //elements
     private RecyclerView rcvTopic;
     //view model
     private TopicViewModel topicViewModel;
+    private SearchViewModel searchViewModel;
     private TopicDetailViewModel topicDetailViewModel;
     //adapter
     private TopicDetailAdapter topicDetailAdapter;
@@ -89,10 +91,13 @@ public class TopicFragment extends Fragment implements
      * @return A new instance of fragment TopicFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TopicFragment newInstance(String username) {
+    public static TopicFragment newInstance(String username, String keyword) {
         TopicFragment fragment = new TopicFragment();
         Bundle args = new Bundle();
-        args.putString("username", username);
+        if (username != null)
+            args.putString("username", username);
+        else
+            args.putString("keyword", keyword);
         fragment.setArguments(args);
         return fragment;
     }
@@ -102,6 +107,7 @@ public class TopicFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             username = getArguments().getString("username");
+            keyword = getArguments().getString("keyword");
         }
     }
 
@@ -115,10 +121,14 @@ public class TopicFragment extends Fragment implements
         rcvTopic = view.findViewById(R.id.rcvTopic);
         topicViewModel = new TopicViewModel();
         topicDetailViewModel = new TopicDetailViewModel();
+        searchViewModel = new SearchViewModel();
         //adapter config
         adapterConfig();
-        //observe data
-        observeData();
+        //get data response from api
+        observeDataByUser();
+        observeDataByKeyWord();
+
+        //
         observeDataDetail();
         //show first time
         showMoreTopic();
@@ -175,10 +185,13 @@ public class TopicFragment extends Fragment implements
 
     private void showMoreTopic(){
         //get data from viewmodel
-        topicViewModel.getAllTopicsByUsername(username, currentPage);
+        if (username != null)
+            topicViewModel.getAllTopicsByUsername(username, currentPage);
+        else
+            searchViewModel.searchTopic(keyword, currentPage);
         currentPage++;
     }
-    private void observeData() {
+    private void observeDataByUser() {
         //observe
         topicViewModel.getTopicsByUserLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<TopicDetailResponse>>() {
             @Override
@@ -199,6 +212,37 @@ public class TopicFragment extends Fragment implements
         });
 
         topicViewModel.getTopicByUserError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> event) {
+                Boolean errorOccurred = event.getContent(); // Lấy lỗi chưa được xử lý
+                if (errorOccurred != null && errorOccurred) {
+                    Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+    private void observeDataByKeyWord() {
+        //observe
+        searchViewModel.getSearchTopicLiveData().observe(getViewLifecycleOwner(), new Observer<PageResponse<TopicDetailResponse>>() {
+            @Override
+            public void onChanged(PageResponse<TopicDetailResponse> topicDetailResponses) {
+                topicDetailAdapter.addData(topicDetailResponses.getContent());
+                isLastPage = topicDetailResponses.isLast();
+            }
+        });
+
+        searchViewModel.getMessageError().observe(getViewLifecycleOwner(), new Observer<Event<String>>() {
+            @Override
+            public void onChanged(Event<String> event) {
+                String message = event.getContent(); // Lấy thông báo lỗi chưa được xử lý
+                if (message != null) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        searchViewModel.getSearchTopicError().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
             @Override
             public void onChanged(Event<Boolean> event) {
                 Boolean errorOccurred = event.getContent(); // Lấy lỗi chưa được xử lý
@@ -272,7 +316,12 @@ public class TopicFragment extends Fragment implements
     }
     @Override
     public void likeTopic(String topicId) {
-        topicDetailViewModel.likeTopic(topicId);
+        if (LoginPromptDialog.isLogged) {
+            topicDetailViewModel.likeTopic(topicId);
+        }
+        else{
+            LoginPromptDialog.showLoginPrompt(getContext());
+        }
     }
 
     @Override

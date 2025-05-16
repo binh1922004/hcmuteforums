@@ -23,6 +23,7 @@ import com.example.hcmuteforums.listeners.OnReplyShowListener;
 import com.example.hcmuteforums.listeners.TopicLikeListener;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -214,24 +215,33 @@ public class TopicDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 btnLike.setImageResource(R.drawable.love_unclick);
             }
 
-            btnLike.setOnClickListener(v -> {
-                if (v.isSelected()){
-                    btnLike.setImageResource(R.drawable.love_unclick);
-                }
-                else{
-                    btnLike.setImageResource(R.drawable.love_click);
-                }
-                v.setSelected(!v.isSelected());
+            if (LoginPromptDialog.isLogged){
+                btnLike.setOnClickListener(v -> {
+                    if (v.isSelected()){
+                        btnLike.setImageResource(R.drawable.love_unclick);
+                    }
+                    else{
+                        btnLike.setImageResource(R.drawable.love_click);
+                    }
+                    v.setSelected(!v.isSelected());
 
-                if (topicLikeListener != null){
-                    topicLikeListener.likeTopic(topic.getId());
-                }
-                int currentLike = topic.getLikeCount();
+                    if (topicLikeListener != null){
+                        topicLikeListener.likeTopic(topic.getId());
+                    }
+                    int currentLike = topic.getLikeCount();
 
-                currentLike += (v.isSelected() ? 1 : -1);
-                topic.setLikeCount(currentLike);
-                tvLikeCount.setText(String.valueOf(currentLike));
-            });
+                    currentLike += (v.isSelected() ? 1 : -1);
+                    topic.setLikeCount(currentLike);
+                    tvLikeCount.setText(String.valueOf(currentLike));
+                });
+            }
+            else{
+                btnLike.setOnClickListener(v -> {
+                    if (topicLikeListener != null){
+                        topicLikeListener.likeTopic(topic.getId());
+                    }
+                });
+            }
 
 
             //biding for reply

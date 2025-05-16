@@ -82,7 +82,7 @@ public class FollowService {
         return followMapper.toFollowResponse(follow);
     }
     public PageResponse<FollowerResponse> getFollowers(String username, int page, int size
-                        ,String sortBy,String direction) {
+            ,String sortBy,String direction) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
         String loginUserName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -190,6 +190,107 @@ public class FollowService {
         }
 
         return followRepository.existsByFollowerAndFollowed(currentUser, targetUser);
+    }
+
+
+
+    public PageResponse<FollowerResponse> getFollowersByUsername(String username, String targetUser, int page, int size
+            ,String sortBy,String direction) {
+        User user = userRepository.findByUsername(targetUser)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+        String loginUserName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Sort sort = direction.equalsIgnoreCase("DESC")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        List<FollowerResponse> followResponses = new ArrayList<>();
+        Page<Follow> followerUserPage = followRepository.findAllByFollowedAndFollower_UsernameContaining(user, username, pageable);
+        //mapping reply to follow response list
+        for(var follow : followerUserPage.getContent()){
+            String followerUserName = follow.getFollower().getUsername();
+            boolean isCurrentUser = loginUserName != null &&
+                    loginUserName.equals(followerUserName);
+
+            UserGeneral userGeneral = UserGeneral.builder()
+                    .fullName(follow.getFollower().getFullName())
+                    .username(follow.getFollower().getUsername())
+                    .avt(Constant.url+follow.getFollower().getProfile().getAvatarUrl())
+                    .build();
+            if (loginUserName != null){
+                followResponses.add(FollowerResponse.builder()
+                        .hasFollowed(followRepository.existsByFollower_UsernameAndFollowed_Username(loginUserName, follow.getFollower().getUsername()))
+                        .currentMe(isCurrentUser)
+                        .followId(follow.getId())
+                        .userGeneral(userGeneral)
+                        .build());
+            }
+            else{
+
+                followResponses.add(FollowerResponse.builder()
+                        .hasFollowed(false)
+                        .followId(follow.getId())
+                        .userGeneral(userGeneral)
+                        .build());
+            }
+        }
+
+        return PageResponse.<FollowerResponse>builder()
+                .content(followResponses)
+                .pageNumber(followerUserPage.getNumber())
+                .pageSize(followerUserPage.getSize())
+                .totalElements(followerUserPage.getTotalElements())
+                .totalPages(followerUserPage.getTotalPages())
+                .last(followerUserPage.isLast())
+                .build();
+    }
+
+    public PageResponse<FollowingResponse> getFollowingsByUsername(String username, String targetUser, int page, int size
+            ,String sortBy,String direction) {
+        User user = userRepository.findByUsername(targetUser)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTEXISTED));
+
+        String loginUserName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Sort sort = direction.equalsIgnoreCase("DESC")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        List<FollowingResponse> followingResponses = new ArrayList<>();
+        Page<Follow> followingUserPage = followRepository.findAllByFollowerAndFollowed_UsernameContaining(user, username, pageable);
+        for(var follow : followingUserPage.getContent()){
+            String followedUserName = follow.getFollowed().getUsername();
+            boolean isCurrentUser = loginUserName != null &&
+                    loginUserName.equals(followedUserName);
+            UserGeneral userGeneral = UserGeneral.builder()
+                    .fullName(follow.getFollowed().getFullName())
+                    .username(follow.getFollowed().getUsername())
+                    .avt(Constant.url+follow.getFollowed().getProfile().getAvatarUrl())
+                    .build();
+
+            if (loginUserName == null){
+                followingResponses.add(FollowingResponse.builder()
+                        .followId(follow.getId())
+                        .hasFollowed(false)
+                        .userGeneral(userGeneral)
+                        .build());
+            }
+            else{
+                followingResponses.add(FollowingResponse.builder()
+                        .followId(follow.getId())
+                        .hasFollowed(loginUserName.equals(username) ||
+                                followRepository.existsByFollower_UsernameAndFollowed_Username(loginUserName, follow.getFollowed().getUsername()))
+                        .currentMe(isCurrentUser)
+                        .userGeneral(userGeneral)
+                        .build());
+            }
+        }
+        return PageResponse.<FollowingResponse>builder()
+                .content(followingResponses)
+                .pageNumber(followingUserPage.getNumber())
+                .pageSize(followingUserPage.getSize())
+                .totalElements(followingUserPage.getTotalElements())
+                .totalPages(followingUserPage.getTotalPages())
+                .last(followingUserPage.isLast())
+                .build();
     }
 
 }

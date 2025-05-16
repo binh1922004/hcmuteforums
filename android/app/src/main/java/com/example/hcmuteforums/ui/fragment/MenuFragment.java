@@ -24,6 +24,7 @@ import com.example.hcmuteforums.model.dto.response.ProfileResponse;
 import com.example.hcmuteforums.model.dto.response.UserResponse;
 import com.example.hcmuteforums.model.modelAdapter.MenuItemModel;
 import com.example.hcmuteforums.ui.activity.user.UserMainActivity;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 import com.example.hcmuteforums.viewmodel.AuthenticationViewModel;
 import com.example.hcmuteforums.viewmodel.ProfileViewModel;
 import com.example.hcmuteforums.viewmodel.UserViewModel;
@@ -104,7 +105,6 @@ public class MenuFragment extends Fragment {
                         break;
                     case 2:
                         logoutEvent();
-                        Toast.makeText(getContext(), "Đăng xuất", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
@@ -193,6 +193,7 @@ public class MenuFragment extends Fragment {
         Intent intent = new Intent(requireActivity(), UserMainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa tất cả activity trước đó
         startActivity(intent);
+        LoginPromptDialog.isLogged = false;
     }
 
     private void getProfile(View view){

@@ -76,9 +76,6 @@ public class ReplyService {
 
             notificationService.sendStructuredNotificationToUser(notification);
         }
-        System.out.println("send username: " + sendUsername);
-        System.out.println("received username: " + receivedUsername);
-
         if (savedReply.getParentReplyId() != null && !savedReply.getParentReplyId().equals("")) {
             var parentReply = replyRepository.findById(savedReply.getParentReplyId()).orElse(null);
             if (parentReply != null) {
@@ -95,7 +92,6 @@ public class ReplyService {
 
                     notificationService.sendStructuredNotificationToUser(notification);
                 }
-                System.out.println("parent username: " + parentUser.getUsername());
 
             }
         }

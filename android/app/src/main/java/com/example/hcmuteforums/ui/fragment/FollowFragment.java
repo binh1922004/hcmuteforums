@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +32,7 @@ import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.FollowerResponse;
 import com.example.hcmuteforums.model.dto.response.FollowingResponse;
 import com.example.hcmuteforums.viewmodel.FollowViewModel;
+import com.example.hcmuteforums.viewmodel.SearchViewModel;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -44,6 +47,9 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
     private FollowingAdapter followingAdapter;
     private TabLayout tabLayout;
     private ImageButton backButton;
+    private ImageView imgSearch;
+    private EditText edtSearch;
+    private SearchViewModel searchViewModel;
     private List<FollowerResponse> followerResponses;
     private List<FollowingResponse> followingResponses;
     private Set<String> followingUsernames; // Danh sách username của những người đang follow
@@ -81,12 +87,13 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
         backButton = view.findViewById(R.id.backButton);
         tv_username = view.findViewById(R.id.tvUsername);
         tv_username.setText(username);
-
+        edtSearch = view.findViewById(R.id.edtSearch);
+        imgSearch = view.findViewById(R.id.imgSearch);
         EventBackProfile();
 
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        searchViewModel = new SearchViewModel();
 
         // Khởi tạo Adapter với các listener riêng
         followerAdapter = new FollowerAdapter(
@@ -108,10 +115,14 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
         initializeTabs();
 
         setupObservers();
-        //Todo: Phân trang cho từng tab
-
-
+        setupObserversBySearch();
+        //TODO: search config when typing
+        searchConfig();
         return view;
+    }
+
+    private void searchConfig() {
+
     }
 
     private void recyclerViewConfig(){
@@ -172,9 +183,16 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
         });
 
     }
-
+    private void showMoreFollowingByUser(String usernameSearch){
+        searchViewModel.searchFollowing(usernameSearch, username, currentPageFollowing);
+        currentPageFollowing++;
+    }
+    private void showMoreFollowerByUser(String usernameSearch){
+        searchViewModel.searchFollower(usernameSearch, username, currentPageFollower);
+        currentPageFollower++;
+    }
     private void showMoreFollower(){
-        followViewModel.getFollower(username, currentPageFollower);
+                followViewModel.getFollower(username, currentPageFollower);
         currentPageFollower++;
     }
     private void showMoreFollowing(){
@@ -193,7 +211,25 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
         });
     }
 
+    public void setupObserversBySearch(){
+        searchViewModel.getSearchFollowerLiveData().observe(getViewLifecycleOwner(), new Observer<Event<PageResponse<FollowerResponse>>>() {
+                    @Override
+                    public void onChanged(Event<PageResponse<FollowerResponse>> pageResponseEvent) {
+                        var followerResponsePageResponse = pageResponseEvent.getContent();
+                        if (followerResponsePageResponse != null)
+                            followerAdapter.addData(followerResponsePageResponse.getContent());
+                    }
+                });
 
+                searchViewModel.getSearchFollowingLiveData().observe(getViewLifecycleOwner(), new Observer<Event<PageResponse<FollowingResponse>>>() {
+                    @Override
+                    public void onChanged(Event<PageResponse<FollowingResponse>> pageResponseEvent) {
+                        var followingResponsePageResponse = pageResponseEvent.getContent();
+                        if (followingResponsePageResponse != null)
+                            followingAdapter.addData(followingResponsePageResponse.getContent());
+                    }
+                });
+    }
 
     private void setupObservers() {
         followViewModel.getGetListFollower().observe(getViewLifecycleOwner(), new Observer<PageResponse<FollowerResponse>>() {
@@ -326,6 +362,35 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
             tabLayout.getTabAt(defaultTab).select();
         }
 
+        imgSearch.setOnClickListener(v -> {
+            String usernameSearch = edtSearch.getText().toString();
+            if (defaultTab == 0){
+                if (!usernameSearch.isEmpty()){
+                    currentPageFollower = 0;
+                    followerAdapter.clearData();
+                    showMoreFollowerByUser(usernameSearch);
+                }
+                else{
+                    currentPageFollower = 0;
+                    followerAdapter.clearData();
+                    showMoreFollower();
+                }
+            }
+            else{
+                if (!usernameSearch.isEmpty()){
+                    currentPageFollowing = 0;
+                    followingAdapter.clearData();
+                    showMoreFollowingByUser(usernameSearch);
+                }
+                else{
+                    currentPageFollowing = 0;
+                    followingAdapter.clearData();
+                    showMoreFollowing();
+                }
+            }
+
+        });
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -357,6 +422,7 @@ public class FollowFragment extends Fragment implements OnSwitchFragmentProfile 
             showMoreFollowing();
             recyclerView.setAdapter(followingAdapter);
         }
+        defaultTab = position;
     }
 
     private void handleFollowClick(String followId, String targetUsername, int position, boolean isFollowing) {
