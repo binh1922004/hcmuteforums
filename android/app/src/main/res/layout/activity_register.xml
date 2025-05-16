@@ -197,7 +197,9 @@
                 android:hint="Mật khẩu"
                 android:padding="8dp"
                 android:inputType="textPassword"
+                android:drawableRight="@drawable/baseline_remove_red_eye_24"
                 android:textColor="@color/black"/>
+
 
             <!-- Button Tiếp theo -->
             <Button
