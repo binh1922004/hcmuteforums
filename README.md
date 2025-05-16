@@ -117,5 +117,7 @@ Tạo thư mục → Clone lần lượt 2 repo dự án từ Github
         ```
   - Khởi chạy dự án bằng **Docker compose**:
     ```bash
+    #Chuyển vào thư mục backend
+    cd /backend
     docker-compose up --build
     ```
