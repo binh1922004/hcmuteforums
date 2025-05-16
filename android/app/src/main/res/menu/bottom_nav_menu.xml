@@ -4,14 +4,19 @@
     <item
         android:id="@+id/itemHome"
         android:title="Home"
-        android:icon="@drawable/home"/>
+        android:icon="@drawable/home"
+        android:tint="#FFFFFF" /> <!-- Màu trắng cho icon Home -->
+
     <item
         android:id="@+id/itemNotification"
         android:title="Notification"
-        android:icon="@drawable/notification_selector"/>
+        android:icon="@drawable/notification_selector"
+        android:tint="#E0E0E0" /> <!-- Màu xám nhạt cho icon Notification, tạo điểm nhấn nhẹ -->
+
     <item
         android:id="@+id/itemMenu"
+        android:title="Menu"
         android:icon="@drawable/baseline_density_medium_24"
-        android:title="Menu"/>
+        android:tint="#FFFFFF" /> <!-- Màu trắng cho icon Menu -->
 
 </menu>

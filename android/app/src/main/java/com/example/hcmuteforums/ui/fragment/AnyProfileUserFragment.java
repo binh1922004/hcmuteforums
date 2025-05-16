@@ -48,7 +48,6 @@ public class AnyProfileUserFragment extends Fragment {
     String currentUsername;
     TextView tv_username, tv_email, tv_countFollower, tv_countFollowing, tv_fullname;
     LinearLayout followingLayout, followerLayout;
-    private boolean isLoggedIn = false;
     private String loginPrompt;
     private boolean isFollowing = false;
 
@@ -77,9 +76,7 @@ public class AnyProfileUserFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
             username = getArguments().getString("username");
             currentUsername = getArguments().getString("currentUsername", "guest"); // Mặc định "guest" nếu null
-            isLoggedIn = getArguments().getBoolean("isLoggedIn", false);
             loginPrompt = getArguments().getString("loginPrompt");
-            Log.d("AnyProfileUserFragment", "Received - username: " + username + ", currentUsername: " + currentUsername + ", isLoggedIn: " + isLoggedIn);
         }else{
             Log.e("AnyProfileUserFragment", "Bundle is null");
             username = "default_username";
@@ -147,7 +144,7 @@ public class AnyProfileUserFragment extends Fragment {
             public void onChanged(Event<String> event) {
                 String message = event.getContent();
                 if (message != null) {
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "user loi", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -191,7 +188,7 @@ public class AnyProfileUserFragment extends Fragment {
             public void onChanged(Event<String> stringEvent) {
                 String message = stringEvent.getContent();
                 if (message != null) {
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "profile loi", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -445,9 +442,5 @@ public class AnyProfileUserFragment extends Fragment {
                 .replace(R.id.fragmentContainer, topicFragment)
                 .commit();
     }
-    private boolean isUserLoggedIn() {
-        return isLoggedIn; // Sử dụng giá trị từ Bundle
-    }
-
 
 }
