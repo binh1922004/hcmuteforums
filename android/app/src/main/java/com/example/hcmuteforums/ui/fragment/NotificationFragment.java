@@ -1,9 +1,13 @@
 package com.example.hcmuteforums.ui.fragment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -163,5 +167,28 @@ public class NotificationFragment extends Fragment implements OnNotificationClic
         topicIntent.putExtra("replyId", replyId);
         topicIntent.putExtra("isOwnTopic", true);
         startActivity(topicIntent);
+    }
+
+    @Override
+    public void onClickFollow(String senderUsername) {
+        SharedPreferences preferences = getContext().getSharedPreferences("User", MODE_PRIVATE);
+        String currentUserName = preferences.getString("username", "guest"); // Giá trị mặc định "guest" nếu chưa đăng nhập
+        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
+
+        AnyProfileUserFragment anyProfileUserFragment = new AnyProfileUserFragment();
+        MyProfileUserFragment myProfileUserFragment = new MyProfileUserFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("username", senderUsername);
+        bundle.putString("currentUsername", currentUserName);
+        bundle.putBoolean("isLoggedIn", isLoggedIn); // Truyền trạng thái đăng nhập
+        bundle.putString("loginPrompt", isLoggedIn ? null : "Bạn cần đăng nhập để theo dõi người dùng này"); // Thông điệp tùy chỉnh
+        anyProfileUserFragment.setArguments(bundle);
+
+        FragmentTransaction transaction = requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction();
+        transaction.replace(R.id.flFragment, anyProfileUserFragment);
+        transaction.addToBackStack(null); // Để người dùng có thể quay lại
+        transaction.commit();
     }
 }

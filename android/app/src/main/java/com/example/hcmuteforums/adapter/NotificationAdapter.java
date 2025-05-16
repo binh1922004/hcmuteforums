@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +20,15 @@ import com.example.hcmuteforums.R;
 import com.example.hcmuteforums.listeners.OnNotificationClickListener;
 import com.example.hcmuteforums.model.dto.NotificationDTO;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -86,6 +93,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             imgAction = itemView.findViewById(R.id.imgAction);
         }
         public void bind(NotificationDTO notification, int pos){
+            Log.d("NoticationAdapter", notification.getCreatedAt()+"");
             //TODO: set up for content of notification
             tvContent.setText(notification.getContent());
             String sender = notification.getSenderName();
@@ -113,10 +121,43 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 if (Objects.equals(notification.getType(), "LIKE")) {
                     onNotificationClickListener.onClickLike(notification.getTopicId());
                 }
+                else if (Objects.equals(notification.getType(), "FOLLOW")){
+                    onNotificationClickListener.onClickFollow(notification.getSenderName());
+                }
                 else{
                     onNotificationClickListener.onClickReply(notification.getTopicId(), notification.getActionId());
                 }
             });
+
+            Log.d("NoticationAdapter", notification.getCreatedAt()+"");
+            tvTime.setText(timeAgo(notification.getCreatedAt()));
+        }
+        public String timeAgo(Date createdAt) {
+            // Lấy thời gian hiện tại
+            // Sử dụng Calendar
+            Calendar nowCal = Calendar.getInstance();
+            Calendar createdCal = Calendar.getInstance();
+            createdCal.setTime(createdAt);
+
+            // Tính khoảng cách thời gian
+            long nowMillis = nowCal.getTimeInMillis();
+            long createdMillis = createdCal.getTimeInMillis();
+            long diffMillis = nowMillis - createdMillis;
+            long seconds = diffMillis / 1000;
+            long minutes = seconds / 60;
+            long hours = minutes / 60;
+            long days = hours / 24;
+
+            // Xác định thời gian hiển thị
+            if (seconds < 60) {
+                return seconds + " giây trước";
+            } else if (minutes < 60) {
+                return minutes + " phút trước";
+            } else if (hours < 24) {
+                return hours + " tiếng trước";
+            } else {
+                return days + " ngày trước";
+            }
         }
     }
 

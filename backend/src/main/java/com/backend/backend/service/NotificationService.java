@@ -61,10 +61,10 @@ public class NotificationService {
                 .type(notification.getContent().name())
                 .content(notification.getContent().getContent())
                 .topicId(notification.getTopic() != null ?  notification.getTopic().getId() : "")
-                .senderName(notification.getSendUser().getFullName())
+                .senderName(notification.getSendUser().getUsername())
                 .actionId(notification.getActionId())
                 .isRead(false)
-                .createdAt(new Date())
+                .createdAt(notification.getCreatedAt())
                 .build();
     }
 

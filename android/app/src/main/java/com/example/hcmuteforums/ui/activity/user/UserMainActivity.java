@@ -32,6 +32,7 @@ import com.example.hcmuteforums.listeners.OnNotificationListener;
 import com.example.hcmuteforums.model.dto.NotificationDTO;
 import com.example.hcmuteforums.ui.activity.topic.TopicDetailActivity;
 import com.example.hcmuteforums.ui.fragment.CategoryFragment;
+import com.example.hcmuteforums.ui.fragment.ChatFragment;
 import com.example.hcmuteforums.ui.fragment.HomeFragment;
 import com.example.hcmuteforums.ui.fragment.MenuFragment;
 import com.example.hcmuteforums.ui.fragment.MyProfileUserFragment;
@@ -46,6 +47,7 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
     Fragment profileFragment = new ProfileFragment();
     NotificationFragment notificationFragment = new NotificationFragment();
     HomeFragment homeFragment = new HomeFragment();
+    ChatFragment chatFragment = new ChatFragment();
     CategoryFragment categoryFragment = new CategoryFragment();
     MyProfileUserFragment profileUserFragment = new MyProfileUserFragment();
     MenuFragment menuFragment = new MenuFragment();
@@ -184,6 +186,9 @@ public class UserMainActivity extends AppCompatActivity implements OnNotificatio
                }
 
             }
+           if (itemId == R.id.itemChatbot){
+               setCurrentFragment(chatFragment);
+           }
            return true;
         });
     }
