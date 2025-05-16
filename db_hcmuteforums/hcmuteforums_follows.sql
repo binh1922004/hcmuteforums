@@ -1,0 +1,58 @@
+-- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: hcmuteforums
+-- ------------------------------------------------------
+-- Server version	8.0.41
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `follows`
+--
+
+DROP TABLE IF EXISTS `follows`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `follows` (
+  `id` varchar(255) NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `followed_id` varchar(255) NOT NULL,
+  `follower_id` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK45sy1jkos9oy1j4by9y7225nm` (`followed_id`),
+  KEY `FKqnkw0cwwh6572nyhvdjqlr163` (`follower_id`),
+  CONSTRAINT `FK45sy1jkos9oy1j4by9y7225nm` FOREIGN KEY (`followed_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `FKqnkw0cwwh6572nyhvdjqlr163` FOREIGN KEY (`follower_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `follows`
+--
+
+LOCK TABLES `follows` WRITE;
+/*!40000 ALTER TABLE `follows` DISABLE KEYS */;
+INSERT INTO `follows` VALUES ('03312b3b-af78-4ee8-b17f-917057c83fef','2025-05-12 16:10:01.870000','approved','b689a10b-5559-47f3-92b9-612a447f589e','8324230f-26ed-42e1-aca5-5c223fb385c8'),('071202c1-db0f-47ee-8273-b761b3a477e6','2025-05-12 23:38:42.402000','approved','9d40a8e6-4667-4d9b-b315-d20f903ca3d5','b689a10b-5559-47f3-92b9-612a447f589e'),('09d1613c-70df-4b46-a20d-9a9d2042b9b2','2025-05-12 23:38:44.071000','approved','13ef5abf-65c5-4210-a59e-9537e2aa6d99','b689a10b-5559-47f3-92b9-612a447f589e'),('2877beec-6421-4d03-9b9b-39f29d76c1a8','2025-05-12 17:20:55.359000','approved','b689a10b-5559-47f3-92b9-612a447f589e','6d7cc351-8932-46f8-a791-d1cdda715619'),('29b5a10b-a77b-431e-a3c4-43dbd063c748','2025-05-12 23:38:43.355000','approved','227f66a9-5caf-49f4-bf9c-76ed38cb63b8','b689a10b-5559-47f3-92b9-612a447f589e'),('2c0a983b-b4ee-44ec-a6f8-d61b51ebdeb3','2025-05-12 11:36:46.931000','approved','0e1bcbd4-9ccf-4e93-a30c-33b19853a5f1','8324230f-26ed-42e1-aca5-5c223fb385c8'),('32bf3372-ced2-4463-8f38-033a13a25747','2025-05-13 13:24:28.945000','approved','9d40a8e6-4667-4d9b-b315-d20f903ca3d5','8324230f-26ed-42e1-aca5-5c223fb385c8'),('38cf11dd-bec6-42b7-a3eb-0df04bbf0cbd','2025-05-14 01:55:15.395000','approved','13ef5abf-65c5-4210-a59e-9537e2aa6d99','10963fa5-bdaf-44f6-a144-4fa079a763fd'),('391f65dd-7e6c-43d3-92c0-241efbac44b9','2025-05-12 20:09:23.064000','approved','b689a10b-5559-47f3-92b9-612a447f589e','903c96f2-691f-485e-91fa-1b9cfc3df178'),('562dd74c-c2c0-49ae-8c06-7e708a169d4a','2025-05-12 16:13:59.466000','approved','8324230f-26ed-42e1-aca5-5c223fb385c8','b689a10b-5559-47f3-92b9-612a447f589e'),('5e32bb74-78f2-414d-bcd1-88dab9742ef0','2025-05-12 11:33:53.598000','approved','8324230f-26ed-42e1-aca5-5c223fb385c8','0e1bcbd4-9ccf-4e93-a30c-33b19853a5f1'),('6cc4e7b3-8b5f-4894-be58-73fb5dab7ed1','2025-05-12 17:21:33.946000','approved','b689a10b-5559-47f3-92b9-612a447f589e','0e1bcbd4-9ccf-4e93-a30c-33b19853a5f1'),('87e24ac2-b6d5-4bea-b33e-846c3d554789','2025-05-12 20:08:42.960000','approved','b689a10b-5559-47f3-92b9-612a447f589e','227f66a9-5caf-49f4-bf9c-76ed38cb63b8'),('89466996-b513-4dd3-9c40-e2bbffb31e6d','2025-05-12 20:09:06.169000','approved','b689a10b-5559-47f3-92b9-612a447f589e','9d40a8e6-4667-4d9b-b315-d20f903ca3d5'),('9a6959c1-33a0-41d1-af15-ff268f594c33','2025-05-12 20:08:28.280000','approved','b689a10b-5559-47f3-92b9-612a447f589e','13ef5abf-65c5-4210-a59e-9537e2aa6d99'),('d25f97e2-c056-4d13-9caa-e2747fc753d8','2025-05-12 15:04:15.374000','approved','b689a10b-5559-47f3-92b9-612a447f589e','e16cb972-f237-4235-b83a-6f73c63c5bdc'),('e6125994-af13-4bfd-a496-0de8fd1e325c','2025-05-12 20:09:58.941000','approved','b689a10b-5559-47f3-92b9-612a447f589e','10963fa5-bdaf-44f6-a144-4fa079a763fd'),('ec4ca43d-2a0a-475c-af58-b1223047af03','2025-05-12 23:33:53.641000','approved','10963fa5-bdaf-44f6-a144-4fa079a763fd','b689a10b-5559-47f3-92b9-612a447f589e'),('ee5314d1-f26b-47d6-a119-e4bfed1c8cef','2025-05-12 23:38:41.046000','approved','903c96f2-691f-485e-91fa-1b9cfc3df178','b689a10b-5559-47f3-92b9-612a447f589e');
+/*!40000 ALTER TABLE `follows` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-05-16  0:29:52
