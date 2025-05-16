@@ -6,12 +6,13 @@
     android:background="?android:attr/selectableItemBackground">
 
     <TextView
+        android:layout_gravity="right"
         android:id="@+id/text_question"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
+        android:textColor="@color/blue"
         android:textStyle="bold"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/text_answer"
@@ -19,5 +20,5 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textColor="@android:color/darker_gray"
-        android:textSize="14sp" />
+        android:textSize="18sp" />
 </LinearLayout>

@@ -2,6 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="8dp"
     tools:context=".ui.fragment.ChatFragment">
@@ -14,15 +15,19 @@
         android:layout_weight="1" />
 
     <EditText
+        android:background="@drawable/custom_edittext"
         android:id="@+id/edit_question"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:hint="Nhập câu hỏi" />
 
     <Button
+        android:backgroundTint="@color/blue"
+        app:cornerRadius = "20dp"        android:layout_gravity="center"
         android:layout_marginBottom="100dp"
         android:id="@+id/button_send"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Gửi" />
 </LinearLayout>
