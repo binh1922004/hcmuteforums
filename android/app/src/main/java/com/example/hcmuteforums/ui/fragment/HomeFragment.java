@@ -215,6 +215,10 @@ public class HomeFragment extends Fragment implements
 
     private void postTopic() {
         cvPostTopic.setOnClickListener(v -> {
+            if (!LoginPromptDialog.isLogged){
+                LoginPromptDialog.showLoginPrompt(getContext());
+                return;
+            }
             Intent myIntent = new Intent(getContext(), TopicPostActivity.class);
             startActivity(myIntent);
         });

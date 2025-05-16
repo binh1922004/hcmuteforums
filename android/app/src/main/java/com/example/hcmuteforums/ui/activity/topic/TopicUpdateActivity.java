@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,6 +34,10 @@ import com.example.hcmuteforums.model.dto.request.TopicUpdateRequest;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.example.hcmuteforums.ui.fragment.LoadingDialogFragment;
 import com.example.hcmuteforums.viewmodel.TopicDetailViewModel;
+import com.example.hcmuteforums.viewmodel.TopicPostViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TopicUpdateActivity extends AppCompatActivity implements ImageActionListener {
     private static final int PICK_IMAGES_REQUEST = 1;
@@ -47,6 +52,7 @@ public class TopicUpdateActivity extends AppCompatActivity implements ImageActio
     LinearLayout layoutAddImage;
     //viewmodel
     TopicDetailViewModel topicUpdateViewModel;
+    TopicPostViewModel topicPostViewModel;
     //fragment
     LoadingDialogFragment loadingDialog;
     TopicUpdateRequest topicUpdateRequest;
@@ -71,24 +77,6 @@ public class TopicUpdateActivity extends AppCompatActivity implements ImageActio
         });
     }
 
-    private void getDataFromIntent() {
-        Intent myIntent = getIntent();
-        topicId = myIntent.getStringExtra("topicId");
-        topicUpdateViewModel.getTopicDetail(topicId);
-        topicUpdateViewModel.getTopicDetailLiveData().observe(this, new Observer<Event<TopicDetailResponse>>() {
-            @Override
-            public void onChanged(Event<TopicDetailResponse> topicDetailResponseEvent) {
-                TopicDetailResponse topic = topicDetailResponseEvent.getContent();
-                if (topic != null){
-                    topicUpdateRequest = new TopicUpdateRequest(topic.getContent(), topic.getTitle());
-
-                    edtContent.setText(topic.getContent());
-                    edtTitle.setText(topic.getTitle());
-                }
-            }
-        });
-    }
-
     private void mappingData() {
         tvCancel = findViewById(R.id.tvCancel);
         tvPost = findViewById(R.id.tvPost);
@@ -102,9 +90,39 @@ public class TopicUpdateActivity extends AppCompatActivity implements ImageActio
         recyclerViewImages.setAdapter(imageAdapter);
         //viewmodel
         topicUpdateViewModel = new TopicDetailViewModel();
+        topicPostViewModel = new TopicPostViewModel();
         //fragment
         loadingDialog = new LoadingDialogFragment();
+
     }
+
+    private void getDataFromIntent() {
+        Intent myIntent = getIntent();
+        topicId = myIntent.getStringExtra("topicId");
+        topicUpdateViewModel.getTopicDetail(topicId);
+        topicUpdateViewModel.getTopicDetailLiveData().observe(this, new Observer<Event<TopicDetailResponse>>() {
+            @Override
+            public void onChanged(Event<TopicDetailResponse> topicDetailResponseEvent) {
+                TopicDetailResponse topic = topicDetailResponseEvent.getContent();
+                if (topic != null) {
+                    topicUpdateRequest = new TopicUpdateRequest(topic.getContent(), topic.getTitle());
+                    edtContent.setText(topic.getContent());
+                    edtTitle.setText(topic.getTitle());
+                    List<String> imageUrls = topic.getImgUrls();
+                    Log.d("TopicUpdateActivity", "Received imageUrls: " + (imageUrls != null ? imageUrls : "null"));
+                    imageAdapter.addImagesFromUrls(imageUrls);
+                    updateImageRecyclerViewVisibility();
+                } else {
+                    Log.d("TopicUpdateActivity", "TopicDetailResponse is null");
+                }
+            }
+        });
+    }
+
+//    private void updateImageRecyclerViewVisibility() {
+//        recyclerViewImages.setVisibility(imageAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
+//        Log.d("TopicUpdateActivity", "RecyclerView visibility: " + (imageAdapter.getItemCount() > 0 ? "VISIBLE" : "GONE"));
+//    }
     private void cancelClickEvent(){
         tvCancel.setOnClickListener(v -> {
             finish();
@@ -122,10 +140,7 @@ public class TopicUpdateActivity extends AppCompatActivity implements ImageActio
             public void onChanged(Event<TopicDetailResponse> topic) {
                 TopicDetailResponse topicDetailResponse = topic.getContent();
                 if (topicDetailResponse != null){
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra("topic", topicDetailResponse);
-                    setResult(RESULT_OK, resultIntent);
-                    finish();
+                    updateImage(topicId, topicDetailResponse);
                 }
             }
         });
@@ -150,7 +165,60 @@ public class TopicUpdateActivity extends AppCompatActivity implements ImageActio
         });
 
     }
+    public void updateImage(String topicId, TopicDetailResponse  topicCurrent){
 
+        List<String> listImageString = new ArrayList<>();
+        List<Uri> listImageUri = new ArrayList<>();
+        List<Object> listImageObject = imageAdapter.getAll();
+
+        for (var item: listImageObject){
+            if (item instanceof Uri){
+                listImageUri.add((Uri) item);
+            }
+            else{
+                listImageString.add((String) item);
+            }
+        }
+
+        if (!listImageString.isEmpty()){
+            topicUpdateViewModel.deleteTopicImage(topicId, listImageString);
+        }
+        else{
+            if (!listImageUri.isEmpty()){
+                topicPostViewModel.uploadImage(topicId, listImageUri, TopicUpdateActivity.this);
+
+            }
+            else{
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("topic", topicCurrent);
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+        }
+
+        //session for observe data
+        topicPostViewModel.getImageUploadSuccess().observe(this, new Observer<TopicDetailResponse>() {
+            @Override
+            public void onChanged(TopicDetailResponse topicDetailResponse) {
+                if (topicDetailResponse != null){
+                    Toast.makeText(TopicUpdateActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("topic", topicDetailResponse);
+                    setResult(RESULT_OK, resultIntent);
+                    finish();
+                }
+            }
+        });
+
+        topicUpdateViewModel.getDeleteImagesLiveData().observe(this, new Observer<Event<Boolean>>() {
+            @Override
+            public void onChanged(Event<Boolean> booleanEvent) {
+                if (booleanEvent != null){
+                    topicPostViewModel.uploadImage(topicId, listImageUri, TopicUpdateActivity.this);
+                }
+            }
+        });
+    }
 
     @Override
     public void onImageRemove(int position) {

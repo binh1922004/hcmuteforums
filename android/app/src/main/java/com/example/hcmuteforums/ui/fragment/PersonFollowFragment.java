@@ -231,10 +231,9 @@ public class PersonFollowFragment extends Fragment implements OnSwitchFragmentPr
             }
         });
 
-        followViewModel.getFollowStatus().observe(getViewLifecycleOwner(), new Observer<Event<Boolean>>() {
+        followViewModel.getFollowStatus().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
-            public void onChanged(Event<Boolean> event) {
-                Boolean isFollowing = event.getContent();
+            public void onChanged(Boolean isFollowing) {
                 if (isFollowing != null && lastCheckedUsername != null) {
                     followStatusMap.put(lastCheckedUsername, isFollowing);
                     followButtonVisibilityMap.put(lastCheckedUsername, !isFollowing); // Ẩn nếu đã theo dõi

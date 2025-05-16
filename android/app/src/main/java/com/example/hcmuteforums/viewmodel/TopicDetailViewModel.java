@@ -12,6 +12,8 @@ import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.response.TopicDetailResponse;
 import com.google.gson.Gson;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -186,5 +188,46 @@ public class TopicDetailViewModel extends ViewModel {
 
     public MutableLiveData<Event<TopicDetailResponse>> getUpdateLiveData() {
         return updateLiveData;
+    }
+
+    private MutableLiveData<Event<Boolean>> deleteImagesLiveData = new MutableLiveData<>();
+
+    public MutableLiveData<Event<Boolean>> getDeleteImagesLiveData() {
+        return deleteImagesLiveData;
+    }
+
+    public void deleteTopicImage(String topicId, List<String> images){
+        topicRepository.deleteTopicImages(topicId, images, new Callback<ApiResponse<Boolean>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<Boolean> apiRes = response.body();
+                    if (apiRes.getResult() != null) {
+                        deleteImagesLiveData.setValue(new Event<>(apiRes.getResult()));  // ✅ Không dùng Event
+                    } else {
+//                        likeTopicError.setValue(new Event<>(true));       // ✅ Dùng Event
+                        Log.d("DeleteImages", "Error");
+                    }
+                } else {
+                    if (response.errorBody() != null) {
+                        Gson gson = new Gson();
+                        ApiErrorResponse apiError = gson.fromJson(response.errorBody().charStream(),
+                                ApiErrorResponse.class);
+                        Log.d("DeleteImages", "Error");
+                        messageError.setValue(new Event<>(apiError.getMessage()));  // ✅ Dùng Event
+                    } else {
+                        Log.d("DeleteImages", "Error");
+
+//                        likeTopicError.setValue(new Event<>(true));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Boolean>> call, Throwable throwable) {
+                Log.d("DeleteImages", throwable.getMessage());
+                likeTopicError.setValue(new Event<>(true));
+            }
+        });
     }
 }

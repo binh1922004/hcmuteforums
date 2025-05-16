@@ -3,15 +3,16 @@ package com.backend.backend.service;
 import com.backend.backend.dto.UserGeneral;
 import com.backend.backend.dto.request.FollowRequest;
 import com.backend.backend.dto.response.*;
-import com.backend.backend.entity.Follow;
-import com.backend.backend.entity.Reply;
-import com.backend.backend.entity.User;
+import com.backend.backend.entity.*;
 import com.backend.backend.exception.AppException;
 import com.backend.backend.exception.ErrorCode;
 import com.backend.backend.mapper.FollowMapper;
 import com.backend.backend.repository.FollowRepository;
+import com.backend.backend.repository.NotificationRepository;
+import com.backend.backend.repository.TopicRepository;
 import com.backend.backend.repository.UserRepository;
 import com.backend.backend.utils.Constant;
+import com.backend.backend.utils.NotificationContent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -34,6 +36,10 @@ public class FollowService {
     FollowRepository followRepository;
     UserRepository userRepository;
     FollowMapper followMapper;
+    NotificationService notificationService;
+    NotificationRepository notificationRepository;
+    private final TopicRepository topicRepository;
+
     public FollowResponse followUser(FollowRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -61,7 +67,16 @@ public class FollowService {
                 .createdAt(new Date())
                 .build();
 
-        return followMapper.toFollowResponse(followRepository.save(follow));
+        var savedFollow = followRepository.save(follow);
+        Notification notification = Notification.builder()
+                .actionId(follow.getId())
+                .sendUser(follower)
+                .recieveUser(followed)
+                .createdAt(new Date())
+                .content(NotificationContent.FOLLOW)
+                .build();
+        notificationService.sendStructuredNotificationToUserFollow(notification);
+        return followMapper.toFollowResponse(savedFollow);
     }
 
     public FollowResponse unfollowUser(String targetUsername) {
@@ -76,8 +91,12 @@ public class FollowService {
 
         Follow follow = followRepository.findByFollowerAndFollowed(follower, followed)
                 .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
-
-        followRepository.delete(follow);
+        System.out.println(follow.getId());
+        Optional<Notification> notification = notificationRepository.findNotificationByActionId(follow.getId());
+        if (notification.isPresent()){
+            notificationRepository.delete(notification.get());
+            followRepository.delete(follow);
+        }
 
         return followMapper.toFollowResponse(follow);
     }
