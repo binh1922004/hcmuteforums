@@ -14,21 +14,26 @@ on:
 
 jobs:
   deploy:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)  # Chạy khi push hoặc PR được merge
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     name: Deploy Backend to Dev VPS
     runs-on: [self-hosted, Linux, X64]
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4  # Lấy code mới nhất
+      uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Clean Buildx
+    - name: Ensure Buildx Instance
       run: |
-        docker buildx prune
-        docker buildx create --use --name mybuilder
+        echo "Setting up Docker Buildx instance..."
+        if docker buildx inspect mybuilder > /dev/null 2>&1; then
+          echo "Builder 'mybuilder' already exists."
+        else
+          echo "Creating new builder 'mybuilder'..."
+          docker buildx create --name mybuilder --use
+        fi
 
     - name: Build Docker Image
       working-directory: ./backend
