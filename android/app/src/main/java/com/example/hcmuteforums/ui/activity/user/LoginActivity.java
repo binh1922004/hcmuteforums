@@ -3,7 +3,9 @@ package com.example.hcmuteforums.ui.activity.user;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -43,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //function for event handler
         loginButton();
+        eventTogglePasswordVisibility(edtpassword,R.drawable.baseline_lock_24, R.drawable.baseline_remove_red_eye_24, R.drawable.icons8_closed_eye_50);
 
         tvRegister.setOnClickListener(v->{
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
@@ -127,5 +130,45 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+    private void eventTogglePasswordVisibility(EditText editText, int leftIconRes,
+                                               int eyeOpenIconRes,
+                                               int eyeClosedIconRes){
+        editText.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2;
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (editText.getRight()
+                        - editText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+
+                    // Kiểm tra nếu đang ở chế độ mật khẩu
+                    if (editText.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                        // Hiển thị mật khẩu
+                        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                        editText.setCompoundDrawablesWithIntrinsicBounds(
+                                leftIconRes,
+                                0,
+                                eyeOpenIconRes,
+                                0
+                        );
+                    } else {
+                        // Ẩn mật khẩu
+                        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        editText.setCompoundDrawablesWithIntrinsicBounds(
+                                leftIconRes,
+                                0,
+                                eyeClosedIconRes,
+                                0
+                        );
+                    }
+
+                    // Giữ con trỏ cuối text
+                    editText.setSelection(editText.getText().length());
+                    return true;
+                }
+            }
+
+            return false;
+        });
     }
 }
