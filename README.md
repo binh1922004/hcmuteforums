@@ -28,7 +28,8 @@
   Docker và Redis dùng để deploy MySQL lên docker và redis giúp hổ trợ trong việc lưu trữ mã OTP
 
 ---
-
+## ⏿ **Sử dụng server demo cho Back-End**
+- **url**: https://ball.io.vn/api
 ## ⚙️ **Cơ Chế Vận Hành**
 
 **Hệ thống gồm 2 vai trò chính:**
