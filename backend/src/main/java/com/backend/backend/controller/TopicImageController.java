@@ -24,10 +24,17 @@ public class TopicImageController {
     TopicImageService topicImageService;
 
     @PostMapping("/{topicId}/upload")
-    public ApiResponse<Boolean> uploadImage(@PathVariable String topicId, @RequestParam("images") List<MultipartFile> images) {
-        return ApiResponse.<Boolean>builder()
+    public ApiResponse<TopicDetailResponse> uploadImage(@PathVariable String topicId, @RequestParam("images") List<MultipartFile> images) {
+        return ApiResponse.<TopicDetailResponse>builder()
                 .result(topicImageService.uploadImages(topicId, images))
                 .build();
     }
 
+    @DeleteMapping("/{topicId}/delete")
+    public ApiResponse<Boolean> holdImages(@PathVariable String topicId, @RequestParam("images") List<String> images) {
+        System.out.println(images);
+        return ApiResponse.<Boolean>builder()
+                .result(topicImageService.holdImages(topicId, images))
+                .build();
+    }
 }
