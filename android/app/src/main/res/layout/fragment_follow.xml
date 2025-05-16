@@ -83,16 +83,33 @@
             </com.google.android.material.tabs.TabLayout>
 
             <!-- Thanh tìm kiếm -->
-            <EditText
+
+            <!-- Header và Search Bar -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Tìm kiếm"
-                android:background="@drawable/search_background"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp"
-                android:drawableStart="@android:drawable/ic_menu_search"/>
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
 
-            <!-- RecyclerView cho danh sách -->
+                <EditText
+                    android:hint="Tìm kiếm..."
+                    android:id="@+id/edtSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.5"
+                    android:background="@drawable/search_bg"
+                    android:padding="8dp"
+                    android:textSize="14sp"
+                    android:drawablePadding="8dp" />
+                <ImageView
+                    android:id="@+id/imgSearch"
+                    android:src="@drawable/ic_search"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"

@@ -15,4 +15,5 @@ public interface TopicRepository extends JpaRepository<Topic, String> {
     boolean existsTopicByIdAndUser_Username(String id, String username);
     boolean existsTopicById(String id);
     Page<Topic> findAllByUser_Username(String username, Pageable pageable);
+    Page<Topic> findAllByContentContaining(String content, Pageable pageable);
 }

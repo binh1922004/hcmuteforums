@@ -80,12 +80,9 @@ public class MyProfileUserFragment extends Fragment {
 
     UserViewModel userViewModel;
     ProfileViewModel profileViewModel;
-    AuthenticationViewModel authenticationViewModel;
     FollowViewModel followViewModel;
-
     UserResponse currentUserResponse;   //Xac nhan co ton du lieu nguoi dung hay chua
     String avatarProfile, coverProfile, bioProfile;
-
     ImageView coverPhoto;
     CircleImageView imgAvatar;
     ImageButton uploadAvatar, uploadCover, btn_back;
@@ -97,7 +94,6 @@ public class MyProfileUserFragment extends Fragment {
     private ActivityResultLauncher<Intent> avatarPickerLauncher;
     private ActivityResultLauncher<Intent> coverPickerLauncher;
     private boolean isPickingAvatar = true;
-
 
 
     public static MyProfileUserFragment newInstance(String param1, String param2) {
@@ -256,8 +252,7 @@ public class MyProfileUserFragment extends Fragment {
         }
 
     }
-
-
+    
     private void showBottomDialog()
     {
         if (currentUserResponse != null) {
@@ -509,7 +504,7 @@ public class MyProfileUserFragment extends Fragment {
 
     private void topicFragmentConfig(String username) {
         TopicFragment topicFragment;
-        topicFragment = TopicFragment.newInstance(username);
+        topicFragment = TopicFragment.newInstance(username, null);
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, topicFragment)
                 .commit();

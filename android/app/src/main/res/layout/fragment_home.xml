@@ -35,20 +35,24 @@
                     android:text="HCMUTE Forums"
                     android:textSize="23sp"
                     android:textStyle="bold" />
-
                 <EditText
+                    android:hint="Tìm kiếm..."
                     android:id="@+id/etSearch"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:hint="Tìm kiếm..."
+                    android:layout_weight="2.5"
                     android:background="@drawable/search_bg"
                     android:padding="8dp"
                     android:textSize="14sp"
-                    android:drawableStart="@drawable/ic_search"
                     android:drawablePadding="8dp" />
+                <ImageView
+                    android:id="@+id/imgSearch"
+                    android:src="@drawable/ic_search"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
-s
+
             <!-- CardView -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cvPostTopic"

@@ -34,6 +34,7 @@ import com.example.hcmuteforums.listeners.OnReplyAddedListener;
 import com.example.hcmuteforums.listeners.OnReplyClickListener;
 import com.example.hcmuteforums.model.dto.PageResponse;
 import com.example.hcmuteforums.model.dto.response.ReplyResponse;
+import com.example.hcmuteforums.utils.LoginPromptDialog;
 import com.example.hcmuteforums.viewmodel.ReplyViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -295,6 +296,10 @@ public class ReplyBottomSheetFragment extends BottomSheetDialogFragment implemen
     private void sendReply() {
 //        // TODO: Gửi reply về backend hoặc ViewModel
         btnSend.setOnClickListener(v -> {
+            if (!LoginPromptDialog.isLogged){
+                LoginPromptDialog.showLoginPrompt(getContext());
+                return;
+            }
             String comment = edtComment.getText().toString().trim();
             if (!comment.isEmpty()) {
                 replyViewModel.postReply(comment, parentReplyId, replyingToUser, topicId);

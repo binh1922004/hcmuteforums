@@ -168,11 +168,6 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             });
         }
 
-        holder.moreButton.setOnClickListener(v -> {
-            if (moreClickListener != null) {
-                moreClickListener.onMoreClick(followId, position);
-            }
-        });
 
         holder.profileImage.setOnClickListener(view -> {
             onSwitchFragmentProfile.onClickAnyProfile(targetUsername);
@@ -220,7 +215,6 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
         TextView username;
         TextView displayName;
         Button followButton, unFollowButton;
-        ImageView moreButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -228,7 +222,6 @@ public class FollowerAdapter extends RecyclerView.Adapter<FollowerAdapter.ViewHo
             username = itemView.findViewById(R.id.username);
             displayName = itemView.findViewById(R.id.displayName);
             followButton = itemView.findViewById(R.id.followButton);
-            moreButton = itemView.findViewById(R.id.moreButton);
             unFollowButton = itemView.findViewById(R.id.unFollowButton);
         }
     }

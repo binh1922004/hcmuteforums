@@ -168,4 +168,29 @@ public class TopicService {
         }
         return topicDetailResponse;
     }
+    public PageResponse<TopicDetailResponse> searchTopic(
+            String keyword,
+            int page,
+            int size,
+            String sortBy,
+            String direction){
+
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Topic> topicPage = topicRepository.findAllByContentContaining(keyword, pageable);
+
+        List<TopicDetailResponse>  content= topicPage.getContent().stream()
+                .map(this::toTopicDetailResponse)
+                .collect(Collectors.toList());
+
+        return PageResponse.<TopicDetailResponse>builder()
+                .content(content)
+                .pageNumber(topicPage.getNumber())
+                .pageSize(topicPage.getSize())
+                .totalElements(topicPage.getTotalElements())
+                .totalPages(topicPage.getTotalPages())
+                .last(topicPage.isLast())
+                .build();
+    }
 }

@@ -1,7 +1,9 @@
+
 package com.example.hcmuteforums.data.repository;
 import android.util.Log;
 
 import com.example.hcmuteforums.data.remote.api.FollowApi;
+import com.example.hcmuteforums.data.remote.api.SearchApi;
 import com.example.hcmuteforums.data.remote.retrofit.LocalRetrofit;
 import com.example.hcmuteforums.model.dto.ApiResponse;
 import com.example.hcmuteforums.model.dto.PageResponse;
@@ -17,8 +19,10 @@ import retrofit2.Callback;
 public class FollowRespository {
     public static FollowRespository instance;
     FollowApi followApi;
+    SearchApi searchApi;
     public FollowRespository(){
         followApi = LocalRetrofit.getRetrofit().create(FollowApi.class);
+        searchApi = LocalRetrofit.getRetrofit().create(SearchApi.class);
     }
 
     public static FollowRespository getInstance(){
@@ -48,6 +52,16 @@ public class FollowRespository {
         Log.d("CurrentUser", currentUsername);
         Log.d("TargetUsername", targetUsername);
         var call = followApi.checkFollowStatus(currentUsername, targetUsername);
+        call.enqueue(callback);
+    }
+
+    public void getFollowerByUsername(String username, String targetUsername, int page, Callback<ApiResponse<PageResponse<FollowerResponse>>> callback){
+        var call = searchApi.getFollowerByUsername(username, targetUsername, page);
+        call.enqueue(callback);
+    }
+
+    public void getFollowingByUsername(String username, String targetUsername, int page, Callback<ApiResponse<PageResponse<FollowingResponse>>> callback){
+        var call = searchApi.getFollowingByUsername(username, targetUsername, page);
         call.enqueue(callback);
     }
 }
