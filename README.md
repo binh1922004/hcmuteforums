@@ -51,30 +51,71 @@
 ## 🛠️ **Hướng Dẫn Setup Dự Án**
 
 ### 🔧 **1. Cài đặt ban đầu**
-Cách 1: Tạo thư mục → Clone lần lượt 2 repo dự án từ Github
+Tạo thư mục → Clone lần lượt 2 repo dự án từ Github
 - API : [https://github.com/binh1922004/hcmuteforums/tree/main/backend](https://github.com/binh1922004/hcmuteforums/tree/main/backend)
-- Android APP: [https://github.com/binh1922004/hcmuteforums/tree/main/android](https://github.com/binh1922004/hcmuteforums/tree/main/android)
-  
-Cách 2: Download source code của toàn bộ dự án được sinh viên gửi trong phần nộp dự án cuối kì, sau đó tiến hành giải nén 
+- Android APP: [https://github.com/binh1922004/hcmuteforums/tree/main/android](https://github.com/binh1922004/hcmuteforums/tree/main/android) 
 
-### 🗄️ **2. Cài đặt cơ sở dữ liệu**
-
-- Mở **MySQL Workbench**:
-  - Tạo database tên `hcmuteforums`
-  - Vào `Server → Data Import`
-  - Chọn `Import from Dump Project Folder`
-  - Chọn thư mục `db_hcmuteforums` trong thư mục đi kèm với dự án 
-
-### 💻 **3. Mở và chạy project**
+### 💻 **2. Mở và chạy project**
 
 - Mở **Android Studio**:
   - `File → Open → chọn thư mục vừa clone app về( hoặc chọn thư mục chứa project nếu tải trực tiếp source code về) 
-- Mở **IntelliJ IDEA**
-  - `File → Open → chọn thư mục vừa clone phần API về( hoặc chọn thư mục chứa API cho dự án nếu tải trực tiếp source code về) 
-  - Mở file `application.yaml`, chỉnh sửa phần cấu hình database:
-    ```yaml
-    username: <Tên người dùng MySQL>
-    password: <Mật khẩu MySQL>
+- Cài đặt server Back-End:
+  - **Install Docker and Docker Compose**  
+  
+    - 🐧 **Linux**  
+        ```bash
+        # cập nhật các package và cho phép dùng apt 
+        sudo apt update
+        sudo apt install -y ca-certificates curl gnupg
+    
+        # Cài đặt các thứ cần thiết trước khi cài đặt Docker
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    
+        # Cài đặt Docker Engine and Docker Compose
+        sudo apt update
+        sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    
+        # Kiểm tra lại phiên bản
+        docker --version
+        docker compose version
+        ```  
+    
+    - 🍎 **macOS**  
+        ```bash
+        # Cài đặt Docker Desktop (recommended)
+        # 1. Tải Docker Desktop từ website chính thức
+        # https://desktop.docker.com/mac/stable/amd64/Docker.dmg
+        # 2. Kéo Docker vào Application folder
+    
+        # Cách khác, dùng brew để cài đặ
+        brew install --cask docker
+    
+        # Kiểm tra lại phiên bản
+        docker --version
+        docker compose version
+        ```  
+    
+    - 🪟 **Windows**  
+        ```powershell
+        # Cài đặt Docker Desktop
+        # 1. Download Docker Desktop from the official website
+        # https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe
+        # 2. Run the installer and follow the on-screen instructions
+    
+        # Đảm bảo WSL 2 đã cài đặt và mở 
+        wsl --install
+    
+        # Khởi động Docker Desktop
+    
+        # Kiểm tra lại phiên bản
+        docker --version
+        docker compose version
+        ```
+  - Khởi chạy dự án bằng **Docker compose**:
+    ```bash
+    docker-compose up --build
     ```
-- **RUN** bấm run cả 2 bên ứng dụng để tiến hành chạy ứng dụng HCMUTEFORUMS. 
-
